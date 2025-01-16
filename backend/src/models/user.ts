@@ -4,7 +4,7 @@ export interface IUser {
     _id: Types.ObjectId;
     firstName: string;
     lastName: string;
-    emailAddress: string;
+    email: string;
     avatar?: string;
     password: string;
     goal?: string;
@@ -24,7 +24,7 @@ type UserModel = Model<IUser>;
 const UserSchema = new Schema<IUser, UserModel>({
     firstName: { type: String, minlength: 1, maxlength: 100, required: true },
     lastName: { type: String, minlength: 1, maxlength: 100, required: true },
-    emailAddress: { type: String, maxlength: 256, required: true, unique: true },
+    email: { type: String, maxlength: 256, required: true, unique: true },
     avatar: { type: String },
     password: { type: String },
     goal: { type: String },
