@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import connectToDatabase from "./db";
 import initialisePassport from "./passport/initialisePassport";
 import bodyParser from "body-parser";
+import session from "express-session";
+import authRoutes from "./routes/authRoutes";
 
 dotenv.config();
 
@@ -14,11 +16,22 @@ connectToDatabase();
 initialisePassport();
 
 app.use(bodyParser.json());
+app.use(
+  session({
+    secret: process.env.TOKEN_SECRET_KEY!,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: process.env.NODE_ENV === "production" },
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Routes
+app.use("/auth", authRoutes);
+
 app.listen(PORT, () => {
-    console.log(`Server if running on port ${PORT}`);
+  console.log(`Server if running on port ${PORT}`);
 });
