@@ -6,7 +6,7 @@ interface AuthenticatedRequest extends Request {
   authData?: any;
 }
 
-const verifyToken = (
+const validateToken = (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
@@ -36,4 +36,4 @@ const verifyToken = (
     return res.status(403).json({ message: "Unauthorized access" });
   }
 };
-export default verifyToken;
+export default validateToken;

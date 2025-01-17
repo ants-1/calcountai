@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import User, { IUser } from "../models/user";
 
+// GET /users
 const getAllUsers = async (
   req: Request,
   res: Response,
@@ -19,6 +20,7 @@ const getAllUsers = async (
   }
 };
 
+// GET /users/:id
 const getUser = async (
   req: Request,
   res: Response,

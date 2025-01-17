@@ -1,4 +1,6 @@
 import mongoose, { Model, Schema, Types } from "mongoose";
+import "./food"; 
+import "./exercise";
 
 export interface IDailyLog {
   _id: Types.ObjectId;
