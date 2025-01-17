@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import User, { IUser } from "../models/user";
 import Food, { IFood } from "../models/food";
 import { Types } from "mongoose";
 

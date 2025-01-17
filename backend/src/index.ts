@@ -9,6 +9,7 @@ import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userController";
 import dailyLogRoutes from "./routes/dailyLogRoutes";
 import foodRoutes from "./routes/foodRoutes";
+import exerciseRoutes from "./routes/exerciseRoutes";
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use("/auth", authRoutes);
 app.use("/", userRoutes);
 app.use("/", dailyLogRoutes);
 app.use("/", foodRoutes);
+app.use("/", exerciseRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server if running on port ${PORT}`);
