@@ -15,11 +15,11 @@ export interface IFood {
 type FoodModel = Model<IFood>;
 
 const FoodSchema = new Schema<IFood, FoodModel>({
-  name: { type: String, require: true },
-  calories: { type: Number, require: true },
-  numberOfServings: { type: Number, require: true },
-  servingSize: { type: Number, require: true },
-  mealType: { type: String, require: true },
+  name: { type: String, required: true },
+  calories: { type: Number, required: true },
+  numberOfServings: { type: Number, required: true },
+  servingSize: { type: Number, required: true },
+  mealType: { type: String, required: true },
   protein: { type: Number },
   fat: { type: Number },
   carbohydrates: { type: Number },

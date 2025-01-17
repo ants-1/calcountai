@@ -15,8 +15,8 @@ type DailyLogModel = Model<IDailyLog>;
 const DailyLogSchema = new Schema<IDailyLog, DailyLogModel>({
   foods: [{ type: Schema.Types.ObjectId, ref: "Food" }],
   exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise" }],
-  completed: { type: Boolean, require: true },
-  date: { type: Date, require: true },
+  completed: { type: Boolean, required: true },
+  date: { type: Date, required: true },
 });
 
 export default mongoose.model<IDailyLog, DailyLogModel>(

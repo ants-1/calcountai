@@ -10,9 +10,9 @@ export interface IExercise {
 type ExerciseModel = Model<IExercise>;
 
 const ExerciseSchema = new Schema<IExercise, ExerciseModel>({
-  name: { type: String, require: true },
-  duration: { type: Number, require: true },
-  caloriesBurned: { type: Number, require: true },
+  name: { type: String, required: true },
+  duration: { type: Number, required: true },
+  caloriesBurned: { type: Number, required: true },
 });
 
 export default mongoose.model<IExercise, ExerciseModel>(
