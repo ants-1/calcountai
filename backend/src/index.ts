@@ -8,6 +8,7 @@ import session from "express-session";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userController";
 import dailyLogRoutes from "./routes/dailyLogRoutes";
+import foodRoutes from "./routes/foodRoutes";
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use(passport.session());
 app.use("/auth", authRoutes);
 app.use("/", userRoutes);
 app.use("/", dailyLogRoutes);
+app.use("/", foodRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server if running on port ${PORT}`);
