@@ -11,6 +11,7 @@ import dailyLogRoutes from "./routes/dailyLogRoutes";
 import foodRoutes from "./routes/foodRoutes";
 import exerciseRoutes from "./routes/exerciseRoutes";
 import challengeRoutes from "./routes/challengeRoutes";
+import communityRoutes from "./routes/communityRoutes";
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.use("/", dailyLogRoutes);
 app.use("/", foodRoutes);
 app.use("/", exerciseRoutes);
 app.use("/", challengeRoutes);
+app.use("/", communityRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server if running on port ${PORT}`);
