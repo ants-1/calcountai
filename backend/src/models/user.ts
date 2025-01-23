@@ -18,6 +18,7 @@ export interface IUser {
   friendRequests?: Types.ObjectId[];
   friends?: Types.ObjectId[];
   dailyLogs?: Types.ObjectId[];
+  challenges?: Types.ObjectId[];
 }
 
 type UserModel = Model<IUser>;
@@ -39,6 +40,7 @@ const UserSchema = new Schema<IUser, UserModel>({
   friendRequests: [{ type: Schema.Types.ObjectId, ref: "User" }],
   friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
   dailyLogs: [{ type: Schema.Types.ObjectId, ref: "DailyLog" }],
+  challenges: [{ type: Schema.Types.ObjectId, ref: "Challegne" }],
 });
 
 export default mongoose.model<IUser, UserModel>("User", UserSchema);

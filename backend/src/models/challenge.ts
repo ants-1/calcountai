@@ -9,6 +9,7 @@ export interface IChallenge {
   completed: Boolean;
   startDate: Date;
   endDate: Date;
+  challengeType: string;
 }
 
 type ChallengeModel = Model<IChallenge>;
@@ -21,6 +22,7 @@ const ChallengeSchema = new Schema<IChallenge, ChallengeModel>({
   completed: { type: Boolean, required: true },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
+  challengeType: { type: String, required: true },
 });
 
 export default mongoose.model<IChallenge, ChallengeModel>(

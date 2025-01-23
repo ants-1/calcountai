@@ -24,7 +24,7 @@ const getAllDailyLogs = async (
       return res.status(404).json({ error: "User not found" });
     }
 
-    if (!user.dailyLogs || user.dailyLogs.length == 0) {
+    if (!user.dailyLogs || user.dailyLogs.length === 0) {
       return res.status(404).json({ message: "No daily Logs found" });
     }
 
