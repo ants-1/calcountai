@@ -9,7 +9,7 @@ router.get(
   challengeController.getPersonalChallenges
 );
 router.get(
-  "/user/:userId/community/:communityId",
+  "/user/:userId/communities/:communityId/challenges",
   challengeController.getUserCommunityChallenges
 );
 router.get(
@@ -18,7 +18,7 @@ router.get(
 );
 router.post("/challenges", challengeController.createChallenge);
 router.put(
-  "/users/:userId/challenges/:challengeId/join",
+  "/user/:userId/challenges/:challengeId/join",
   challengeController.joinChallenge
 );
 router.delete("/challenges/:challengeId", challengeController.deleteChallenge);

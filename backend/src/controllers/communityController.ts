@@ -59,6 +59,8 @@ const createCommunity = async (
       challenges: req.body.challenges,
     });
 
+    // Get User and add to 
+
     return res.status(200).json({ newCommunity });
   } catch (err) {
     return next(err);

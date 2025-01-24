@@ -40,7 +40,7 @@ const UserSchema = new Schema<IUser, UserModel>({
   friendRequests: [{ type: Schema.Types.ObjectId, ref: "User" }],
   friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
   dailyLogs: [{ type: Schema.Types.ObjectId, ref: "DailyLog" }],
-  challenges: [{ type: Schema.Types.ObjectId, ref: "Challegne" }],
+  challenges: [{ type: Schema.Types.ObjectId, ref: "Challenge" }],
 });
 
 export default mongoose.model<IUser, UserModel>("User", UserSchema);

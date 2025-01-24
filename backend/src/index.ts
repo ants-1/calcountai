@@ -5,13 +5,7 @@ import connectToDatabase from "./db";
 import initialisePassport from "./passport/initialisePassport";
 import bodyParser from "body-parser";
 import session from "express-session";
-import authRoutes from "./routes/authRoutes";
-import userRoutes from "./routes/userController";
-import dailyLogRoutes from "./routes/dailyLogRoutes";
-import foodRoutes from "./routes/foodRoutes";
-import exerciseRoutes from "./routes/exerciseRoutes";
-import challengeRoutes from "./routes/challengeRoutes";
-import communityRoutes from "./routes/communityRoutes";
+import routes from "./routes/index";
 
 dotenv.config();
 
@@ -36,14 +30,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
-app.use("/auth", authRoutes);
-app.use("/", userRoutes);
-app.use("/", dailyLogRoutes);
-app.use("/", foodRoutes);
-app.use("/", exerciseRoutes);
-app.use("/", challengeRoutes);
-app.use("/", communityRoutes);
+app.use("/", routes);
 
 app.listen(PORT, () => {
-  console.log(`Server if running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

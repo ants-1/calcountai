@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import User, { IUser } from "../models/user";
-import Challenge, { IChallenge } from "../models/challenge";
+import Challenge from "../models/challenge";
 import { Types } from "mongoose";
 import Community from "../models/community";
 
@@ -29,6 +29,7 @@ const getAllChallenges = async (
 
     return res.status(200).json({ challenges: user.challenges });
   } catch (err) {
+    console.error("Error fetching challenges:", err);
     return next(err);
   }
 };
@@ -48,7 +49,7 @@ const getPersonalChallenges = async (
 
     const user = await User.findById(userId).populate({
       path: "challenges",
-      match: { challengeType: "personal" },
+      match: { challengeType: "Personal" },
     });
 
     if (!user) {
@@ -56,7 +57,7 @@ const getPersonalChallenges = async (
     }
 
     if (!user.challenges || user.challenges.length === 0) {
-      return res.status(404).json({ message: "No challenges found" });
+      return res.status(404).json({ message: "No personal challenges found" });
     }
 
     return res.status(200).json({ challenges: user.challenges });
@@ -65,7 +66,7 @@ const getPersonalChallenges = async (
   }
 };
 
-// GET /user/:userId/community/:communityId
+// GET /user/:userId/communities/:communityId/challenges
 const getUserCommunityChallenges = async (
   req: Request,
   res: Response,
@@ -94,7 +95,9 @@ const getUserCommunityChallenges = async (
     }
 
     const communityChallenges = community.challenges.filter((challengeId) =>
-      user.challenges?.includes(challengeId)
+      user.challenges?.some(
+        (userChallenge) => userChallenge.toString() === challengeId.toString()
+      )
     );
 
     return res.status(200).json({ challenges: communityChallenges });
@@ -147,7 +150,7 @@ const createChallenge = async (
       startDate,
       endDate,
       challengeType,
-    });
+    }); 
 
     if (challengeType.toLowerCase() === "personal") {
       const user = await User.findById(targetId);

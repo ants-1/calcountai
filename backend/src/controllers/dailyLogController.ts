@@ -75,7 +75,7 @@ const createDailyLog = async (
 ): Promise<any> => {
   try {
     const { userId } = req.params;
-    const { foods, exercises, completed, data } = req.body;
+    const { foods, exercises, completed, date } = req.body;
 
     if (!Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ error: "Invalid user ID" });
@@ -93,7 +93,7 @@ const createDailyLog = async (
       foods,
       exercises,
       completed,
-      data,
+      date,
     });
 
     user.dailyLogs?.push(dailyLog._id);
