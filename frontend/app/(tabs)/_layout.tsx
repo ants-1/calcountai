@@ -75,7 +75,7 @@ const TabLayout: React.FC = () => {
               <TabIcon
                 icon={icons.foodEntry}
                 color={color}
-                name="Food Entry"
+                name="Meals"
                 focused={focused}
               />
             )
