@@ -13,9 +13,9 @@ const generateToken = (user: IUser) => {
         _id,
         email,
       },
+      expiresIn: TOKEN_EXPIRE_TIME 
     },
     TOKEN_SECRET_KEY,
-    { expiresIn: TOKEN_EXPIRE_TIME }
   );
 };
 
