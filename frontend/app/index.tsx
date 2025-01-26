@@ -19,13 +19,13 @@ export default function Index() {
         </TouchableOpacity>
         <Text className="text-center">
           Already have an account?{" "}
-          <Link href="/sign-in" className="underline font-semibold">
-            Log in
+          <Link href="/sign-in" className="underline font-semibold text-blue-500 ">
+            Login
           </Link>
         </Text>
         <Link href="/dashboard" className="underline font-semibold">
-            Dashboard
-          </Link>
+          Dashboard
+        </Link>
       </View>
     </SafeAreaView>
   );

@@ -67,21 +67,6 @@ const TabLayout: React.FC = () => {
           }}
         />
         <Tabs.Screen
-          name="chatbot"
-          options={{
-            title: "Chatbot",
-            headerShown: false,
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon
-                icon={icons.chatbot}
-                color={color}
-                name="Chatbot"
-                focused={focused}
-              />
-            )
-          }}
-        />
-        <Tabs.Screen
           name="food-entry"
           options={{
             title: "foodEntry",
@@ -91,6 +76,21 @@ const TabLayout: React.FC = () => {
                 icon={icons.foodEntry}
                 color={color}
                 name="Food Entry"
+                focused={focused}
+              />
+            )
+          }}
+        />
+        <Tabs.Screen
+          name="chatbot"
+          options={{
+            title: "Chatbot",
+            headerShown: false,
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon
+                icon={icons.chatbot}
+                color={color}
+                name="Chatbot"
                 focused={focused}
               />
             )
