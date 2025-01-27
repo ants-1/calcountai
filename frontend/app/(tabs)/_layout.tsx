@@ -11,7 +11,7 @@ interface TabIconProps {
 
 const icons = {
   dashboard: require("../../assets/icons/home.png"),
-  foodEntry: require("../../assets/icons/add.png"),
+  logs: require("../../assets/icons/add.png"),
   chatbot: require("../../assets/icons/message.png"),
   community: require("../../assets/icons/community.png"),
 }
@@ -67,15 +67,15 @@ const TabLayout: React.FC = () => {
           }}
         />
         <Tabs.Screen
-          name="food-entry"
+          name="logs"
           options={{
-            title: "foodEntry",
+            title: "Logs",
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <TabIcon
-                icon={icons.foodEntry}
+                icon={icons.logs}
                 color={color}
-                name="Meals"
+                name="Logs"
                 focused={focused}
               />
             )

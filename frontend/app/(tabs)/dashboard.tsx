@@ -112,7 +112,7 @@ const Dashboard: React.FC = () => {
         </View>
 
         {/* Completed Challenges Section */}
-        <View className="mt-10">
+        <View className="mt-10 bg-gray-100 p-4 rounded-xl">
           <Text className="text-lg font-semibold text-gray-700">Completed Challenges</Text>
           {completedChallenges.map((challenge, index) => (
             <View key={index} className="flex-row justify-between items-center mt-4">
@@ -120,19 +120,18 @@ const Dashboard: React.FC = () => {
               <Text className="text-sm text-gray-500">{challenge.date}</Text>
             </View>
           ))}
+
+          <TouchableOpacity
+            className="mt-4 bg-blue-500 py-2 px-4 rounded-lg"
+          >
+            <Text className="text-center text-white font-semibold text-lg">
+              View Challenges
+            </Text>
+          </TouchableOpacity>
         </View>
 
-        {/* View Challenges Button */}
-        <TouchableOpacity
-          className="mt-4 bg-blue-500 py-2 px-4 rounded-lg"
-        >
-          <Text className="text-center text-white font-semibold text-lg">
-            View Challenges
-          </Text>
-        </TouchableOpacity>
-
         {/* Recent Meals Section */}
-        <View className="mt-10">
+        <View className="mt-10 bg-gray-100 p-4 rounded-xl">
           <Text className="text-lg font-semibold text-gray-700">Recent Meals</Text>
           {recentMeals.map((meal, index) => (
             <View key={index} className="flex-row justify-between items-center mt-4">
@@ -140,19 +139,18 @@ const Dashboard: React.FC = () => {
               <Text className="text-sm text-gray-500">{meal.calories} kcal</Text>
             </View>
           ))}
+
+          <TouchableOpacity
+            className="mt-4 bg-blue-500 py-2 px-4 rounded-lg"
+          >
+            <Text className="text-center text-white font-semibold text-lg">
+              View Logs
+            </Text>
+          </TouchableOpacity>
         </View>
 
-        {/* View Log Button */}
-        <TouchableOpacity
-          className="mt-4 bg-blue-500 py-2 px-4 rounded-lg"
-        >
-          <Text className="text-center text-white font-semibold text-lg">
-            View Logs
-          </Text>
-        </TouchableOpacity>
-
         {/* Recent Activities Section */}
-        <View className="mt-10">
+        <View className="mt-10 bg-gray-100 p-4 rounded-xl">
           <Text className="text-lg font-semibold text-gray-700">Recent Activities</Text>
           {recentActivities.map((activity, index) => (
             <View key={index} className="flex-row justify-between items-center mt-4">
@@ -160,16 +158,16 @@ const Dashboard: React.FC = () => {
               <Text className="text-sm text-gray-500">{activity.calories} kcal burned</Text>
             </View>
           ))}
+
+          <TouchableOpacity
+            className="mt-4 bg-blue-500 py-2 px-4 rounded-lg"
+          >
+            <Text className="text-center text-white font-semibold text-lg">
+              View Activities
+            </Text>
+          </TouchableOpacity>
         </View>
 
-        {/* View Activities Button */}
-        <TouchableOpacity
-          className="mt-4 bg-blue-500 py-2 px-4 rounded-lg"
-        >
-          <Text className="text-center text-white font-semibold text-lg">
-            View Activities
-          </Text>
-        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
