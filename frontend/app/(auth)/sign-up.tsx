@@ -1,32 +1,33 @@
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 
 interface FormState {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
-  confirmPassword: string;
+  // confirmPassword: string;
 }
 
 const SignUp: React.FC = () => {
   const [form, setForm] = useState<FormState>({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
-    confirmPassword: '',
+    // confirmPassword: '',
   });
-
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submit = async () => {
     setIsSubmitting(true);
-    // Mock sign-up process
     setTimeout(() => {
       console.log('Form Submitted:', form);
       setIsSubmitting(false);
-      Alert.alert('Success', 'Your account has been created!');
+      router.push('/goal-info'); // Navigate to goal-info page
     }, 2000);
   };
 
@@ -36,58 +37,60 @@ const SignUp: React.FC = () => {
         <View className='mb-8'>
           <Text className="text-4xl font-bold text-center mb-16">Sign Up</Text>
 
-          {/* Full Name Input */}
+          {/* Input Fields */}
           <TextInput
             className="w-full bg-gray-100 rounded-lg p-5 mb-6"
-            placeholder="Full Name"
-            placeholderTextColor="#888"
-            value={form.fullName}
-            onChangeText={(e) => setForm({ ...form, fullName: e })}
+            placeholder="First Name"
+            placeholderTextColor={'#888'}
+            value={form.firstName}
+            onChangeText={(e) => setForm({ ...form, firstName: e })}
           />
 
-          {/* Email Input */}
+          <TextInput
+            className="w-full bg-gray-100 rounded-lg p-5 mb-6"
+            placeholder="Last Name"
+            placeholderTextColor={'#888'}
+            value={form.lastName}
+            onChangeText={(e) => setForm({ ...form, lastName: e })}
+          />
+
           <TextInput
             className="w-full bg-gray-100 rounded-lg p-5 mb-6"
             placeholder="Email Address"
-            placeholderTextColor="#888"
+            placeholderTextColor={'#888'}
             value={form.email}
             onChangeText={(e) => setForm({ ...form, email: e })}
           />
-
-          {/* Password Input */}
           <TextInput
             className="w-full bg-gray-100 rounded-lg p-5 mb-6"
             placeholder="Password"
-            placeholderTextColor="#888"
+            placeholderTextColor={'#888'}
             value={form.password}
+            secureTextEntry
             onChangeText={(e) => setForm({ ...form, password: e })}
           />
-
-          {/* Confirm Password Input */}
-          <TextInput
+          {/* <TextInput
             className="w-full bg-gray-100 rounded-lg p-5 mb-6"
             placeholder="Confirm Password"
-            placeholderTextColor="#888"
             value={form.confirmPassword}
+            secureTextEntry
             onChangeText={(e) => setForm({ ...form, confirmPassword: e })}
-          />
+          /> */}
         </View>
 
-        <View>
+        {/* Sign Up Button */}
+        <View className='flex flex-col items-center'>
           <TouchableOpacity
-            className="bg-blue-500 py-4 rounded-lg"
+            className="bg-blue-500 py-4 rounded-lg w-[300px]"
             onPress={submit}
             disabled={isSubmitting}
           >
             {isSubmitting ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text className="text-center text-white font-semibold text-lg">
-                Sign Up
-              </Text>
+              <Text className="text-center text-white font-semibold text-lg">Sign Up</Text>
             )}
           </TouchableOpacity>
-
           <Text className="text-center text-base mt-4">
             Already have an account?{' '}
             <Link href="/sign-in" className="text-blue-500 font-semibold underline">

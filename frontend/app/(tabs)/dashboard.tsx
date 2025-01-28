@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Icon from 'react-native-vector-icons/FontAwesome'; // Importing an example icon
 
 const Dashboard: React.FC = () => {
   const [caloriesConsumed, setCaloriesConsumed] = useState(1200);
@@ -54,7 +55,15 @@ const Dashboard: React.FC = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white px-4 pt-6 -pb-6">
-      <Text className="text-3xl font-bold text-center">Dashboard</Text>
+      <View className="flex-row justify-between items-center px-4">
+        {/* Dashboard Title */}
+        <Text className="text-3xl font-bold">Dashboard</Text>
+
+        {/* Profile Icon */}
+        <TouchableOpacity>
+          <Icon name="user-circle" size={30} color="#4B5563" />
+        </TouchableOpacity>
+      </View>
 
       <ScrollView className="mt-6">
         {/* Calorie Progress Section */}
