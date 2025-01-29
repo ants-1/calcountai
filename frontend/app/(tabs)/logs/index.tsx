@@ -1,9 +1,11 @@
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Log: React.FC = () => {
   const dailyGoal = 2000;
+  const router = useRouter();
 
   // Sample data
   const dailyLog = {
@@ -55,7 +57,10 @@ const Log: React.FC = () => {
         </View>
 
         {/* Meals Section */}
-        <TouchableOpacity className="mt-10 bg-blue-500 py-2 px-4 rounded-lg">
+        <TouchableOpacity
+          className="mt-10 bg-blue-500 py-2 px-4 rounded-lg"
+          onPress={() => router.push("/(tabs)/logs/meals")}
+        >
           <Text className="text-center text-white font-semibold text-lg">Add Meal</Text>
         </TouchableOpacity>
 
@@ -74,7 +79,10 @@ const Log: React.FC = () => {
         ))}
 
         {/* Activities Section */}
-        <TouchableOpacity className="mt-10 bg-blue-500 py-2 px-4 rounded-lg">
+        <TouchableOpacity
+          className="mt-10 bg-blue-500 py-2 px-4 rounded-lg"
+          onPress={() => router.push("/(tabs)/logs/activity")}
+        >
           <Text className="text-center text-white font-semibold text-lg">Add Activities</Text>
         </TouchableOpacity>
 
