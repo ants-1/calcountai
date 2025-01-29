@@ -174,7 +174,7 @@ const Dashboard: React.FC = () => {
 
           <TouchableOpacity
             className="mt-4 bg-blue-500 py-2 px-4 rounded-lg"
-            onPress={() => router.push("/dashboard")}
+            onPress={() => router.push("/(tabs)/logs/activity")}
           >
             <Text className="text-center text-white font-semibold text-lg">
               View Activities

@@ -12,8 +12,8 @@ const Challenges: React.FC = () => {
       <View className="flex-row justify-between items-center px-4">
         <Text className="text-3xl font-bold">Challenges</Text>
 
-        <TouchableOpacity onPress={() => router.push("/dashboard/profile" as any)}>
-          <Icon name="user-circle" size={30} color="#4B5563" />
+        <TouchableOpacity onPress={() => router.back()}>
+          <Icon name="arrow-left" size={24} color="#4B5563" />
         </TouchableOpacity>
       </View>
 

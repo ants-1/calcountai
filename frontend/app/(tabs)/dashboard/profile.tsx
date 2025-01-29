@@ -20,6 +20,7 @@ const Profile: React.FC = () => {
           <Icon name="arrow-left" size={24} color="#4B5563" />
         </TouchableOpacity>
       </View>
+      
       <View>
         <View className="mt-10 items-center">
           <Icon name="user-circle" size={100} color="#4B5563" />
