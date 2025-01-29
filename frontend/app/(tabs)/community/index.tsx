@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from "expo-router";
 
 const Community: React.FC = () => {
-  
+  const router = useRouter();
+
   // Sample community data 
   const [communities] = useState([
     { id: 1, name: 'Fitness Enthusiasts', members: 1200, description: 'A community for fitness lovers to share tips, workouts, and motivation.' },
@@ -66,9 +68,8 @@ const Community: React.FC = () => {
             onPress={() => setShowSortDropdown((prev) => !prev)}
           >
             <Text className="text-sm font-semibold text-gray-700">
-              Sort: {`${sortOption === 'name' ? 'Name' : 'Members'} ${
-                sortOrder === 'asc' ? 'Ascending' : 'Descending'
-              }`}
+              Sort: {`${sortOption === 'name' ? 'Name' : 'Members'} ${sortOrder === 'asc' ? 'Ascending' : 'Descending'
+                }`}
             </Text>
           </TouchableOpacity>
 
@@ -98,7 +99,10 @@ const Community: React.FC = () => {
         data={sortedCommunities}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity className="bg-gray-100 p-4 mb-3 rounded-lg">
+          <TouchableOpacity
+            className="bg-gray-100 p-4 mb-3 rounded-lg"
+            onPress={() => router.push(`/community/${item.id}`)}
+          >
             <Text className="text-lg font-semibold text-gray-700">{item.name}</Text>
             <Text className="text-sm text-gray-500">{item.members} members</Text>
             <Text className="text-sm text-gray-600 mt-2">{item.description}</Text>
