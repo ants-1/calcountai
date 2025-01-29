@@ -35,7 +35,7 @@ const Log: React.FC = () => {
       <Text className="text-3xl font-bold text-center">Daily Logs</Text>
       <Text className="font-semibold text-center">18/12/25</Text>
 
-      <ScrollView className="mt-4">
+      <ScrollView className="mt-4" showsVerticalScrollIndicator={false}>
         {/* Calorie Progress Section */}
         <View className="mt-6 bg-gray-100 p-4 rounded-xl">
           <Text className="text-lg font-semibold text-gray-700">Calories Progress</Text>
@@ -56,14 +56,26 @@ const Log: React.FC = () => {
           </Text>
         </View>
 
-        {/* Meals Section */}
-        <TouchableOpacity
-          className="mt-10 bg-blue-500 py-2 px-4 rounded-lg"
-          onPress={() => router.push("/(tabs)/logs/meals")}
-        >
-          <Text className="text-center text-white font-semibold text-lg">Add Meal</Text>
-        </TouchableOpacity>
 
+        <View className='flex flex-row justify-between'>
+          <TouchableOpacity
+            className="mt-8 bg-blue-500 py-2 px-4 rounded-lg w-40"
+            onPress={() => router.push("/(tabs)/logs/meals")}
+          >
+            <Text className="text-center text-white font-semibold text-lg">Add Meal</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            className="mt-8 bg-blue-500 py-2 px-4 rounded-lg w-40"
+            onPress={() => router.push("/(tabs)/logs/activity")}
+          >
+            <Text className="text-center text-white font-semibold text-lg">Add Activity</Text>
+          </TouchableOpacity>
+
+        </View>
+
+        {/* Meals Section */}
+        <Text className='text-2xl font-semibold text-center mt-8'>Meals</Text>
         {['Breakfast', 'Lunch', 'Dinner', 'Snacks'].map((mealType) => (
           <View key={mealType} className="mt-4 bg-gray-100 p-4 rounded-xl">
             <Text className="text-lg font-semibold text-gray-700">{mealType}</Text>
@@ -79,13 +91,7 @@ const Log: React.FC = () => {
         ))}
 
         {/* Activities Section */}
-        <TouchableOpacity
-          className="mt-10 bg-blue-500 py-2 px-4 rounded-lg"
-          onPress={() => router.push("/(tabs)/logs/activity")}
-        >
-          <Text className="text-center text-white font-semibold text-lg">Add Activities</Text>
-        </TouchableOpacity>
-
+        <Text className='text-2xl font-semibold text-center mt-10'>Activities</Text>
         <View className="mt-4 bg-gray-100 p-4 rounded-xl">
           <Text className="text-lg font-semibold text-gray-700">Activities</Text>
           {dailyLog.exercises.map((exercise) => (

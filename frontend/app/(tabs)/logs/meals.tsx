@@ -42,7 +42,7 @@ const Meals: React.FC = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white px-6 pt-6">
-      <View className="flex-row justify-between items-center mb-4">
+      <View className="flex-row justify-between items-center mb-10">
         <Text className="text-3xl font-bold">Meals</Text>
         <TouchableOpacity onPress={() => router.back()}>
           <Icon name="arrow-left" size={24} color="#4B5563" />

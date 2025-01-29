@@ -45,7 +45,7 @@ const Community: React.FC = () => {
   return (
     <SafeAreaView className="flex-1 bg-white px-4 pt-6">
       <Text className="text-3xl font-bold text-center">Communities</Text>
-      <Text className="text-md text-center text-gray-600 mt-2">
+      <Text className="text-md text-center text-gray-600 mt-8">
         Find and join communities that match your interests and goals!
       </Text>
 
