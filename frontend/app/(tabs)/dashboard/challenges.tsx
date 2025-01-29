@@ -4,13 +4,12 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import Icon from 'react-native-vector-icons/FontAwesome'
 
-const Challenges = () => {
+const Challenges: React.FC = () => {
   const router = useRouter();
 
   return (
     <SafeAreaView className="flex-1 bg-white px-4 pt-6">
       <View className="flex-row justify-between items-center px-4">
-        {/* Dashboard Title */}
         <Text className="text-3xl font-bold">Challenges</Text>
 
         <TouchableOpacity onPress={() => router.push("/dashboard/profile" as any)}>
