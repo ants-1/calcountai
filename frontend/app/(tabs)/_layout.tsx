@@ -1,5 +1,5 @@
 import { View, Image, ImageSourcePropType, Text } from 'react-native'
-import { Tabs, Redirect } from "expo-router";
+import { Tabs, Redirect, Stack } from "expo-router";
 import React from 'react';
 
 interface TabIconProps {

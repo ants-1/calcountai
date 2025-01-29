@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Importing an example icon
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { useRouter } from "expo-router";
 
 const Dashboard: React.FC = () => {
   const [caloriesConsumed, setCaloriesConsumed] = useState(1200);
   const [caloriesBurned, setCaloriesBurned] = useState(500);
   const dailyGoal = 2000;
+  const router = useRouter();
 
   const recentMeals = [
     { name: 'Salad', calories: 350 },
@@ -60,7 +62,7 @@ const Dashboard: React.FC = () => {
         <Text className="text-3xl font-bold">Dashboard</Text>
 
         {/* Profile Icon */}
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/dashboard/profile" as any)}>
           <Icon name="user-circle" size={30} color="#4B5563" />
         </TouchableOpacity>
       </View>
@@ -132,6 +134,7 @@ const Dashboard: React.FC = () => {
 
           <TouchableOpacity
             className="mt-4 bg-blue-500 py-2 px-4 rounded-lg"
+            onPress={() => router.push("/(tabs)/dashboard/challenges")}
           >
             <Text className="text-center text-white font-semibold text-lg">
               View Challenges
@@ -151,6 +154,7 @@ const Dashboard: React.FC = () => {
 
           <TouchableOpacity
             className="mt-4 bg-blue-500 py-2 px-4 rounded-lg"
+            onPress={() => router.push("/logs")}
           >
             <Text className="text-center text-white font-semibold text-lg">
               View Logs
@@ -170,6 +174,7 @@ const Dashboard: React.FC = () => {
 
           <TouchableOpacity
             className="mt-4 bg-blue-500 py-2 px-4 rounded-lg"
+            onPress={() => router.push("/dashboard")}
           >
             <Text className="text-center text-white font-semibold text-lg">
               View Activities
