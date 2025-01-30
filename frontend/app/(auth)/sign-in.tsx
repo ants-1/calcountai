@@ -1,7 +1,7 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import React, { useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link } from 'expo-router';
+import React, { useState } from "react";
+import { SafeAreaView, View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
+import { Link } from "expo-router";
+import useAuth from "@/hooks/useAuth";
 
 interface FormState {
   email: string;
@@ -10,27 +10,34 @@ interface FormState {
 
 const SignIn: React.FC = () => {
   const [form, setForm] = useState<FormState>({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const { login } = useAuth();
 
   const submit = async () => {
+    if (!form.email || !form.password) {
+      Alert.alert("Validation Error", "Please enter both email and password.");
+      return;
+    }
+
     setIsSubmitting(true);
-    // Mock sign-in process
-    setTimeout(() => {
-      console.log('Form Submitted:', form);
+
+    try {
+      await login(form.email, form.password);
+    } catch (error: any) {
       setIsSubmitting(false);
-      Alert.alert('Success', 'You have logged in successfully!');
-    }, 2000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="w-full justify-evenly min-h-[83vh] px-4 my-6">
-        <View className='mb-48'>
+        <View className="mb-48">
           <Text className="text-4xl font-bold text-center mb-16">Login</Text>
 
           {/* Email Input */}
@@ -48,11 +55,10 @@ const SignIn: React.FC = () => {
             placeholder="Password"
             placeholderTextColor="#888"
             value={form.password}
+            secureTextEntry
             onChangeText={(e) => setForm({ ...form, password: e })}
           />
-
         </View>
-
 
         <View>
           <TouchableOpacity
@@ -70,7 +76,7 @@ const SignIn: React.FC = () => {
           </TouchableOpacity>
 
           <Text className="text-center text-base mt-4">
-            Don't have an account?{' '}
+            Don't have an account?{" "}
             <Link href="/sign-up" className="text-blue-500 font-semibold">
               Sign Up
             </Link>

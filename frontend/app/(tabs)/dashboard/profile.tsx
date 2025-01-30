@@ -3,14 +3,32 @@ import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import Icon from "react-native-vector-icons/FontAwesome";
+import useAuth from "@/hooks/useAuth"; 
 
 const Profile: React.FC = () => {
   const router = useRouter();
+
+  const { logout, isAuth } = useAuth();
 
   const [firstName, setFirstName] = useState("John");
   const [lastName, setLastName] = useState("Doe");
   const [email, setEmail] = useState("johndoe@example.com");
   const [isEditing, setIsEditing] = useState(false);
+
+  // Handle logout functionality
+  const handleLogout = async () => {
+    try {
+      await logout();
+      console.log(isAuth);
+      if (!isAuth) {
+        router.replace("/(auth)/sign-in");
+      } else {
+        alert("Error logging out");
+      }
+    } catch (error) {
+      console.error("Logout error: ", error);
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white px-6 pt-6">
@@ -20,7 +38,7 @@ const Profile: React.FC = () => {
           <Icon name="arrow-left" size={24} color="#4B5563" />
         </TouchableOpacity>
       </View>
-      
+
       <View>
         <View className="mt-10 items-center">
           <Icon name="user-circle" size={100} color="#4B5563" />
@@ -71,7 +89,7 @@ const Profile: React.FC = () => {
 
       <TouchableOpacity
         className="mt-6 flex-row items-center justify-center p-3 bg-red-500 rounded-lg"
-        onPress={() => router.replace("/(auth)/sign-in")}
+        onPress={handleLogout} 
       >
         <Icon name="sign-out" size={20} color="#fff" />
         <Text className="ml-3 text-white font-semibold text-lg">Logout</Text>
