@@ -1,30 +1,112 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import Icon from "react-native-vector-icons/FontAwesome";
-import useAuth from "@/hooks/useAuth"; 
+import useAuth from "@/hooks/useAuth";
+import Constants from "expo-constants";
 
 const Profile: React.FC = () => {
   const router = useRouter();
-
-  const { logout, isAuth } = useAuth();
+  const { user, logout } = useAuth();
 
   const [firstName, setFirstName] = useState("John");
   const [lastName, setLastName] = useState("Doe");
   const [email, setEmail] = useState("johndoe@example.com");
   const [isEditing, setIsEditing] = useState(false);
 
+  useEffect(() => {
+    if (!user) {
+      router.replace("/(auth)/sign-in");
+    }
+  }, [user, router]);
+
+  const fetchUser = async () => {
+    if (!user?._id) return;
+
+    try {
+      const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
+      const API_URL = `${BACKEND_API_URL}/users/${user._id}`;
+
+      const response = await fetch(API_URL, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData?.message || `HTTP Error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Fetched User Data:", data);
+
+      if (data.user) {
+        setFirstName(data.user.firstName || "");
+        setLastName(data.user.lastName || "");
+        setEmail(data.user.email || "");
+      } else {
+        throw new Error("Invalid user data received");
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  };
+
+  // Handle update profile 
+  const updateProfile = async () => {
+    if (!user?._id) return;
+
+    try {
+      const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
+      const API_URL = `${BACKEND_API_URL}/users/${user._id}`;
+
+      const updatedUserData = {
+        firstName,
+        lastName,
+        email,
+      };
+
+      const response = await fetch(API_URL, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedUserData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData?.message || `HTTP Error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Updated User Data:", data);
+
+      setFirstName(data.updatedUser.firstName || "");
+      setLastName(data.updatedUser.lastName || "");
+      setEmail(data.updatedUser.email || "");
+
+      setIsEditing(false);  // Close the edit mode after saving
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("Failed to update profile. Please try again.");
+    }
+  };
+
+  // Fetch user on component mount
+  useEffect(() => {
+    if (user) {
+      fetchUser();
+    }
+  }, [user]);
+
   // Handle logout functionality
   const handleLogout = async () => {
     try {
       await logout();
-      console.log(isAuth);
-      if (!isAuth) {
-        router.replace("/(auth)/sign-in");
-      } else {
-        alert("Error logging out");
-      }
     } catch (error) {
       console.error("Logout error: ", error);
     }
@@ -71,7 +153,9 @@ const Profile: React.FC = () => {
             </>
           ) : (
             <>
-              <Text className="text-2xl font-semibold mt-4 text-center mb-4">{firstName}{" "}{lastName}</Text>
+              <Text className="text-2xl font-semibold mt-4 text-center mb-4">
+                {firstName} {lastName}
+              </Text>
               <Text className="text-gray-500 text-center">{email}</Text>
             </>
           )}
@@ -80,7 +164,7 @@ const Profile: React.FC = () => {
 
       <TouchableOpacity
         className="mt-6 bg-blue-500 py-3 rounded-lg"
-        onPress={() => setIsEditing(!isEditing)}
+        onPress={isEditing ? updateProfile : () => setIsEditing(true)}
       >
         <Text className="text-center text-white font-semibold text-lg">
           {isEditing ? "Save Changes" : "Edit Profile"}
@@ -89,7 +173,7 @@ const Profile: React.FC = () => {
 
       <TouchableOpacity
         className="mt-6 flex-row items-center justify-center p-3 bg-red-500 rounded-lg"
-        onPress={handleLogout} 
+        onPress={handleLogout}
       >
         <Icon name="sign-out" size={20} color="#fff" />
         <Text className="ml-3 text-white font-semibold text-lg">Logout</Text>

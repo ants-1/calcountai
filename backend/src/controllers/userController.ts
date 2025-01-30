@@ -41,7 +41,37 @@ const getUser = async (
   }
 };
 
+// PUT /users/:id
+const updateUserData = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  try {
+    const { id } = req.params;
+
+    const updatedUser = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+    };
+
+    const user = await User.findByIdAndUpdate(id, updatedUser, {
+      new: true,
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    return res.status(200).json({ updatedUser });
+  } catch (err) {
+    return next(err);
+  }
+}
+
 export default {
   getAllUsers,
   getUser,
+  updateUserData,
 };

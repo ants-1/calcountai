@@ -14,6 +14,7 @@ interface AuthContextType {
   token: string | null;
   user: UserType | null;
   isAuth: boolean;
+  tokenExpiration: number | null;
   setToken: Dispatch<SetStateAction<string | null>>;
   setUser: Dispatch<SetStateAction<UserType | null>>;
   setIsAuth: Dispatch<SetStateAction<boolean>>;
@@ -30,6 +31,7 @@ export const AuthContext = createContext<AuthContextType>({
   token: null,
   user: null,
   isAuth: false,
+  tokenExpiration: null,
   setToken: () => null,
   setUser: () => null,
   setIsAuth: () => false,
@@ -42,6 +44,7 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<UserType | null>(null);
   const [isAuth, setIsAuth] = useState<boolean>(false);
+  const [tokenExpiration, setTokenExpiration] = useState<number | null>(null);
 
   const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
   const router = useRouter();
@@ -56,7 +59,55 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
     }
   }, [token]);
 
-  // Login function
+  useEffect(() => {
+    const getUserToken = async () => {
+      try {
+        const response = await fetch(`${BACKEND_API_URL}/auth/user-token`, {
+          method: "GET",
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          logout();
+          return;
+        }
+
+        const data = await response.json();
+        console.log('User data:', data.user); 
+        setUser(data.user);
+        setIsAuth(true);
+      } catch (error) {
+        setUser(null);
+        setIsAuth(false);
+        console.log(error);
+      }
+    };
+
+    const getTokenExpirationTime = () => {
+      if (token) {
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        const expirationTime = decodedToken.exp * 1000;
+        setTokenExpiration(expirationTime);
+
+        const currentTime = Date.now();
+        if (expirationTime < currentTime) {
+          logout();
+        } else {
+          const timeUntilExpiration = expirationTime - currentTime;
+          setTimeout(logout, timeUntilExpiration);
+        }
+      }
+    };
+
+    if (token) {
+      getUserToken();
+      getTokenExpirationTime();
+    }
+  }, [token]);
+
   const login = async (email: string, password: string): Promise<void> => {
     try {
       const response = await fetch(`${BACKEND_API_URL}/auth/login`, {
@@ -80,7 +131,6 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
     }
   };
 
-  // Sign-up function
   const signUp = async (firstName: string, lastName: string, email: string, password: string): Promise<void> => {
     try {
       const response = await fetch(`${BACKEND_API_URL}/auth/sign-up`, {
@@ -104,11 +154,11 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
     }
   };
 
-  // Logout function
   const logout = async (): Promise<void> => {
     setToken(null);
     setUser(null);
     setIsAuth(false);
+    setTokenExpiration(null);
     await AsyncStorage.removeItem("token");
   };
 
@@ -118,6 +168,7 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
         token,
         user,
         isAuth,
+        tokenExpiration,
         setToken,
         setUser,
         setIsAuth,
