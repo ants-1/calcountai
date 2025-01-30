@@ -166,6 +166,29 @@ const leaveCommunity = async () => {
   }
 };
 
+// Handle delete community (only accessible by the creator)
+const deleteCommunity = async () => {
+  try {
+    const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
+    const API_URL = `${BACKEND_API_URL}/communities/${id}`;
+    
+    const response = await fetch(API_URL, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to delete community. Status: ${response.status}`);
+    }
+
+    Alert.alert("Success", "Community has been deleted.");
+    router.push('/(tabs)/community'); // Redirect to communities page after deletion
+  } catch (error) {
+    console.error("Error deleting community:", error);
+    Alert.alert("Error", "There was an issue deleting the community.");
+  }
+};
+
 
   if (loading) {
     return (
@@ -199,9 +222,16 @@ const leaveCommunity = async () => {
         {isJoined === null ? (
           <Text className="text-lg text-gray-700">Checking membership...</Text>
         ) : isJoined ? (
-          <TouchableOpacity className="p-3 bg-red-500 rounded-lg" onPress={leaveCommunity}>
-            <Text className="text-white text-center">Leave Community</Text>
-          </TouchableOpacity>
+          <View>
+            <TouchableOpacity className="p-3 bg-red-500 rounded-lg" onPress={leaveCommunity}>
+              <Text className="text-white text-center">Leave Community</Text>
+            </TouchableOpacity>
+            {community.createdBy === user._id && (
+              <TouchableOpacity className="mt-3 p-3 bg-red-700 rounded-lg" onPress={deleteCommunity}>
+                <Text className="text-white text-center">Delete Community</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         ) : (
           <TouchableOpacity className="p-3 bg-blue-500 rounded-lg" onPress={joinCommunity}>
             <Text className="text-white text-center">Join Community</Text>

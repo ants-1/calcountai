@@ -3,6 +3,7 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator } 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import Constants from 'expo-constants';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Community: React.FC = () => {
   const router = useRouter();
@@ -40,9 +41,13 @@ const Community: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchCommunities();
-  }, []);
+  // Re-fetch communities every time the screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      setLoading(true); // Reset loading state when refocusing the page
+      fetchCommunities();
+    }, [])
+  );
 
   // Filtered and sorted communities
   const filteredCommunities = communities.filter((community) =>
@@ -90,7 +95,6 @@ const Community: React.FC = () => {
           </Text>
         </TouchableOpacity>
       </View>
-
 
       <View className="relative mt-4">
         <TouchableOpacity
