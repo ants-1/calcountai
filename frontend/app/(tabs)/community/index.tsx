@@ -76,6 +76,7 @@ const Community: React.FC = () => {
         <TextInput
           className="flex-1 p-3 bg-gray-100 rounded-lg text-sm mr-2"
           placeholder="Search for a community..."
+          placeholderTextColor="#888"
           value={searchText}
           onChangeText={setSearchText}
         />
@@ -90,15 +91,16 @@ const Community: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Sort Dropdown */}
+
       <View className="relative mt-4">
         <TouchableOpacity
           className="bg-blue-500 p-3 rounded-lg"
-          onPress={() => router.push('/')}
+          onPress={() => router.push('/community/create-community')}
         >
           <Text className="text-white font-semibold">+ Create</Text>
         </TouchableOpacity>
 
+        {/* Sort Dropdown */}
         {showSortDropdown && (
           <View className="absolute bg-white border border-gray-300 rounded-lg mt-2 z-10 w-full">
             {sortOptions.map((option) => (

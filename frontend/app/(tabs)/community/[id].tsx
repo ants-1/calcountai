@@ -5,6 +5,7 @@ import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useState, useEffect } from "react";
 import Constants from "expo-constants";
+import useAuth from "@/hooks/useAuth";
 
 // Sample Screens
 const InfoScreen = ({ community }: { community: any }) => (
@@ -57,16 +58,19 @@ const PeopleScreen = ({ members, creatorId }: { members: any[]; creatorId: strin
 
 const CommunityDetails = () => {
   const router = useRouter();
+  const { user } = useAuth(); 
   const { id } = useLocalSearchParams();
   const [community, setCommunity] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [index, setIndex] = useState(0);
+  const [isJoined, setIsJoined] = useState<boolean | null>(null); 
 
   const routes = [
     { key: "info", title: "Info" },
     { key: "challenges", title: "Challenges" },
     { key: "people", title: "People" },
   ];
+
   const renderScene = SceneMap({
     info: () => (community ? <InfoScreen community={community} /> : null),
     challenges: () => (community ? <ChallengesScreen challenges={community.challenges} /> : null),
@@ -79,16 +83,16 @@ const CommunityDetails = () => {
         const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
         const API_URL = `${BACKEND_API_URL}/communities/${id}`;
         const response = await fetch(API_URL);
-
+  
         if (!response.ok) {
           throw new Error(`HTTP Error! Status: ${response.status}`);
         }
-
+  
         const data = await response.json();
         if (!data.community) {
           throw new Error("API did not return valid community data");
         }
-
+  
         setCommunity(data.community);
       } catch (error) {
         console.error("Error fetching community:", error);
@@ -97,9 +101,71 @@ const CommunityDetails = () => {
         setLoading(false);
       }
     };
-
+  
     fetchCommunity();
-  }, [id]);
+  }, [id]); 
+
+  useEffect(() => {
+  
+    if (community && user) {
+      const isUserJoined = community.members.some(member => String(member._id) === String(user._id));
+      setIsJoined(isUserJoined);
+    }
+  }, [community, user]); 
+  
+
+// Handle join community
+const joinCommunity = async () => {
+  try {
+    const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
+    const API_URL = `${BACKEND_API_URL}/communities/${id}/join`;
+    const userId = user._id;
+
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to join community. Status: ${response.status}`);
+    }
+
+    setIsJoined(true);
+    Alert.alert("Success", "You have successfully joined the community.");
+    router.replace(`/community/${id}`); 
+  } catch (error) {
+    console.error("Error joining community:", error);
+    Alert.alert("Error", "There was an issue joining the community.");
+  }
+};
+
+// Handle leave community
+const leaveCommunity = async () => {
+  try {
+    const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
+    const API_URL = `${BACKEND_API_URL}/communities/${id}/leave`;
+    const userId = user._id;
+
+    const response = await fetch(API_URL, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to leave community. Status: ${response.status}`);
+    }
+
+    setIsJoined(false);
+    Alert.alert("Success", "You have successfully left the community.");
+    router.replace(`/community/${id}`); 
+  } catch (error) {
+    console.error("Error leaving community:", error);
+    Alert.alert("Error", "There was an issue leaving the community.");
+  }
+};
+
 
   if (loading) {
     return (
@@ -129,6 +195,20 @@ const CommunityDetails = () => {
         </TouchableOpacity>
       </View>
 
+      <View className="px-6 py-4">
+        {isJoined === null ? (
+          <Text className="text-lg text-gray-700">Checking membership...</Text>
+        ) : isJoined ? (
+          <TouchableOpacity className="p-3 bg-red-500 rounded-lg" onPress={leaveCommunity}>
+            <Text className="text-white text-center">Leave Community</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity className="p-3 bg-blue-500 rounded-lg" onPress={joinCommunity}>
+            <Text className="text-white text-center">Join Community</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
       {/* Tab View */}
       <TabView
         navigationState={{ index, routes }}
@@ -148,6 +228,5 @@ const CommunityDetails = () => {
     </SafeAreaView>
   );
 };
-
 
 export default CommunityDetails;

@@ -89,14 +89,13 @@ const Profile: React.FC = () => {
       setLastName(data.updatedUser.lastName || "");
       setEmail(data.updatedUser.email || "");
 
-      setIsEditing(false);  // Close the edit mode after saving
+      setIsEditing(false);
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Failed to update profile. Please try again.");
     }
   };
 
-  // Fetch user on component mount
   useEffect(() => {
     if (user) {
       fetchUser();

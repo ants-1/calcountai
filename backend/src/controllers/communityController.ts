@@ -68,6 +68,49 @@ const createCommunity = async (
   }
 };
 
+// POST /communities/:communityId/join
+const joinCommunity = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  try {
+    const { communityId } = req.params;
+    const { userId } = req.body;
+
+    if (!Types.ObjectId.isValid(communityId)) {
+      return res.status(400).json({ error: "Invalid community ID" });
+    }
+
+    if (!Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+
+    const community = await Community.findById(communityId);
+
+    if (!community) {
+      return res.status(404).json({ error: "Community not found" });
+    }
+
+    if (community.members.includes(userId)) {
+      return res
+        .status(400)
+        .json({ error: "User is already a member of this community" });
+    }
+
+    community.members.push(userId);
+
+    const updatedCommunity = await community.save();
+
+    return res.status(200).json({
+      message: "User successfully joined the community",
+      updatedCommunity,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
 // PUT /communities/:communityId
 const updateCommunity = async (
   req: Request,
@@ -95,6 +138,53 @@ const updateCommunity = async (
     }
 
     return res.status(200).json({ updateCommunity });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+// DELETE /communities/:communityId/leave
+const leaveCommunity = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  try {
+    const { communityId } = req.params;
+    const { userId } = req.body;
+
+    if (!Types.ObjectId.isValid(communityId)) {
+      return res.status(400).json({ error: "Invalid community ID" });
+    }
+
+    if (!Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+
+    const community = await Community.findById(communityId);
+
+    if (!community) {
+      return res.status(404).json({ error: "Community not found" });
+    }
+
+    // Check if the user is a member of the community
+    if (!community.members.includes(userId)) {
+      return res
+        .status(400)
+        .json({ error: "User is not a member of this community" });
+    }
+
+    // Remove the user from the members array
+    community.members = community.members.filter(
+      (memberId) => !memberId.equals(userId)
+    );
+
+    const updatedCommunity = await community.save();
+
+    return res.status(200).json({
+      message: "User successfully left the community",
+      updatedCommunity,
+    });
   } catch (err) {
     return next(err);
   }
@@ -134,6 +224,8 @@ export default {
   getAllCommunities,
   getCommunity,
   createCommunity,
+  leaveCommunity,
+  joinCommunity,
   updateCommunity,
   deleteCommunity,
 };

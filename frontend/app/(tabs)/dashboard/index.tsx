@@ -68,6 +68,12 @@ const Dashboard: React.FC = () => {
       </View>
 
       <ScrollView className="mt-6">
+        {/* Motivational Support Section */}
+        <View className="mt-6 bg-yellow-100 p-4 rounded-xl">
+          <Text className="text-lg font-semibold text-yellow-700">Motivation for You</Text>
+          <Text className="text-base text-gray-600 mt-2">{randomQuote}</Text>
+        </View>
+
         {/* Calorie Progress Section */}
         <View className="mt-6 bg-gray-100 p-4 rounded-xl">
           <Text className="text-lg font-semibold text-gray-700">Calories Progress</Text>
@@ -88,13 +94,13 @@ const Dashboard: React.FC = () => {
           </Text>
         </View>
 
-        {/* Streak Section */}
+        {/* Streak Section
         <View className="mt-6 bg-blue-100 p-4 rounded-xl">
           <Text className="text-lg font-semibold text-blue-700">Streak</Text>
           <Text className="text-sm text-blue-500 mt-2">
             You have logged your activity for {streak} consecutive days!
           </Text>
-        </View>
+        </View> */}
 
         {/* Weight Goal Section */}
         <View className="mt-6 bg-green-100 p-4 rounded-xl">
@@ -108,12 +114,6 @@ const Dashboard: React.FC = () => {
               style={{ width: `${Math.max(0, Math.min(weightProgress, 100))}%` }}
             />
           </View>
-        </View>
-
-        {/* Motivational Support Section */}
-        <View className="mt-6 bg-yellow-100 p-4 rounded-xl">
-          <Text className="text-lg font-semibold text-yellow-700">Motivation for You</Text>
-          <Text className="text-base text-gray-600 mt-2">{randomQuote}</Text>
         </View>
 
         {/* Daily Progress Message */}
