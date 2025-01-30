@@ -8,6 +8,9 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "extra": {
+      "BACKEND_API_URL": "http://192.168.1.223:5001/api/v1"
+    },
     "ios": {
       "supportsTablet": true
     },

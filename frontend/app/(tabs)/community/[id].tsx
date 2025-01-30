@@ -1,44 +1,113 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { View, Text, TouchableOpacity, Dimensions } from "react-native";
+import { View, Text, TouchableOpacity, Dimensions, Alert, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { useState } from "react";
-import { ScrollView } from "react-native";
+import { useState, useEffect } from "react";
+import Constants from "expo-constants";
 
-// Sample community data 
-const communities = [
-  { id: 1, name: 'Fitness Enthusiasts', members: 1200, description: 'A community for fitness lovers to share tips, workouts, and motivation.' },
-  { id: 2, name: 'Healthy Eating', members: 900, description: 'Discover healthy recipes and nutrition advice for a balanced lifestyle.' },
-  { id: 3, name: 'Yoga and Wellness', members: 450, description: 'Join us for yoga tips, mindfulness practices, and wellness inspiration.' },
-  { id: 4, name: 'Marathon Runners', members: 700, description: 'Connect with marathon enthusiasts and share running plans and experiences.' },
-  { id: 5, name: 'Weight Loss Warriors', members: 800, description: 'Support and motivate each other on your weight loss journey.' },
-  { id: 6, name: 'Cycling Club', members: 600, description: 'A group for cycling enthusiasts to share routes, gear tips, and adventures.' },
-];
-
-const InfoScreen = ({ community }) => (
+// Sample Screens
+const InfoScreen = ({ community }: { community: any }) => (
   <ScrollView className="flex-1 p-6">
     <Text className="text-lg text-gray-700">{community.description}</Text>
   </ScrollView>
 );
 
-const ChallengesScreen = () => (
+const ChallengesScreen = ({ challenges }: { challenges: any[] }) => (
   <ScrollView className="p-6">
-    <Text className="text-lg text-gray-700">No challenges available yet.</Text>
+    {challenges.length > 0 ? (
+      challenges.map((challenge) => (
+        <View key={challenge._id}>
+          <View className="flex flex-row justify-between items-center w-full bg-gray-200 p-2 rounded-xl">
+            <Text className="p-3 flex-1">{challenge.description}</Text>
+
+            <Text className="bg-green-300 p-2.5 rounded-xl w-auto text-center h-10">{challenge.challengeType}</Text>
+          </View>
+        </View>
+      ))
+    ) : (
+      <Text className="text-lg text-gray-700">No challenges available yet.</Text>
+    )}
   </ScrollView>
 );
 
-const PeopleScreen = () => (
+const PeopleScreen = ({ members, creatorId }: { members: any[]; creatorId: string }) => (
   <ScrollView className="p-6">
-    <Text className="text-lg text-gray-700">List of members coming soon...</Text>
+    {members.length > 0 ? (
+      members.map((member) => (
+        <View key={member._id} className="flex flex-row justify-between items-center w-full mb-4 bg-gray-200 p-4 rounded-lg">
+          <View className="flex flex-row gap-2">
+            <Icon name="user-circle" size={25} color="#4B5563" />
+            <Text className="text-lg text-gray-800">
+              {member.firstName} {member.lastName}
+            </Text>
+          </View>
+
+          {/* Check if the member is the creator */}
+          {member._id === creatorId && (
+            <Text className="text-lg font-semibold mb-1">Creator</Text>
+          )}
+        </View>
+      ))
+    ) : (
+      <Text className="text-lg text-gray-700">No members available yet.</Text>
+    )}
   </ScrollView>
 );
 
 const CommunityDetails = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const community = communities.find((c) => c.id === Number(id));
+  const [community, setCommunity] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [index, setIndex] = useState(0);
 
+  const routes = [
+    { key: "info", title: "Info" },
+    { key: "challenges", title: "Challenges" },
+    { key: "people", title: "People" },
+  ];
+  const renderScene = SceneMap({
+    info: () => (community ? <InfoScreen community={community} /> : null),
+    challenges: () => (community ? <ChallengesScreen challenges={community.challenges} /> : null),
+    people: () => (community ? <PeopleScreen members={community.members} creatorId={community.createdBy} /> : null),
+  });
+
+  useEffect(() => {
+    const fetchCommunity = async () => {
+      try {
+        const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
+        const API_URL = `${BACKEND_API_URL}/communities/${id}`;
+        const response = await fetch(API_URL);
+
+        if (!response.ok) {
+          throw new Error(`HTTP Error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (!data.community) {
+          throw new Error("API did not return valid community data");
+        }
+
+        setCommunity(data.community);
+      } catch (error) {
+        console.error("Error fetching community:", error);
+        Alert.alert("Error", "Community not found or there was an issue loading the data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCommunity();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1 items-center justify-center bg-white">
+        <Text className="text-xl font-semibold text-gray-700">Loading community...</Text>
+      </SafeAreaView>
+    );
+  }
 
   if (!community) {
     return (
@@ -50,21 +119,6 @@ const CommunityDetails = () => {
       </SafeAreaView>
     );
   }
-
-  // Tab Configuration
-  const [index, setIndex] = useState(0);
-
-  const routes = [
-    { key: "info", title: "Info" },
-    { key: "challenges", title: "Challenges" },
-    { key: "people", title: "People" },
-  ]
-
-  const renderScene = SceneMap({
-    info: () => <InfoScreen community={community} />,
-    challenges: ChallengesScreen,
-    people: PeopleScreen,
-  });
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -94,5 +148,6 @@ const CommunityDetails = () => {
     </SafeAreaView>
   );
 };
+
 
 export default CommunityDetails;

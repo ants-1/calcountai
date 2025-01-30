@@ -1,25 +1,48 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useState, useEffect } from "react";
+import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import Constants from 'expo-constants';
 
 const Community: React.FC = () => {
   const router = useRouter();
-
-  // Sample community data 
-  const [communities] = useState([
-    { id: 1, name: 'Fitness Enthusiasts', members: 1200, description: 'A community for fitness lovers to share tips, workouts, and motivation.' },
-    { id: 2, name: 'Healthy Eating', members: 900, description: 'Discover healthy recipes and nutrition advice for a balanced lifestyle.' },
-    { id: 3, name: 'Yoga and Wellness', members: 450, description: 'Join us for yoga tips, mindfulness practices, and wellness inspiration.' },
-    { id: 4, name: 'Marathon Runners', members: 700, description: 'Connect with marathon enthusiasts and share running plans and experiences.' },
-    { id: 5, name: 'Weight Loss Warriors', members: 800, description: 'Support and motivate each other on your weight loss journey.' },
-    { id: 6, name: 'Cycling Club', members: 600, description: 'A group for cycling enthusiasts to share routes, gear tips, and adventures.' },
-  ]);
-
-  const [searchText, setSearchText] = useState('');
+  const [communities, setCommunities] = useState([]);
+  const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(true);
   const [sortOption, setSortOption] = useState<'name' | 'members'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+
+  // Fetch communities from backend
+  const fetchCommunities = async () => {
+    try {
+      const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
+      const API_URL = `${BACKEND_API_URL}/communities`;
+      const response = await fetch(API_URL);
+
+      if (!response.ok) {
+        throw new Error(`HTTP Error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.communities || !Array.isArray(data.communities)) {
+        console.error("API Response is not an array:", data);
+        throw new Error("API did not return an array");
+      }
+
+      setCommunities(data.communities);
+    } catch (error) {
+      console.error("Error fetching communities:", error);
+      setCommunities([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCommunities();
+  }, []);
 
   // Filtered and sorted communities
   const filteredCommunities = communities.filter((community) =>
@@ -32,7 +55,7 @@ const Community: React.FC = () => {
         ? a.name.localeCompare(b.name)
         : b.name.localeCompare(a.name);
     } else {
-      return sortOrder === 'asc' ? a.members - b.members : b.members - a.members;
+      return sortOrder === 'asc' ? a.members.length - b.members.length : b.members.length - a.members.length;
     }
   });
 
@@ -47,73 +70,75 @@ const Community: React.FC = () => {
   return (
     <SafeAreaView className="flex-1 bg-white px-4 pt-6">
       <Text className="text-3xl font-bold text-center">Communities</Text>
-      <Text className="text-md text-center text-gray-600 mt-8">
-        Find and join communities that match your interests and goals!
-      </Text>
 
-      {/* Search and Sort Controls */}
+      {/* Search and Create Community Button */}
       <View className="flex-row items-center mt-4">
-        {/* Search Bar */}
         <TextInput
-          className="flex-1 p-3 bg-gray-100 rounded-lg text-sm"
+          className="flex-1 p-3 bg-gray-100 rounded-lg text-sm mr-2"
           placeholder="Search for a community..."
           value={searchText}
           onChangeText={setSearchText}
         />
 
-        {/* Sort Dropdown */}
-        <View className="relative ml-3">
-          <TouchableOpacity
-            className="bg-gray-200 p-3 rounded-lg"
-            onPress={() => setShowSortDropdown((prev) => !prev)}
-          >
-            <Text className="text-sm font-semibold text-gray-700">
-              Sort: {`${sortOption === 'name' ? 'Name' : 'Members'} ${sortOrder === 'asc' ? 'Ascending' : 'Descending'
-                }`}
-            </Text>
-          </TouchableOpacity>
-
-          {showSortDropdown && (
-            <View className="absolute bg-white border border-gray-300 rounded-lg mt-2 z-10 w-full">
-              {sortOptions.map((option) => (
-                <TouchableOpacity
-                  key={option.label}
-                  className="p-2"
-                  onPress={() => {
-                    setSortOption(option.option as 'name' | 'members');
-                    setSortOrder(option.order as 'asc' | 'desc');
-                    setShowSortDropdown(false);
-                  }}
-                >
-                  <Text className="text-sm text-gray-700">{option.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-        </View>
+        <TouchableOpacity
+          className="bg-gray-200 p-3 rounded-lg"
+          onPress={() => setShowSortDropdown((prev) => !prev)}
+        >
+          <Text className="text-sm font-semibold text-gray-700">
+            Sort: {`${sortOption === 'name' ? 'Name' : 'Members'} ${sortOrder === 'asc' ? 'Ascending' : 'Descending'}`}
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Communities List */}
-      <FlatList
-        className="mt-4"
-        data={sortedCommunities}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            className="bg-gray-100 p-4 mb-3 rounded-lg"
-            onPress={() => router.push(`/community/${item.id}`)}
-          >
-            <Text className="text-lg font-semibold text-gray-700">{item.name}</Text>
-            <Text className="text-sm text-gray-500">{item.members} members</Text>
-            <Text className="text-sm text-gray-600 mt-2">{item.description}</Text>
-          </TouchableOpacity>
-        )}
-        ListEmptyComponent={
-          <View className="mt-6">
-            <Text className="text-center text-gray-500">No communities found.</Text>
+      {/* Sort Dropdown */}
+      <View className="relative mt-4">
+        <TouchableOpacity
+          className="bg-blue-500 p-3 rounded-lg"
+          onPress={() => router.push('/')}
+        >
+          <Text className="text-white font-semibold">+ Create</Text>
+        </TouchableOpacity>
+
+        {showSortDropdown && (
+          <View className="absolute bg-white border border-gray-300 rounded-lg mt-2 z-10 w-full">
+            {sortOptions.map((option) => (
+              <TouchableOpacity
+                key={option.label}
+                className="p-2"
+                onPress={() => {
+                  setSortOption(option.option as 'name' | 'members');
+                  setSortOrder(option.order as 'asc' | 'desc');
+                  setShowSortDropdown(false);
+                }}
+              >
+                <Text className="text-sm text-gray-700">{option.label}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
-        }
-      />
+        )}
+      </View>
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#3B82F6" className="mt-6" />
+      ) : communities.length === 0 ? (
+        <Text className="text-center text-gray-500 mt-5">No communities found.</Text>
+      ) : (
+        <FlatList
+          className="mt-4"
+          data={sortedCommunities}
+          keyExtractor={(item) => item._id.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              className="bg-gray-100 p-4 mb-3 rounded-lg"
+              onPress={() => router.push(`/community/${item._id}`)}
+            >
+              <Text className="text-lg font-semibold text-gray-700">{item.name}</Text>
+              <Text className="text-sm text-gray-500">{item.members?.length || 0} members</Text>
+              <Text className="text-sm text-gray-600 mt-2">{item.description}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 };

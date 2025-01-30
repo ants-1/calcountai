@@ -30,9 +30,10 @@ const getCommunity = async (
   try {
     const { communityId } = req.params;
 
-    const community: ICommunity | null = await Community.findById(
-      communityId
-    ).exec();
+    const community: ICommunity | null = await Community.findById(communityId)
+      .populate("members", "-password")
+      .populate("challenges")
+      .exec();
 
     if (!community) {
       return res.status(404).json({ error: "Community not found" });
@@ -59,7 +60,7 @@ const createCommunity = async (
       challenges: req.body.challenges,
     });
 
-    // Get User and add to 
+    // Get User and add to
 
     return res.status(200).json({ newCommunity });
   } catch (err) {
