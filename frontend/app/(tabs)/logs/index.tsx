@@ -151,6 +151,30 @@ const Log: React.FC = () => {
     }
   };
 
+  const handleRemoveExercise = async (exerciseId) => {
+    if (!currentLog) return;
+
+    try {
+      const updatedExercises = currentLog.exercises.filter(exercise => exercise._id !== exerciseId);
+
+      const response = await fetch(`${BACKEND_API_URL}/users/${user._id}/dailyLogs/${currentLog._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ exercises: updatedExercises }),
+      });
+
+      if (response.ok) {
+        const updatedLog = await response.json();
+        setCurrentLog(updatedLog.dailyLog);
+      } else {
+        Alert.alert("Failed to remove exercise");
+      }
+    } catch (error) {
+      console.error("Error removing exercise:", error);
+    }
+  };
+
+
   if (loading) {
     return <ActivityIndicator size="large" className='pt-96' />;
   }
@@ -243,12 +267,11 @@ const Log: React.FC = () => {
             </View>
 
             {/* Meals Section */}
-            <Text className='text-2xl font-semibold text-center mt-8'>Meals</Text>
             {['Breakfast', 'Lunch', 'Dinner', 'Snacks'].map((mealType) => (
               <View key={mealType} className="mt-4 bg-gray-100 p-4 rounded-xl">
                 <Text className="text-lg font-semibold text-gray-700">{mealType}</Text>
                 {currentLog.foods
-                  ?.filter((food) => food.mealType.toLowerCase() === mealType.toLowerCase())
+                  ?.filter((food) => food.mealType?.toLowerCase() === mealType.toLowerCase())
                   .map((food) => (
                     <View key={food._id} className="flex-row justify-between items-center mt-4">
                       <Text className="text-sm text-gray-600">{food.name}</Text>
@@ -258,17 +281,26 @@ const Log: React.FC = () => {
               </View>
             ))}
 
-
             {/* Activities Section */}
-            <Text className='text-2xl font-semibold text-center mt-10'>Activities</Text>
+            <Text className="text-2xl font-semibold text-center mt-10">Activities</Text>
             <View className="mt-4 bg-gray-100 p-4 rounded-xl">
               <Text className="text-lg font-semibold text-gray-700">Activities</Text>
-              {currentLog.exercises?.map((exercise) => (
-                <View key={exercise._id} className="flex-row justify-between items-center mt-4">
-                  <Text className="text-sm text-gray-600">{exercise.name}</Text>
-                  <Text className="text-sm text-gray-500">{exercise.caloriesBurned} kcal burned</Text>
-                </View>
-              ))}
+              {currentLog.exercises?.map((exercise) => {
+                const key = exercise._id || `${exercise.name}-${exercise.caloriesBurned}`;
+                return (
+                  <View key={key} className="flex-row justify-between items-center mt-4">
+                    <Text className="text-sm text-gray-600">{exercise.name}</Text>
+                    <View className="flex flex-row gap-4">
+                      <Text className="text-sm text-gray-500">{exercise.caloriesBurned} kcal burned</Text>
+                      <TouchableOpacity
+                        onPress={() => handleRemoveExercise(exercise._id)}
+                      >
+                        <Icon name="remove" size={20} color="#FF0000" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                );
+              })}
             </View>
           </>
         ) : (

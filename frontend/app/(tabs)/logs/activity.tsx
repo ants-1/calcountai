@@ -1,46 +1,110 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
-
-const activityItemsData = [
-  { id: "1", name: "Running", caloriesBurned: 300 },
-  { id: "2", name: "Cycling", caloriesBurned: 250 },
-  { id: "3", name: "Swimming", caloriesBurned: 400 },
-];
+import Constants from "expo-constants";
+import useAuth from "@/hooks/useAuth";
+import { Alert } from "react-native";
 
 const ActivityTrackerScreen: React.FC = () => {
   const router = useRouter();
+  const { user } = useAuth();
+  const userId = user?._id;
+  const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
+
   const [searchText, setSearchText] = useState("");
   const [sortOption, setSortOption] = useState<"name" | "caloriesBurned">("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [allActivities, setAllActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [todayLog, setTodayLog] = useState(null);
 
-  // Filter and sort activities
-  const filteredActivities = activityItemsData.filter((item) =>
-    item.name.toLowerCase().includes(searchText.toLowerCase())
-  );
+  useEffect(() => {
+    const fetchExercises = async () => {
+      try {
+        const response = await fetch(`${BACKEND_API_URL}/exercises`);
+        const data = await response.json();
+        setAllActivities(data.exercises || []);
+      } catch (error) {
+        console.error("Error fetching activities:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const sortedActivities = filteredActivities.slice().sort((a, b) => {
-    if (sortOption === "name") {
-      return sortOrder === "asc"
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name);
-    } else {
-      return sortOrder === "asc"
-        ? a.caloriesBurned - b.caloriesBurned
-        : b.caloriesBurned - a.caloriesBurned;
+    const fetchTodayLog = async () => {
+      try {
+        const response = await fetch(`${BACKEND_API_URL}/users/${userId}/dailyLogs`);
+        const data = await response.json();
+
+        const today = new Date().toISOString().split("T")[0];
+        const todaysLog = data.dailyLogs?.find(log => log.date.split("T")[0] === today);
+
+        setTodayLog(todaysLog || null);
+      } catch (error) {
+        console.error("Error fetching today's log:", error);
+      }
+    };
+
+    if (userId) {
+      fetchExercises();
+      fetchTodayLog();
     }
-  });
+  }, [userId]);
 
-  // Sorting options
-  const sortOptions = [
-    { label: "Name Ascending", option: "name", order: "asc" },
-    { label: "Name Descending", option: "name", order: "desc" },
-    { label: "Calories Burned Ascending", option: "caloriesBurned", order: "asc" },
-    { label: "Calories Burned Descending", option: "caloriesBurned", order: "desc" },
-  ];
+  const handleAddExercise = async (exerciseId: string) => {
+    if (!todayLog) {
+      router.push("/(tabs)/logs");
+      return;
+    }
+
+    if (todayLog.exercises.some((e) => e._id === exerciseId)) {
+      Alert.alert("Error", "This activity has already been added to today's log.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${BACKEND_API_URL}/users/${userId}/dailyLogs/${todayLog._id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            exercises: [...todayLog.exercises.map((e) => e._id), exerciseId],
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const updatedLog = await response.json();
+        setTodayLog(updatedLog.dailyLog);
+        Alert.alert('Exercise Added', 'Exercise has been added to log');
+        router.push("/(tabs)/logs");
+      } else {
+        Alert.alert("Failed to add exercise");
+      }
+    } catch (error) {
+      console.error("Error adding exercise:", error);
+    }
+  };
+
+  // Function to apply sorting based on selected option and order
+  const getSortedActivities = () => {
+    return allActivities
+      .filter(item => item.name.toLowerCase().includes(searchText.toLowerCase()))
+      .sort((a, b) => {
+        if (sortOption === "name") {
+          return sortOrder === "asc"
+            ? a.name.localeCompare(b.name)
+            : b.name.localeCompare(a.name);
+        } else if (sortOption === "caloriesBurned") {
+          return sortOrder === "asc" ? a.caloriesBurned - b.caloriesBurned : b.caloriesBurned - a.caloriesBurned;
+        }
+        return 0;
+      });
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white px-6 pt-6">
@@ -67,7 +131,6 @@ const ActivityTrackerScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Sort Dropdown */}
       <View className="flex-row justify-start relative mt-4">
         <TouchableOpacity
           className="bg-gray-200 p-3 rounded-lg"
@@ -80,8 +143,13 @@ const ActivityTrackerScreen: React.FC = () => {
         </TouchableOpacity>
 
         {showSortDropdown && (
-          <View className="absolute right-0 bg-white border border-gray-200 rounded-lg mt-12 w-48 z-10 shadow-lg">
-            {sortOptions.map((option) => (
+          <View className="absolute left-0 bg-white border border-gray-200 rounded-lg mt-12 w-48 z-10 shadow-lg">
+            {[
+              { label: "Name Ascending", option: "name", order: "asc" },
+              { label: "Name Descending", option: "name", order: "desc" },
+              { label: "Calories Burned Ascending", option: "caloriesBurned", order: "asc" },
+              { label: "Calories Burned Descending", option: "caloriesBurned", order: "desc" },
+            ].map((option) => (
               <TouchableOpacity
                 key={option.label}
                 className="p-2"
@@ -98,29 +166,35 @@ const ActivityTrackerScreen: React.FC = () => {
         )}
       </View>
 
-      {/* Tabs */}
       <View className="flex-row justify-around mt-6 border-b border-gray-300 pb-2">
         <Text className="font-semibold">History</Text>
-        <Text className="font-semibold">My Activities</Text>
       </View>
 
-      {/* Activity List */}
-      <FlatList
-        className="mt-4"
-        data={sortedActivities}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View className="flex-row justify-between items-center bg-gray-100 p-3 mt-2 rounded-lg">
-            <Text className="text-lg">{item.name}</Text>
-            <Text className="text-gray-600">{item.caloriesBurned} cal</Text>
-          </View>
-        )}
-        ListEmptyComponent={
-          <View className="mt-6">
-            <Text className="text-center text-gray-500">No activities found.</Text>
-          </View>
-        }
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#4B5563" className="mt-6" />
+      ) : (
+        <FlatList
+          className="mt-4"
+          data={getSortedActivities()}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <View className="flex-row justify-between items-center bg-gray-100 p-3 mt-2 rounded-lg">
+              <Text className="text-lg">{item.name}</Text>
+              <View className="flex flex-row items-center gap-4">
+                <Text className="text-gray-600">{item.caloriesBurned} cal</Text>
+                <TouchableOpacity onPress={() => handleAddExercise(item._id)}>
+                  <Icon name="plus" size={20} color="#4B5563" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+          ListEmptyComponent={
+            <View className="mt-6">
+              <Text className="text-center text-gray-500">No activities found.</Text>
+            </View>
+          }
+        />
+      )}
     </SafeAreaView>
   );
 };
