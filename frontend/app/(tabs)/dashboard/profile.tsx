@@ -10,10 +10,11 @@ const Profile: React.FC = () => {
   const router = useRouter();
   const { user, logout } = useAuth();
 
-  const [firstName, setFirstName] = useState("John");
-  const [lastName, setLastName] = useState("Doe");
-  const [email, setEmail] = useState("johndoe@example.com");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [originalData, setOriginalData] = useState({ firstName: "", lastName: "", email: "" });
 
   useEffect(() => {
     if (!user) {
@@ -30,9 +31,7 @@ const Profile: React.FC = () => {
 
       const response = await fetch(API_URL, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
       if (!response.ok) {
@@ -41,12 +40,17 @@ const Profile: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log("Fetched User Data:", data);
 
       if (data.user) {
         setFirstName(data.user.firstName || "");
         setLastName(data.user.lastName || "");
         setEmail(data.user.email || "");
+
+        setOriginalData({
+          firstName: data.user.firstName || "",
+          lastName: data.user.lastName || "",
+          email: data.user.email || "",
+        });
       } else {
         throw new Error("Invalid user data received");
       }
@@ -55,7 +59,6 @@ const Profile: React.FC = () => {
     }
   };
 
-  // Handle update profile 
   const updateProfile = async () => {
     if (!user?._id) return;
 
@@ -63,17 +66,11 @@ const Profile: React.FC = () => {
       const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
       const API_URL = `${BACKEND_API_URL}/users/${user._id}`;
 
-      const updatedUserData = {
-        firstName,
-        lastName,
-        email,
-      };
+      const updatedUserData = { firstName, lastName, email };
 
       const response = await fetch(API_URL, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedUserData),
       });
 
@@ -83,11 +80,16 @@ const Profile: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log("Updated User Data:", data);
 
       setFirstName(data.updatedUser.firstName || "");
       setLastName(data.updatedUser.lastName || "");
       setEmail(data.updatedUser.email || "");
+
+      setOriginalData({
+        firstName: data.updatedUser.firstName || "",
+        lastName: data.updatedUser.lastName || "",
+        email: data.updatedUser.email || "",
+      });
 
       setIsEditing(false);
     } catch (error) {
@@ -96,20 +98,18 @@ const Profile: React.FC = () => {
     }
   };
 
+  const handleCancelEdit = () => {
+    setFirstName(originalData.firstName);
+    setLastName(originalData.lastName);
+    setEmail(originalData.email);
+    setIsEditing(false);
+  };
+
   useEffect(() => {
     if (user) {
       fetchUser();
     }
   }, [user]);
-
-  // Handle logout functionality
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error("Logout error: ", error);
-    }
-  };
 
   return (
     <SafeAreaView className="flex-1 bg-white px-6 pt-6">
@@ -161,18 +161,34 @@ const Profile: React.FC = () => {
         </View>
       </View>
 
-      <TouchableOpacity
-        className="mt-6 bg-blue-500 py-3 rounded-lg"
-        onPress={isEditing ? updateProfile : () => setIsEditing(true)}
-      >
-        <Text className="text-center text-white font-semibold text-lg">
-          {isEditing ? "Save Changes" : "Edit Profile"}
-        </Text>
-      </TouchableOpacity>
+      {isEditing ? (
+        <View className="mt-6 flex-row justify-between">
+          <TouchableOpacity
+            className="flex-1 mr-2 bg-blue-500 py-3 rounded-lg"
+            onPress={updateProfile}
+          >
+            <Text className="text-center text-white font-semibold text-lg">Save Changes</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            className="flex-1 ml-2 bg-gray-300 py-3 rounded-lg"
+            onPress={handleCancelEdit}
+          >
+            <Text className="text-center text-black font-semibold text-lg">Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <TouchableOpacity
+          className="mt-6 bg-blue-500 py-3 rounded-lg"
+          onPress={() => setIsEditing(true)}
+        >
+          <Text className="text-center text-white font-semibold text-lg">Edit Profile</Text>
+        </TouchableOpacity>
+      )}
 
       <TouchableOpacity
         className="mt-6 flex-row items-center justify-center p-3 bg-red-500 rounded-lg"
-        onPress={handleLogout}
+        onPress={logout}
       >
         <Icon name="sign-out" size={20} color="#fff" />
         <Text className="ml-3 text-white font-semibold text-lg">Logout</Text>

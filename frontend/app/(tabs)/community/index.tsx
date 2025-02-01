@@ -28,7 +28,6 @@ const Community: React.FC = () => {
       const data = await response.json();
 
       if (!data.communities || !Array.isArray(data.communities)) {
-        console.error("API Response is not an array:", data);
         throw new Error("API did not return an array");
       }
 

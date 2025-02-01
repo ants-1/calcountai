@@ -8,8 +8,7 @@ interface Message {
 
 const Chatbot: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
-    { sender: 'bot', text: 'Hello! How can I assist you today?' },
-    { sender: 'user', text: 'Hello! Can you suggest a health breakfast?' },
+    { sender: 'bot', text: 'Hello! Chatbot is under construction.' },
   ]);
   const [messageInput, setMessageInput] = useState('');
 
@@ -25,7 +24,7 @@ const Chatbot: React.FC = () => {
 
     // Simulate a bot response
     setTimeout(() => {
-      const botMessage: Message = { sender: 'bot', text: 'I am here to help you with your questions!' };
+      const botMessage: Message = { sender: 'bot', text: 'I am currently under construction, I will be able to help you once I am completed.' };
       setMessages((prevMessages) => [...prevMessages, botMessage]);
     }, 1000);
   };
