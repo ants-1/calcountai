@@ -18,14 +18,20 @@ const getAllDailyLogs = async (
       return res.status(400).json({ error: "Invalid user ID" });
     }
 
-    const user = await User.findById(userId).populate("dailyLogs");
+    const user = await User.findById(userId).populate({
+      path: "dailyLogs",
+      populate: [
+        { path: "foods", model: "Food" },
+        { path: "exercises", model: "Exercise" },
+      ],
+    });
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
     if (!user.dailyLogs || user.dailyLogs.length === 0) {
-      return res.status(404).json({ message: "No daily Logs found" });
+      return res.status(404).json({ message: "No daily logs found" });
     }
 
     return res.status(200).json({ dailyLogs: user.dailyLogs });
@@ -54,7 +60,10 @@ const getDailyLog = async (
     }
 
     const dailyLog: IDailyLog | null = await DailyLog.findById(dailyLogId)
-      .populate("foods", "exercises")
+      .populate([
+        { path: "foods", model: "Food" },
+        { path: "exercises", model: "Exercise" },
+      ])
       .exec();
 
     if (!dailyLog) {
