@@ -187,6 +187,13 @@ const Profile: React.FC = () => {
       )}
 
       <TouchableOpacity
+        className="mt-6 bg-green-500 py-3 rounded-lg"
+        onPress={() => router.push("/goal-info")}
+      >
+        <Text className="text-center text-white font-semibold text-lg">Edit Info</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
         className="mt-6 flex-row items-center justify-center p-3 bg-red-500 rounded-lg"
         onPress={logout}
       >

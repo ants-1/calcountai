@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "extra": {
-      "BACKEND_API_URL": "http://192.168.1.44:5001/api/v1"
+      "BACKEND_API_URL": "http://192.168.1.84:5001/api/v1"
     },
     "ios": {
       "supportsTablet": true

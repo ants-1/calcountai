@@ -1,28 +1,53 @@
-import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
+import { useUserData } from "@/hooks/useUser"; // Import the hook for user data context
 
 const TargetWeight: React.FC = () => {
   const router = useRouter();
+  const { userData, updateUserData } = useUserData();
   const [weight, setWeight] = useState({ value1: "", value2: "" });
   const [unit, setUnit] = useState<"st" | "lbs" | "kg">("st");
+
+  // Convert target weight to kg
+  const convertWeight = () => {
+    const weight1 = parseFloat(weight.value1) || 0;
+    const weight2 = parseFloat(weight.value2) || 0;
+
+    switch (unit) {
+      case "st":
+        return (weight1 * 6.35) + (weight2 * 0.453592);
+      case "lbs":
+        return weight1 * 0.453592;
+      case "kg":
+        return weight1;
+      default:
+        return 0;
+    }
+  };
+
+  const handleUpdateTargetWeight = () => {
+    const updatedWeight = convertWeight();
+
+    const updatedUser = {
+      ...userData,
+      targetWeight: updatedWeight, 
+    };
+
+    updateUserData(updatedUser);
+
+    router.push("/(auth)/height");
+  };
 
   return (
     <View className="flex-1 justify-evenly items-center bg-white px-4">
       <View className="w-full">
         {/* Back Button */}
+        <TouchableOpacity className="absolute top-0 left-0 p-4" onPress={() => router.back()}>
+          <Text className="text-2xl">←</Text>
+        </TouchableOpacity>
 
         <Text className="text-3xl font-bold mb-10 text-center">Target weight?</Text>
-
-        {/* Progress Indicator */}
-        <View className='flex flex-row justify-center mb-20 gap-5'>
-          <View className='rounded-full h-8 w-8 bg-black'></View>
-          <View className='rounded-full h-8 w-8 bg-black'></View>
-          <View className='rounded-full h-8 w-8 bg-black'></View>
-          <View className='rounded-full h-8 w-8 bg-black'></View>
-          <View className='rounded-full h-8 w-8 bg-gray-200'></View>
-          <View className='rounded-full h-8 w-8 bg-gray-200'></View>
-        </View>
 
         {/* Weight Input */}
         <View className="flex flex-row justify-center gap-3">
@@ -63,18 +88,15 @@ const TargetWeight: React.FC = () => {
         </View>
       </View>
 
-      {/* Continue Button */}
+      {/* Submit Button */}
       <View>
         <TouchableOpacity
           className={`p-4 rounded-lg w-[300px] ${weight.value1 ? "bg-blue-500" : "bg-gray-300"
             }`}
           disabled={!weight.value1}
-          onPress={() => router.push("/height")}
+          onPress={handleUpdateTargetWeight}
         >
           <Text className="text-center text-white font-semibold text-lg">Continue</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/dashboard")}>
-          <Text className="text-center mt-5 underline">Enter Information Later</Text>
         </TouchableOpacity>
       </View>
     </View>

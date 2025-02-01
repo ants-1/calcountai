@@ -14,16 +14,22 @@ const signUp = async (
     }
 
     if (!user) {
-      return res
-        .status(400)
-        .json({
-          error: "Sign up failed. User already exists or invalid data.",
-        });
+      return res.status(400).json({
+        error: "Sign up failed. User already exists or invalid data.",
+      });
     }
 
-    return res.status(201).json({
-      message: "Sign up successful.",
-      user,
+    req.login(user, { session: false }, async (loginErr) => {
+      if (loginErr) {
+        return res.status(400).json({ error: "Error during login process." });
+      }
+
+      try {
+        const token = generateToken(user);
+        return res.status(201).json({ success: true, token, user });
+      } catch (generateTokenError) {
+        return next(generateTokenError);
+      }
     });
   })(req, res, next);
 };

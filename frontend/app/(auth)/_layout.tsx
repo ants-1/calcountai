@@ -1,9 +1,10 @@
+import { UserProvider } from '@/context/UserContext'
 import { Stack } from 'expo-router'
 import React from 'react'
 
 const AuthLayout = () => {
   return (
-    <>
+    <UserProvider>
       <Stack>
         <Stack.Screen
           name="sign-in"
@@ -54,7 +55,7 @@ const AuthLayout = () => {
           }}
         />
       </Stack>
-    </>
+    </UserProvider>
   )
 }
 

@@ -1,11 +1,8 @@
 import { Stack } from "expo-router";
 import "../global.css";
 import AuthContextProvider from "@/context/AuthContext";
-import useAuth from "@/hooks/useAuth";
 
 export default function RootLayout() {
-  const { isAuth } = useAuth();
-
   return (
     <AuthContextProvider>
       <Stack>

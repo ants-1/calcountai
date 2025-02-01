@@ -1,12 +1,23 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { TouchableOpacity, View, Text } from "react-native";
+import { useUserData } from "@/hooks/useUser";
 
 const PersonalInfo: React.FC = () => {
   const router = useRouter();
+  const { userData, updateUserData } = useUserData();
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
 
   const genders = ["Male", "Female", "Other"];
+
+  const handleGenderChange = () => {
+    const updatedUser = {
+      ...userData,
+      gender: selectedGender,
+    };
+
+    updateUserData(updatedUser);
+  };
 
   return (
     <View className="flex-1 justify-evenly items-center bg-white px-4">
@@ -42,7 +53,10 @@ const PersonalInfo: React.FC = () => {
         <TouchableOpacity
           className={`p-4 rounded-lg w-[300px] ${selectedGender ? "bg-blue-500" : "bg-gray-300"}`}
           disabled={!selectedGender}
-          onPress={() => router.push("/current-weight")}
+          onPress={() => {
+            handleGenderChange(); 
+            router.push("/current-weight"); 
+          }}
         >
           <Text className="text-center text-white font-semibold text-lg">Continue</Text>
         </TouchableOpacity>

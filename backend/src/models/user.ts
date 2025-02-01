@@ -7,6 +7,7 @@ export interface IUser {
   email: string;
   avatar?: string;
   password: string;
+  gender: string;
   goal?: string;
   currentWeight?: Number;
   targetWeight?: Number;
@@ -29,6 +30,7 @@ const UserSchema = new Schema<IUser, UserModel>({
   email: { type: String, maxlength: 256, required: true, unique: true },
   avatar: { type: String },
   password: { type: String },
+  gender: { type: String},
   goal: { type: String },
   currentWeight: { type: Number },
   targetWeight: { type: Number },

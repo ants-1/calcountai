@@ -1,12 +1,25 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { useUserData } from '@/hooks/useUser';
 
 const GoalInfo: React.FC = () => {
   const router = useRouter();
-  const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
+  const { userData, updateUserData } = useUserData(); 
+  const [selectedGoal, setSelectedGoal] = useState<string | null>(userData?.goal || null);
 
   const goals = ["Lose Weight", "Get Healthier", "Reduce Stress"];
+
+  const handleGoalSelection = (goal: string) => {
+    setSelectedGoal(goal);
+
+    const updatedUser = {
+      ...userData,
+      goal, 
+    };
+
+    updateUserData(updatedUser);
+  };
 
   return (
     <View className="flex-1 justify-evenly items-center bg-white px-4">
@@ -28,7 +41,7 @@ const GoalInfo: React.FC = () => {
           <TouchableOpacity
             key={goal}
             className={`w-full p-6 mb-4 rounded-lg ${selectedGoal === goal ? 'bg-blue-500' : 'bg-gray-200'}`}
-            onPress={() => setSelectedGoal(goal)}
+            onPress={() => handleGoalSelection(goal)}
           >
             <Text className={`text-center ${selectedGoal === goal ? 'text-white font-bold' : 'text-black'}`}>
               {goal}

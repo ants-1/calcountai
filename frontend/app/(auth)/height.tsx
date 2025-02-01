@@ -1,11 +1,36 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { useUserData } from "@/hooks/useUser"; 
 
 const Height: React.FC = () => {
   const router = useRouter();
+  const { userData, updateUserData } = useUserData()
   const [height, setHeight] = useState({ value1: "", value2: "" });
   const [unit, setUnit] = useState<"ft" | "cm">("ft");
+
+  const convertHeight = () => {
+    const feet = parseFloat(height.value1) || 0;
+    const inches = parseFloat(height.value2) || 0;
+
+    if (unit === "ft") {
+      return (feet * 30.48) + (inches * 2.54);
+    } else if (unit === "cm") {
+      return feet;
+    }
+    return 0;
+  };
+
+  const handleHeightChange = () => {
+    const updatedHeight = convertHeight();
+
+    const updatedUser = {
+      ...userData,
+      height: updatedHeight,
+    };
+
+    updateUserData(updatedUser);
+  };
 
   return (
     <View className="flex-1 justify-evenly items-center bg-white px-4">
@@ -67,7 +92,10 @@ const Height: React.FC = () => {
           className={`p-4 rounded-lg w-[300px] ${height.value1 ? "bg-blue-500" : "bg-gray-300"
             }`}
           disabled={!height.value1}
-          onPress={() => router.push("/dob")}
+          onPress={() => {
+            handleHeightChange();
+            router.push("/dob"); 
+          }}
         >
           <Text className="text-center text-white font-semibold text-lg">Continue</Text>
         </TouchableOpacity>
