@@ -1,14 +1,9 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
-
-const foodItemsData = [
-  { id: "1", name: "Tea", calories: 2 },
-  { id: "2", name: "Orange", calories: 32 },
-  { id: "3", name: "Banana", calories: 52 },
-];
+import Constants from "expo-constants";
 
 const Meals: React.FC = () => {
   const router = useRouter();
@@ -16,9 +11,30 @@ const Meals: React.FC = () => {
   const [sortOption, setSortOption] = useState<"name" | "calories">("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [meals, setMeals] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true); 
+
+  const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
+
+  // Fetch meals from API
+  const fetchMeals = async () => {
+    try {
+      const response = await fetch(`${BACKEND_API_URL}/foods`);
+      const data = await response.json();
+      setMeals(data.foods || []);
+    } catch (error) {
+      console.error("Error fetching meals:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMeals();
+  }, []); 
 
   // Filter and sort meals
-  const filteredMeals = foodItemsData.filter((item) =>
+  const filteredMeals = meals.filter((item) =>
     item.name.toLowerCase().includes(searchText.toLowerCase())
   );
 
@@ -67,9 +83,9 @@ const Meals: React.FC = () => {
 
       {/* Sort Dropdown */}
       <View className="flex-row justify-between relative mt-4">
-        <TouchableOpacity 
-        className="bg-gray-200 p-3 rounded-lg"
-        onPress={() => router.push("/(tabs)/logs/add-meal-barcode")}
+        <TouchableOpacity
+          className="bg-gray-200 p-3 rounded-lg"
+          onPress={() => router.push("/(tabs)/logs/add-meal-barcode")}
         >
           <Text>Scan a Barcode</Text>
         </TouchableOpacity>
@@ -79,9 +95,8 @@ const Meals: React.FC = () => {
           onPress={() => setShowSortDropdown((prev) => !prev)}
         >
           <Text className="text-sm font-semibold">
-            Sort: {`${sortOption === "name" ? "Name" : "Calories"} ${
-              sortOrder === "asc" ? "Ascending" : "Descending"
-            }`}
+            Sort: {`${sortOption === "name" ? "Name" : "Calories"} ${sortOrder === "asc" ? "Ascending" : "Descending"
+              }`}
           </Text>
         </TouchableOpacity>
 
@@ -110,23 +125,32 @@ const Meals: React.FC = () => {
         <Text className="font-semibold">My Foods</Text>
       </View>
 
-      {/* Food List */}
-      <FlatList
-        className="mt-4"
-        data={sortedMeals}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View className="flex-row justify-between items-center bg-gray-100 p-3 mt-2 rounded-lg">
-            <Text className="text-lg">{item.name}</Text>
-            <Text className="text-gray-600">{item.calories} cal</Text>
-          </View>
-        )}
-        ListEmptyComponent={
-          <View className="mt-6">
-            <Text className="text-center text-gray-500">No meals found.</Text>
-          </View>
-        }
-      />
+      {/* Loading Indicator */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#4B5563" className="mt-6" />
+      ) : (
+        <FlatList
+          className="mt-4"
+          data={sortedMeals}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <View className="flex-row justify-between items-center bg-gray-100 p-3 mt-2 rounded-lg">
+              <Text className="text-lg">{item.name}</Text>
+              <View className="flex flex-row gap-4">
+                <Text className="text-gray-600">{item.calories} cal</Text>
+                <TouchableOpacity>
+                  <Icon name="plus" size={20} color="#4B5563" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+          ListEmptyComponent={
+            <View className="mt-6">
+              <Text className="text-center text-gray-500">No meals found.</Text>
+            </View>
+          }
+        />
+      )}
     </SafeAreaView>
   );
 };

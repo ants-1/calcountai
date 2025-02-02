@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Constants from "expo-constants";
+import useAuth from "@/hooks/useAuth";
 
 const AddMealManual = () => {
   const router = useRouter();
+  const { user } = useAuth();
+  const userId = user?._id;
+  const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
 
   const [meal, setMeal] = useState({
     name: "",
@@ -17,31 +22,122 @@ const AddMealManual = () => {
     fat: "",
     carbohydrates: "",
   });
+  const [logs, setLogs] = useState([]);
+  const [log, setLog] = useState(null);
+  const [showLogDropdown, setShowLogDropdown] = useState(false);
+  const [showMealTypeDropdown, setShowMealTypeDropdown] = useState(false);
 
-  const mealTypes = ["Breakfast", "Lunch", "Dinner", "Snack"];
+  // Fetch logs for the user
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const response = await fetch(`${BACKEND_API_URL}/users/${userId}/dailyLogs`);
+        const data = await response.json();
+        setLogs(data.dailyLogs || []);
+      } catch (error) {
+        console.error("Error fetching logs:", error);
+      }
+    };
 
-  // Handle Form Submission
-  const handleSubmit = () => {
+    fetchLogs();
+  }, [userId]);
+
+  // Format the date
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+  };
+
+  // Handle the meal type selection
+  const mealTypes = ["Breakfast", "Lunch", "Dinner", "Snacks"];
+
+  const handleAddMeal = async () => {
+    if (!log) {
+      Alert.alert("Error", "Please select a log.");
+      return;
+    }
+
     if (!meal.name || !meal.calories || !meal.numberOfServings || !meal.servingSize || !meal.mealType) {
       Alert.alert("Error", "Please fill all required fields.");
       return;
     }
 
-    console.log("Meal Added:", meal);
+    try {
+      const mealResponse = await fetch(`${BACKEND_API_URL}/foods`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: meal.name,
+          calories: meal.calories,
+          numberOfServings: meal.numberOfServings,
+          servingSize: meal.servingSize,
+          protein: meal.protein,
+          fat: meal.fat,
+          carbohydrates: meal.carbohydrates,
+          mealType: meal.mealType,
+        }),
+      });
 
-    router.push("/logs");
+      const rawResponse = await mealResponse.text();
+
+      if (!mealResponse.ok) {
+        Alert.alert("Error", "Failed to add meal.");
+        return;
+      }
+
+      const mealData = JSON.parse(rawResponse);
+
+      const mealId = mealData.newFood?._id;
+
+      if (!mealId) {
+        console.error("Invalid meal ID:", mealData);
+        Alert.alert("Error", "Failed to create valid meal.");
+        return;
+      }
+
+      if (log.foods.some((m) => m._id === mealId)) {
+        Alert.alert("Error", "This meal has already been added to the log.");
+        return;
+      }
+
+      const updatedMeals = [...log.foods, { _id: mealId }];
+
+      const logResponse = await fetch(
+        `${BACKEND_API_URL}/users/${userId}/dailyLogs/${log._id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            foods: updatedMeals,
+          }),
+        }
+      );
+
+      if (logResponse.ok) {
+        const updatedLog = await logResponse.json();
+        setLog(updatedLog.dailyLog);
+        Alert.alert("Success", "Meal added successfully!");
+        router.push("/logs");
+      } else {
+        const errorLogData = await logResponse.json();
+        console.error("Failed to add meal to log:", errorLogData);
+        Alert.alert("Error", "Failed to add meal to log.");
+      }
+    } catch (error) {
+      console.error("Error adding meal:", error);
+      Alert.alert("Error", "An error occurred while adding the meal.");
+    }
   };
 
   return (
     <SafeAreaView className="flex-1 bg-white px-6 pt-6">
-      <View className="flex-row justify-between items-center mb-10">
-        <Text className="text-3xl font-bold">Add Meal</Text>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Icon name="arrow-left" size={24} color="#4B5563" />
-        </TouchableOpacity>
-      </View>
-
       <ScrollView showsVerticalScrollIndicator={false}>
+        <View className="flex-row justify-between items-center mb-10">
+          <Text className="text-3xl font-bold">Add Meal</Text>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Icon name="arrow-left" size={24} color="#4B5563" />
+          </TouchableOpacity>
+        </View>
 
         {/* Name */}
         <Text className="text-lg font-semibold mb-2">Meal Name</Text>
@@ -82,32 +178,106 @@ const AddMealManual = () => {
           onChangeText={(text) => setMeal({ ...meal, servingSize: text })}
         />
 
-        {/* Meal Type (Dropdown) */}
+        {/* Meal Type */}
         <Text className="text-lg font-semibold mb-2">Meal Type</Text>
-        <View className="w-full bg-gray-200 rounded-lg mb-4">
-          {mealTypes.map((type) => (
-            <TouchableOpacity
-              key={type}
-              className={`p-4 ${meal.mealType === type ? "bg-blue-500" : ""}`}
-              onPress={() => setMeal({ ...meal, mealType: type })}
-            >
-              <Text className={`text-lg ${meal.mealType === type ? "text-white font-bold" : "text-black"}`}>
-                {type}
-              </Text>
-            </TouchableOpacity>
-          ))}
+        <View className="flex-row justify-start relative ">
+          <TouchableOpacity
+            className="bg-gray-200 px-3 py-6 rounded-lg w-full"
+            onPress={() => setShowMealTypeDropdown((prev) => !prev)}
+          >
+            <Text className="font-semibold">
+              {meal.mealType ? `${meal.mealType}` : "Select a Meal Type"}
+            </Text>
+          </TouchableOpacity>
+
+          {showMealTypeDropdown && (
+            <View className="absolute left-0 bg-white border border-gray-200 rounded-lg mt-12 w-full z-10 shadow-lg">
+              {mealTypes.map((mealType) => (
+                <TouchableOpacity
+                  key={mealType}
+                  className="p-2"
+                  onPress={() => {
+                    setMeal({ ...meal, mealType });
+                    setShowMealTypeDropdown(false);
+                  }}
+                >
+                  <Text className="text-gray-700">{mealType}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
 
-        <View className="flex items-center justify-center mt-6">
+        {/* Protein */}
+        <Text className="text-lg font-semibold mb-2 mt-4">Protein (grams)</Text>
+        <TextInput
+          className="w-full p-4 bg-gray-200 rounded-lg mb-4 text-lg"
+          placeholder="Enter protein amount"
+          keyboardType="numeric"
+          value={meal.protein}
+          onChangeText={(text) => setMeal({ ...meal, protein: text })}
+        />
+
+        {/* Fat */}
+        <Text className="text-lg font-semibold mb-2">Fat (grams)</Text>
+        <TextInput
+          className="w-full p-4 bg-gray-200 rounded-lg mb-4 text-lg"
+          placeholder="Enter fat amount"
+          keyboardType="numeric"
+          value={meal.fat}
+          onChangeText={(text) => setMeal({ ...meal, fat: text })}
+        />
+
+        {/* Carbohydrates */}
+        <Text className="text-lg font-semibold mb-2">Carbohydrates (grams)</Text>
+        <TextInput
+          className="w-full p-4 bg-gray-200 rounded-lg mb-4 text-lg"
+          placeholder="Enter carbohydrate amount"
+          keyboardType="numeric"
+          value={meal.carbohydrates}
+          onChangeText={(text) => setMeal({ ...meal, carbohydrates: text })}
+        />
+
+        {/* Log Selection */}
+        <Text className="text-lg font-semibold mb-2">Logs</Text>
+        <View className="flex-row justify-start relative ">
           <TouchableOpacity
-            className={`p-4 rounded-lg w-[300px] ${meal.name && meal.calories && meal.numberOfServings && meal.servingSize && meal.mealType
+            className="bg-gray-200 px-3 py-6 rounded-lg w-full"
+            onPress={() => setShowLogDropdown((prev) => !prev)}
+          >
+            <Text className="font-semibold">
+              {log ? `Selected Log: ${formatDate(log.date)}` : "Select a Log"}
+            </Text>
+          </TouchableOpacity>
+
+          {showLogDropdown && (
+            <View className="absolute left-0 bg-white border border-gray-200 rounded-lg mt-12 w-full z-10 shadow-lg">
+              {logs.map((logItem) => (
+                <TouchableOpacity
+                  key={logItem._id}
+                  className="p-2"
+                  onPress={() => {
+                    setLog(logItem);
+                    setShowLogDropdown(false);
+                  }}
+                >
+                  <Text className="text-gray-700">{`Log Date: ${formatDate(logItem.date)}`}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </View>
+
+        <View className="flex items-center justify-center mt-10">
+          <TouchableOpacity
+            className={`p-4 rounded-lg w-[300px] ${meal.name && meal.calories && meal.numberOfServings && meal.servingSize && meal.mealType && log
               ? "bg-blue-500"
               : "bg-gray-300"
               }`}
-            disabled={!meal.name || !meal.calories || !meal.numberOfServings || !meal.servingSize || !meal.mealType}
-            onPress={handleSubmit}
+            disabled={!meal.name || !meal.calories || !meal.numberOfServings || !meal.servingSize || !meal.mealType || !log}
+            onPress={handleAddMeal}
           >
-            <Text className="text-center text-white font-semibold text-lg">Add</Text>
+            <Text className="text-center text-white font-semibold text-lg">Add Meal</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
