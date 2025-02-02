@@ -1,18 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import Constants from 'expo-constants';
 import { useFocusEffect } from '@react-navigation/native';
+import { CommunityType } from "@/types/CommunityType";
+
+type SortOption = 'name' | 'members';
+type SortOrder = 'asc' | 'desc';
 
 const Community: React.FC = () => {
   const router = useRouter();
-  const [communities, setCommunities] = useState([]);
-  const [searchText, setSearchText] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [sortOption, setSortOption] = useState<'name' | 'members'>('name');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [communities, setCommunities] = useState<CommunityType[]>([]);
+  const [searchText, setSearchText] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [sortOption, setSortOption] = useState<SortOption>('name');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [showSortDropdown, setShowSortDropdown] = useState<boolean>(false);
 
   // Fetch communities from backend
   const fetchCommunities = async () => {
@@ -43,7 +47,7 @@ const Community: React.FC = () => {
   // Re-fetch communities every time the screen is focused
   useFocusEffect(
     React.useCallback(() => {
-      setLoading(true); // Reset loading state when refocusing the page
+      setLoading(true);
       fetchCommunities();
     }, [])
   );
@@ -111,8 +115,8 @@ const Community: React.FC = () => {
                 key={option.label}
                 className="p-2"
                 onPress={() => {
-                  setSortOption(option.option as 'name' | 'members');
-                  setSortOrder(option.order as 'asc' | 'desc');
+                  setSortOption(option.option as SortOption);
+                  setSortOrder(option.order as SortOrder);
                   setShowSortDropdown(false);
                 }}
               >
@@ -131,14 +135,14 @@ const Community: React.FC = () => {
         <FlatList
           className="mt-4"
           data={sortedCommunities}
-          keyExtractor={(item) => item._id.toString()}
+          keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
             <TouchableOpacity
               className="bg-gray-100 p-4 mb-3 rounded-lg"
               onPress={() => router.push(`/community/${item._id}`)}
             >
               <Text className="text-lg font-semibold text-gray-700">{item.name}</Text>
-              <Text className="text-sm text-gray-500">{item.members?.length || 0} members</Text>
+              <Text className="text-sm text-gray-500">{item.members.length || 0} members</Text>
               <Text className="text-sm text-gray-600 mt-2">{item.description}</Text>
             </TouchableOpacity>
           )}

@@ -6,12 +6,34 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import useAuth from "@/hooks/useAuth";
 import Constants from "expo-constants";
 
+// Types for data
+interface Food {
+  _id: string;
+  name: string;
+  calories: number;
+  mealType: string;
+}
+
+interface Exercise {
+  _id: string;
+  name: string;
+  caloriesBurned: number;
+}
+
+interface Log {
+  _id: string;
+  date: string;
+  foods: Food[];
+  exercises: Exercise[];
+  completed: boolean;
+}
+
 const Log: React.FC = () => {
   const router = useRouter();
   const { user } = useAuth();
-  const [dailyLogs, setDailyLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentLog, setCurrentLog] = useState(null);
+  const [dailyLogs, setDailyLogs] = useState<Log[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [currentLog, setCurrentLog] = useState<Log | null>(null);
   const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
 
   useFocusEffect(
@@ -23,13 +45,13 @@ const Log: React.FC = () => {
 
   const fetchDailyLogs = async () => {
     try {
-      const response = await fetch(`${BACKEND_API_URL}/users/${user._id}/dailyLogs`);
+      const response = await fetch(`${BACKEND_API_URL}/users/${user?._id}/dailyLogs`);
       if (!response.ok) {
         throw new Error("Failed to fetch logs");
       }
 
       const data = await response.json();
-      const logs = data.dailyLogs;
+      const logs: Log[] = data.dailyLogs;
       setDailyLogs(logs);
 
       const today = new Date().toISOString().split('T')[0];
@@ -43,7 +65,7 @@ const Log: React.FC = () => {
           completed: false,
         };
 
-        const newLogResponse = await fetch(`${BACKEND_API_URL}/users/${user._id}/dailyLogs`, {
+        const newLogResponse = await fetch(`${BACKEND_API_URL}/users/${user?._id}/dailyLogs`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(newLog),
@@ -84,40 +106,10 @@ const Log: React.FC = () => {
     }
   };
 
-  // const handleDeleteLog = async () => {
-  //   try {
-  //     const confirmDelete = await Alert.alert(
-  //       "Delete Log",
-  //       "Are you sure you want to delete this log?",
-  //       [
-  //         { text: "Cancel", style: "cancel" },
-  //         {
-  //           text: "Delete", onPress: async () => {
-  //             const response = await fetch(`${BACKEND_API_URL}/users/${user._id}/dailyLogs/${currentLog._id}`, {
-  //               method: "DELETE",
-  //             });
-
-  //             if (!response.ok) {
-  //               throw new Error("Failed to delete log");
-  //             }
-
-  //             await fetchDailyLogs();
-  //             setCurrentLog(null); // Optionally reset current log
-  //             Alert.alert("Success", "The log has been deleted.");
-  //           }
-  //         }
-  //       ]
-  //     );
-  //   } catch (error) {
-  //     console.error("Error deleting log:", error);
-  //   }
-  // };
-
   const handleCreateNewLog = async () => {
     try {
       const today = new Date().toISOString().split('T')[0];
 
-      // Check if today's log already exists
       const todayLog = dailyLogs.find(log => log.date.split('T')[0] === today);
       if (todayLog) {
         Alert.alert(
@@ -135,7 +127,7 @@ const Log: React.FC = () => {
         completed: false,
       };
 
-      const response = await fetch(`${BACKEND_API_URL}/users/${user._id}/dailyLogs`, {
+      const response = await fetch(`${BACKEND_API_URL}/users/${user?._id}/dailyLogs`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newLog),
@@ -151,13 +143,13 @@ const Log: React.FC = () => {
     }
   };
 
-  const handleRemoveExercise = async (exerciseId) => {
+  const handleRemoveExercise = async (exerciseId: string) => {
     if (!currentLog) return;
 
     try {
       const updatedExercises = currentLog.exercises.filter(exercise => exercise._id !== exerciseId);
 
-      const response = await fetch(`${BACKEND_API_URL}/users/${user._id}/dailyLogs/${currentLog._id}`, {
+      const response = await fetch(`${BACKEND_API_URL}/users/${user?._id}/dailyLogs/${currentLog._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ exercises: updatedExercises }),
@@ -174,7 +166,6 @@ const Log: React.FC = () => {
     }
   };
 
-
   if (loading) {
     return <ActivityIndicator size="large" className='pt-96' />;
   }
@@ -187,12 +178,6 @@ const Log: React.FC = () => {
   return (
     <SafeAreaView className="flex-1 bg-white px-4 pt-6">
       <View className="flex flex-row justify-between items-center">
-        {/* Delete Button
-        <TouchableOpacity
-          onPress={handleDeleteLog}
-        >
-          <Icon name="remove" size={24} color="#4B5563" />
-        </TouchableOpacity> */}
         <View></View>
         <View className='ml-8'>
           <Text className="text-3xl font-bold text-center">Daily Logs</Text>
@@ -247,25 +232,6 @@ const Log: React.FC = () => {
                 className={`bg-gray-200 p-3 rounded-lg ${!currentLog || dailyLogs[dailyLogs.length - 1]?._id === currentLog._id ? 'opacity-50' : ''}`}
               >
                 <Icon name="arrow-right" size={24} color={(!currentLog || dailyLogs[dailyLogs.length - 1]?._id === currentLog._id) ? '#9CA3AF' : '#4B5563'} />
-              </TouchableOpacity>
-            </View>
-
-            <View className='flex flex-row justify-between'>
-              <TouchableOpacity
-                className="mt-8 bg-blue-500 py-2 px-4 rounded-lg w-40"
-                onPress={() => router.push("/(tabs)/logs/meals")}
-              >
-                <Text className="text-center text-white font-semibold text-lg">Add Meal</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                className="mt-8 bg-blue-500 py-2 px-4 rounded-lg w-40"
-                onPress={() => {
-                  router.push("/(tabs)/logs/activity");
-                }}
-                
-              >
-                <Text className="text-center text-white font-semibold text-lg">Add Activity</Text>
               </TouchableOpacity>
             </View>
 

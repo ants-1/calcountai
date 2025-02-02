@@ -1,24 +1,14 @@
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, ScrollView } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter } from 'expo-router'
-import Icon from 'react-native-vector-icons/FontAwesome'
+import Header from '@/components/Header'
 
 const Challenges: React.FC = () => {
-  const router = useRouter();
-
   return (
-    <SafeAreaView className="flex-1 bg-white px-4 pt-6">
-      <View className="flex-row justify-between items-center px-4">
-        <Text className="text-3xl font-bold">Challenges</Text>
+    <SafeAreaView className="flex-1 bg-white pt-6">
+      <Header title='Challenges' icon='arrow-left' iconSize={25} titleSize='text-3xl' />
 
-        <TouchableOpacity onPress={() => router.back()}>
-          <Icon name="arrow-left" size={24} color="#4B5563" />
-        </TouchableOpacity>
-      </View>
-
-
-      <ScrollView className="mt-10">
+      <ScrollView className="mt-10 px-6">
         <Text className='text-2xl font-semibold text-center'>Personal</Text>
         <Text className='text-lg font-semibold mt-5'>Completed</Text>
         <View className='mt-5'>

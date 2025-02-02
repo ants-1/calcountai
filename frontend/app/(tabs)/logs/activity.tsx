@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
 import Constants from "expo-constants";
 import useAuth from "@/hooks/useAuth";
-import { Alert } from "react-native";
+import Header from "@/components/Header";
+import { ActivityType } from "@/types/ActivityType";
+
+type SortOption = "name" | "caloriesBurned";
+type SortOrder = "asc" | "desc";
 
 const ActivityTrackerScreen: React.FC = () => {
   const router = useRouter();
@@ -13,13 +17,13 @@ const ActivityTrackerScreen: React.FC = () => {
   const userId = user?._id;
   const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
 
-  const [searchText, setSearchText] = useState("");
-  const [sortOption, setSortOption] = useState<"name" | "caloriesBurned">("name");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [showSortDropdown, setShowSortDropdown] = useState(false);
-  const [allActivities, setAllActivities] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [todayLog, setTodayLog] = useState(null);
+  const [searchText, setSearchText] = useState<string>("");
+  const [sortOption, setSortOption] = useState<SortOption>("name");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const [showSortDropdown, setShowSortDropdown] = useState<boolean>(false);
+  const [allActivities, setAllActivities] = useState<ActivityType[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [todayLog, setTodayLog] = useState<any | null>(null);
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -40,7 +44,7 @@ const ActivityTrackerScreen: React.FC = () => {
         const data = await response.json();
 
         const today = new Date().toISOString().split("T")[0];
-        const todaysLog = data.dailyLogs?.find(log => log.date.split("T")[0] === today);
+        const todaysLog = data.dailyLogs?.find((log: any) => log.date.split("T")[0] === today);
 
         setTodayLog(todaysLog || null);
       } catch (error) {
@@ -60,7 +64,7 @@ const ActivityTrackerScreen: React.FC = () => {
       return;
     }
 
-    if (todayLog.exercises.some((e) => e._id === exerciseId)) {
+    if (todayLog.exercises.some((e: any) => e._id === exerciseId)) {
       Alert.alert("Error", "This activity has already been added to today's log.");
       return;
     }
@@ -72,7 +76,7 @@ const ActivityTrackerScreen: React.FC = () => {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            exercises: [...todayLog.exercises.map((e) => e._id), exerciseId],
+            exercises: [...todayLog.exercises.map((e: any) => e._id), exerciseId],
           }),
         }
       );
@@ -80,7 +84,7 @@ const ActivityTrackerScreen: React.FC = () => {
       if (response.ok) {
         const updatedLog = await response.json();
         setTodayLog(updatedLog.dailyLog);
-        Alert.alert('Exercise Added', 'Exercise has been added to log');
+        Alert.alert("Exercise Added", "Exercise has been added to log");
         router.push("/(tabs)/logs");
       } else {
         Alert.alert("Failed to add exercise");
@@ -93,29 +97,26 @@ const ActivityTrackerScreen: React.FC = () => {
   // Function to apply sorting based on selected option and order
   const getSortedActivities = () => {
     return allActivities
-      .filter(item => item.name.toLowerCase().includes(searchText.toLowerCase()))
+      .filter((item) => item.name.toLowerCase().includes(searchText.toLowerCase()))
       .sort((a, b) => {
         if (sortOption === "name") {
           return sortOrder === "asc"
             ? a.name.localeCompare(b.name)
             : b.name.localeCompare(a.name);
         } else if (sortOption === "caloriesBurned") {
-          return sortOrder === "asc" ? a.caloriesBurned - b.caloriesBurned : b.caloriesBurned - a.caloriesBurned;
+          return sortOrder === "asc"
+            ? a.caloriesBurned - b.caloriesBurned
+            : b.caloriesBurned - a.caloriesBurned;
         }
         return 0;
       });
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white px-6 pt-6">
-      <View className="flex-row justify-between items-center mb-10">
-        <Text className="text-3xl font-bold">Activities</Text>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Icon name="arrow-left" size={24} color="#4B5563" />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView className="flex-1 bg-white pt-6">
+      <Header title="Activities" icon="arrow-left" iconSize={25} titleSize="text-3xl" />
 
-      <View className="flex-row items-center space-x-2">
+      <View className="flex-row items-center space-x-2 px-6 mt-5">
         <TextInput
           className="flex-1 bg-gray-100 p-3 mr-3 rounded-lg"
           placeholder="Search for an activity..."
@@ -131,14 +132,13 @@ const ActivityTrackerScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <View className="flex-row justify-start relative mt-4">
+      <View className="flex-row justify-start relative mt-4 px-6">
         <TouchableOpacity
           className="bg-gray-200 p-3 rounded-lg"
           onPress={() => setShowSortDropdown((prev) => !prev)}
         >
           <Text className="text-sm font-semibold">
-            Sort: {`${sortOption === "name" ? "Name" : "Calories Burned"} ${sortOrder === "asc" ? "Ascending" : "Descending"
-              }`}
+            Sort: {`${sortOption === "name" ? "Name" : "Calories Burned"} ${sortOrder === "asc" ? "Ascending" : "Descending"}`}
           </Text>
         </TouchableOpacity>
 
@@ -154,8 +154,8 @@ const ActivityTrackerScreen: React.FC = () => {
                 key={option.label}
                 className="p-2"
                 onPress={() => {
-                  setSortOption(option.option as "name" | "caloriesBurned");
-                  setSortOrder(option.order as "asc" | "desc");
+                  setSortOption(option.option as SortOption);
+                  setSortOrder(option.order as SortOrder);
                   setShowSortDropdown(false);
                 }}
               >
@@ -166,15 +166,15 @@ const ActivityTrackerScreen: React.FC = () => {
         )}
       </View>
 
-      <View className="flex-row justify-around mt-6 border-b border-gray-300 pb-2">
-        <Text className="font-semibold">History</Text>
+      <View className="flex-row justify-around mt-6 border-b border-gray-300 pb-2 mx-6">
+        <Text className="font-semibold px-6">History</Text>
       </View>
 
       {loading ? (
         <ActivityIndicator size="large" color="#4B5563" className="mt-6" />
       ) : (
         <FlatList
-          className="mt-4"
+          className="mt-4 px-6"
           data={getSortedActivities()}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (

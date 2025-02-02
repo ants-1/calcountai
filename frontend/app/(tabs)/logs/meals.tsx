@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
 import Constants from "expo-constants";
+import Header from "@/components/Header";
 
 const Meals: React.FC = () => {
   const router = useRouter();
@@ -12,11 +13,10 @@ const Meals: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [meals, setMeals] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
 
-  // Fetch meals from API
   const fetchMeals = async () => {
     try {
       const response = await fetch(`${BACKEND_API_URL}/foods`);
@@ -31,7 +31,7 @@ const Meals: React.FC = () => {
 
   useEffect(() => {
     fetchMeals();
-  }, []); 
+  }, []);
 
   // Filter and sort meals
   const filteredMeals = meals.filter((item) =>
@@ -57,15 +57,10 @@ const Meals: React.FC = () => {
   ];
 
   return (
-    <SafeAreaView className="flex-1 bg-white px-6 pt-6">
-      <View className="flex-row justify-between items-center mb-10">
-        <Text className="text-3xl font-bold">Meals</Text>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Icon name="arrow-left" size={24} color="#4B5563" />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView className="flex-1 bg-white  pt-6">
+      <Header title="Meals" icon="arrow-left" iconSize={25} titleSize="text-3xl" />
 
-      <View className="flex-row items-center space-x-2">
+      <View className="flex-row items-center space-x-2 mt-5 px-6">
         <TextInput
           className="flex-1 bg-gray-100 p-3 mr-3 rounded-lg"
           placeholder="Search for food..."
@@ -82,7 +77,7 @@ const Meals: React.FC = () => {
       </View>
 
       {/* Sort Dropdown */}
-      <View className="flex-row justify-between relative mt-4">
+      <View className="flex-row justify-between relative mt-4 px-6">
         <TouchableOpacity
           className="bg-gray-200 p-3 rounded-lg"
           onPress={() => router.push("/(tabs)/logs/add-meal-barcode")}
@@ -101,7 +96,7 @@ const Meals: React.FC = () => {
         </TouchableOpacity>
 
         {showSortDropdown && (
-          <View className="absolute right-0 bg-white border border-gray-200 rounded-lg mt-12 w-48 z-10 shadow-lg">
+          <View className="absolute right-0 bg-white border border-gray-200 rounded-lg mt-12 w-48 z-10 shadow-lg mr-6">
             {sortOptions.map((option) => (
               <TouchableOpacity
                 key={option.label}
@@ -120,9 +115,8 @@ const Meals: React.FC = () => {
       </View>
 
       {/* Tabs */}
-      <View className="flex-row justify-around mt-6 border-b border-gray-300 pb-2">
-        <Text className="font-semibold">History</Text>
-        <Text className="font-semibold">My Foods</Text>
+      <View className="flex-row justify-center mt-6 border-b border-gray-300 pb-2 mx-6">
+        <Text className="font-semibold ">My Foods</Text>
       </View>
 
       {/* Loading Indicator */}
@@ -130,7 +124,7 @@ const Meals: React.FC = () => {
         <ActivityIndicator size="large" color="#4B5563" className="mt-6" />
       ) : (
         <FlatList
-          className="mt-4"
+          className="mt-4 px-6"
           data={sortedMeals}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
@@ -138,14 +132,19 @@ const Meals: React.FC = () => {
               <Text className="text-lg">{item.name}</Text>
               <View className="flex flex-row gap-4">
                 <Text className="text-gray-600">{item.calories} cal</Text>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => router.push({
+                    pathname: "/(tabs)/logs/add-meal-manual",
+                    params: { mealId: item._id },
+                  })}
+                >
                   <Icon name="plus" size={20} color="#4B5563" />
                 </TouchableOpacity>
               </View>
             </View>
           )}
           ListEmptyComponent={
-            <View className="mt-6">
+            <View className="mt-6 px-6">
               <Text className="text-center text-gray-500">No meals found.</Text>
             </View>
           }

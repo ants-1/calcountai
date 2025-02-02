@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import useAuth from "@/hooks/useAuth";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
-import Icon from "react-native-vector-icons/FontAwesome";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Header from "@/components/Header";
 
 const CreateCommunity = () => {
   const { user } = useAuth();
@@ -28,8 +28,8 @@ const CreateCommunity = () => {
         body: JSON.stringify({
           name,
           description,
-          createdBy: user._id,
-          members: [user._id],
+          createdBy: user?._id,
+          members: [user?._id],
           challenges: [],
         }),
       });
@@ -47,16 +47,11 @@ const CreateCommunity = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white px-6 pt-6">
-      <View className="flex-row justify-between items-center">
-        <Text className="text-3xl font-bold">Create Community</Text>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Icon name="arrow-left" size={24} color="#4B5563" />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView className="flex-1 bg-white pt-6">
+      <Header title="Create Community" icon="arrow-left" iconSize={25} titleSize="text-3xl" />
 
       {/* Community Form */}
-      <View className="mt-6">
+      <View className="mt-6 px-6">
         <Text className="mt-4 text">Community Name</Text>
         <TextInput
           className="border-2 border-gray-300 p-3 rounded-lg w-full mb-4"

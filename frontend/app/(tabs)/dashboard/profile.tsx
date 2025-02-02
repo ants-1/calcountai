@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import Icon from "react-native-vector-icons/FontAwesome";
 import useAuth from "@/hooks/useAuth";
 import Constants from "expo-constants";
+import Header from "@/components/Header";
 
 const Profile: React.FC = () => {
   const router = useRouter();
@@ -112,13 +113,8 @@ const Profile: React.FC = () => {
   }, [user]);
 
   return (
-    <SafeAreaView className="flex-1 bg-white px-6 pt-6">
-      <View className="flex-row justify-between items-center">
-        <Text className="text-3xl font-bold">Profile</Text>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Icon name="arrow-left" size={24} color="#4B5563" />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView className="flex-1 bg-white pt-6 px-6">
+      <Header title="Profile" icon="arrow-left" iconSize={25} titleSize="text-3xl"  />
 
       <View>
         <View className="mt-10 items-center">

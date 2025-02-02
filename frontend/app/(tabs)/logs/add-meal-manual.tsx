@@ -1,10 +1,38 @@
 import { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
-import Icon from "react-native-vector-icons/FontAwesome";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Constants from "expo-constants";
 import useAuth from "@/hooks/useAuth";
+import Header from "@/components/Header";
+
+// Define types for state variables
+interface Meal {
+  name: string;
+  calories: string;
+  numberOfServings: string;
+  servingSize: string;
+  mealType: string;
+  protein: string;
+  fat: string;
+  carbohydrates: string;
+}
+
+interface Log {
+  _id: string;
+  date: string;
+  foods: Array<{ _id: string }>;
+}
+
+interface LogResponse {
+  dailyLogs: Log[];
+}
+
+interface MealResponse {
+  newFood: {
+    _id: string;
+  };
+}
 
 const AddMealManual = () => {
   const router = useRouter();
@@ -12,7 +40,7 @@ const AddMealManual = () => {
   const userId = user?._id;
   const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
 
-  const [meal, setMeal] = useState({
+  const [meal, setMeal] = useState<Meal>({
     name: "",
     calories: "",
     numberOfServings: "",
@@ -22,17 +50,17 @@ const AddMealManual = () => {
     fat: "",
     carbohydrates: "",
   });
-  const [logs, setLogs] = useState([]);
-  const [log, setLog] = useState(null);
-  const [showLogDropdown, setShowLogDropdown] = useState(false);
-  const [showMealTypeDropdown, setShowMealTypeDropdown] = useState(false);
+  const [logs, setLogs] = useState<Log[]>([]);
+  const [log, setLog] = useState<Log | null>(null);
+  const [showLogDropdown, setShowLogDropdown] = useState<boolean>(false);
+  const [showMealTypeDropdown, setShowMealTypeDropdown] = useState<boolean>(false);
 
   // Fetch logs for the user
   useEffect(() => {
     const fetchLogs = async () => {
       try {
         const response = await fetch(`${BACKEND_API_URL}/users/${userId}/dailyLogs`);
-        const data = await response.json();
+        const data: LogResponse = await response.json();
         setLogs(data.dailyLogs || []);
       } catch (error) {
         console.error("Error fetching logs:", error);
@@ -43,7 +71,7 @@ const AddMealManual = () => {
   }, [userId]);
 
   // Format the date
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   };
@@ -85,7 +113,7 @@ const AddMealManual = () => {
         return;
       }
 
-      const mealData = JSON.parse(rawResponse);
+      const mealData: MealResponse = JSON.parse(rawResponse);
 
       const mealId = mealData.newFood?._id;
 
@@ -130,17 +158,12 @@ const AddMealManual = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white px-6 pt-6">
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="flex-row justify-between items-center mb-10">
-          <Text className="text-3xl font-bold">Add Meal</Text>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Icon name="arrow-left" size={24} color="#4B5563" />
-          </TouchableOpacity>
-        </View>
+    <SafeAreaView className="flex-1 bg-white pt-6">
+      <Header title="Add Meal" icon="arrow-left" iconSize={25} titleSize="text-3xl" />
 
+      <ScrollView showsVerticalScrollIndicator={false} className="px-6">
         {/* Name */}
-        <Text className="text-lg font-semibold mb-2">Meal Name</Text>
+        <Text className="text-lg font-semibold mb-2 mt-10">Meal Name</Text>
         <TextInput
           className="w-full p-4 bg-gray-200 rounded-lg mb-4 text-lg"
           placeholder="Enter meal name"

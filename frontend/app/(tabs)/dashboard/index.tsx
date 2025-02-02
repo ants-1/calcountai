@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Icon from "react-native-vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
 import useAuth from "@/hooks/useAuth";
 import Constants from "expo-constants";
 import { useFocusEffect } from "expo-router";
+import Header from "@/components/Header";
 
 const fetchLatestDailyLog = async (userId: string) => {
   try {
@@ -18,11 +18,11 @@ const fetchLatestDailyLog = async (userId: string) => {
     }
 
     if (!data.dailyLogs || data.dailyLogs.length === 0) {
-      return null; 
+      return null;
     }
 
     // Sort logs by date in descending order (latest first)
-    const sortedLogs = data.dailyLogs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const sortedLogs = data.dailyLogs.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     return sortedLogs[0];
   } catch (error) {
@@ -36,15 +36,15 @@ const fetchWeightGoalData = async (userId: string) => {
     const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
     const response = await fetch(`${BACKEND_API_URL}/users/${userId}`);
 
-    const textResponse = await response.text(); 
+    const textResponse = await response.text();
 
-    const data = JSON.parse(textResponse); 
+    const data = JSON.parse(textResponse);
 
     if (!response.ok) {
       throw new Error(data.error || "Failed to fetch weight goal data");
     }
 
-    return data.user; 
+    return data.user;
   } catch (error) {
     console.error("Error fetching weight goal data:", error);
     return null;
@@ -63,7 +63,7 @@ const Dashboard: React.FC = () => {
   const [weightGoal, setWeightGoal] = useState<number | null>(null);
   const [currentWeight, setCurrentWeight] = useState<number>(75);
   const [recentMeals, setRecentMeals] = useState<any[]>([]);
-  const [recentActivities, setRecentActivities] = useState<any[]>([]); 
+  const [recentActivities, setRecentActivities] = useState<any[]>([]);
 
   const dailyGoal = 2000;
   const streak = 5;
@@ -105,14 +105,14 @@ const Dashboard: React.FC = () => {
         fetchWeightGoalData(userId)
           .then((userData) => {
             if (userData) {
-              setWeightGoal(userData.targetWeight); 
+              setWeightGoal(userData.targetWeight);
               setCurrentWeight(userData.currentWeight);
             }
           })
           .catch((error) => console.error("Error fetching weight goal data:", error))
           .finally(() => setLoading(false));
       }
-    }, [userId]) 
+    }, [userId])
   );
 
   const getProgressMessage = () => {
@@ -126,15 +126,10 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white px-4 pt-6 pb-6">
-      <View className="flex-row justify-between items-center px-4">
-        <Text className="text-3xl font-bold">Dashboard</Text>
-        <TouchableOpacity onPress={() => router.push("/dashboard/profile" as any)}>
-          <Icon name="user-circle" size={30} color="#4B5563" />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView className="flex-1 bg-white px-4 pt-6">
+      <Header title="Dashboard" icon="user-circle" iconSize={30} titleSize="text-3xl" link="/dashboard/profile" />
 
-      <ScrollView className="mt-6">
+      <ScrollView>
         {/* Motivational Support Section */}
         <View className="mt-6 bg-yellow-100 p-4 rounded-xl">
           <Text className="text-lg font-semibold text-yellow-700">Motivation for You</Text>

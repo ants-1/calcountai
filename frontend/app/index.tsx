@@ -22,11 +22,7 @@ export default function Index() {
               Log in
             </Link>
           </Text>
-          <Link href="/dashboard" className="underline font-semibold text-center">
-            Dashboard
-          </Link>
         </View>
-
       </View>
     </SafeAreaView>
   );

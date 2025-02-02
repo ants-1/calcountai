@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import { useUserData } from "@/hooks/useUser"; // Import the hook for user data context
+import { useUserData } from "@/hooks/useUser";
 
 const TargetWeight: React.FC = () => {
   const router = useRouter();

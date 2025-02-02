@@ -5,6 +5,20 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Constants from "expo-constants";
 import useAuth from "@/hooks/useAuth";
+import Header from "@/components/Header";
+
+// Types for Activity and Log
+type Activity = {
+  name: string;
+  duration: string;
+  caloriesBurned: string;
+};
+
+type Log = {
+  _id: string;
+  date: string;
+  exercises: Array<{ _id: string }>;
+};
 
 const AddActivity = () => {
   const router = useRouter();
@@ -12,14 +26,15 @@ const AddActivity = () => {
   const userId = user?._id;
   const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
 
-  const [activity, setActivity] = useState({
+  const [activity, setActivity] = useState<Activity>({
     name: "",
     duration: "",
     caloriesBurned: "",
   });
-  const [logs, setLogs] = useState([]);
-  const [log, setLog] = useState(null);
-  const [showLogDropdown, setShowLogDropdown] = useState(false);
+
+  const [logs, setLogs] = useState<Log[]>([]);
+  const [log, setLog] = useState<Log | null>(null);
+  const [showLogDropdown, setShowLogDropdown] = useState<boolean>(false);
 
   // Fetch logs for the user
   useEffect(() => {
@@ -37,7 +52,7 @@ const AddActivity = () => {
   }, [userId]);
 
   // Format the date
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   };
@@ -70,7 +85,6 @@ const AddActivity = () => {
       }
 
       const exerciseData = await exerciseResponse.json();
-
 
       const exerciseId = exerciseData.newExercise?._id;
 
@@ -118,15 +132,10 @@ const AddActivity = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white px-6 pt-6">
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="flex-row justify-between items-center mb-10">
-          <Text className="text-3xl font-bold">Add Activity</Text>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Icon name="arrow-left" size={24} color="#4B5563" />
-          </TouchableOpacity>
-        </View>
+    <SafeAreaView className="flex-1 bg-white pt-6">
+      <Header title="Add Activity" icon="arrow-left" iconSize={25} titleSize="text-3xl" />
 
+      <ScrollView showsVerticalScrollIndicator={false} className="px-6 mt-5">
         {/* Name */}
         <Text className="text-lg font-semibold mb-2">Activity Name</Text>
         <TextInput
