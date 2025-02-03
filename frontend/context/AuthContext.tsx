@@ -76,7 +76,6 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
         }
 
         const data = await response.json();
-        console.log('User data:', data.user); 
         setUser(data.user);
         setIsAuth(true);
       } catch (error) {
@@ -120,7 +119,6 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
         throw new Error("Login failed");
       } else {
         const data: AuthResponse = await response.json();
-        console.log("Login success:", data);
         setToken(data.token);
         setUser(data.user);
         router.push("/(tabs)/dashboard");
@@ -143,7 +141,6 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
         throw new Error("Sign-up failed");
       } else {
         const data: AuthResponse = await response.json();
-        console.log("Sign-up success:", data);
         setToken(data.token);
         setUser(data.user);
         router.push("/(auth)/goal-info");

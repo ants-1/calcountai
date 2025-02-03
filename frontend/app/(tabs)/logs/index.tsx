@@ -235,8 +235,18 @@ const Log: React.FC = () => {
               </TouchableOpacity>
             </View>
 
+            <View className='flex flex-row justify-between mt-8'>
+              <TouchableOpacity onPress={() => router.push("/(tabs)/logs/meals")} className='bg-blue-500 p-5 rounded-lg w-36'>
+                <Text className='text-white text-center'>+ Add Meal</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => router.push("/(tabs)/logs/activity")} className='bg-blue-500 p-5 rounded-lg w-36'>
+                <Text className='text-white text-center'>+ Add Activity</Text>
+              </TouchableOpacity>
+            </View>
+
             {/* Meals Section */}
-            <Text className="text-2xl font-semibold text-center mt-10">Meals</Text>
+            <Text className="text-2xl font-semibold text-center mt-8">Meals</Text>
             {['Breakfast', 'Lunch', 'Dinner', 'Snacks'].map((mealType) => (
               <View key={mealType} className="mt-4 bg-gray-100 p-4 rounded-xl">
                 <Text className="text-lg font-semibold text-gray-700">{mealType}</Text>

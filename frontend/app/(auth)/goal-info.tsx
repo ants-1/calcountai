@@ -24,7 +24,7 @@ const GoalInfo: React.FC = () => {
   return (
     <View className="flex-1 justify-evenly items-center bg-white px-4">
       <View className='w-full'>
-        <Text className="text-3xl font-bold mb-10 text-center">Current Goal?</Text>
+        <Text className="text-3xl font-bold mb-10 mt-20 text-center">Current Goal?</Text>
 
         {/* Progress Indicator */}
         <View className='flex flex-row justify-center mb-20 gap-5'>

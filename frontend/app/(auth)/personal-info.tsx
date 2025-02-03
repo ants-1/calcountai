@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { TouchableOpacity, View, Text } from "react-native";
 import { useUserData } from "@/hooks/useUser";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const PersonalInfo: React.FC = () => {
   const router = useRouter();
@@ -22,6 +23,12 @@ const PersonalInfo: React.FC = () => {
   return (
     <View className="flex-1 justify-evenly items-center bg-white px-4">
       <View className="w-full">
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="bg-gray-200 p-3 rounded-lg w-12"
+        >
+          <Icon name="arrow-left" size={24} color="#4B5563" />
+        </TouchableOpacity>
         <Text className="text-3xl font-bold mb-10 text-center">Personal Info</Text>
 
         {/* Progress Indicator */}
@@ -54,8 +61,8 @@ const PersonalInfo: React.FC = () => {
           className={`p-4 rounded-lg w-[300px] ${selectedGender ? "bg-blue-500" : "bg-gray-300"}`}
           disabled={!selectedGender}
           onPress={() => {
-            handleGenderChange(); 
-            router.push("/current-weight"); 
+            handleGenderChange();
+            router.push("/current-weight");
           }}
         >
           <Text className="text-center text-white font-semibold text-lg">Continue</Text>
