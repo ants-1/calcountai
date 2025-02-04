@@ -9,7 +9,13 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "extra": {
-      "BACKEND_API_URL": "https://calcountai.onrender.com/api/v1" 
+      "BACKEND_API_URL": "https://calcountai.onrender.com/api/v1",
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "7d2b63d3-36c9-430a-a56d-dd76b7bf9252"
+      }
     },
     "ios": {
       "supportsTablet": true
@@ -18,7 +24,10 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA"
+      ]
     },
     "web": {
       "bundler": "metro",

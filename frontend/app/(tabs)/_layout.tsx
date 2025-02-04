@@ -24,6 +24,7 @@ const TabIcon: React.FC<TabIconProps> = ({ icon, color, name, focused }) => {
         resizeMode="contain"
         tintColor={color}
         className="w-6 h-6"
+        style={{ width: 24, height: 24 }}
       />
       <Text
         className={`${focused ? "font-semibold" : "font-normal"} text-xs`}

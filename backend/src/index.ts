@@ -12,12 +12,12 @@ dotenv.config();
 
 const app = express();
 const PORT = Number(process.env.PORT) || 4000;
-const allowedOrigins = [
-  String(PORT),
-  "http://localhost:4000",
-  String(process.env.FRONTEND_DEV_URL),
-  String(process.env.FRONTEND_PRO_URL),
-];
+// const allowedOrigins = [
+//   String(PORT),
+//   "http://localhost:4000",
+//   String(process.env.FRONTEND_DEV_URL),
+//   String(process.env.FRONTEND_PRO_URL),
+// ];
 
 connectToDatabase();
 initialisePassport();
@@ -33,7 +33,7 @@ app.use(
 );
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
