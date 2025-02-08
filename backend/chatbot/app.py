@@ -1,5 +1,6 @@
 import os
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import google.generativeai as genai
 from dotenv import load_dotenv
 
@@ -8,6 +9,13 @@ load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 app = Flask(__name__)
+CORS(app, resources={
+    r"/*": {
+        "origins": "*", 
+        "methods": ["GET", "POST", "PUT", "DELETE"], 
+        "supports_credentials": True 
+    }
+})
 
 genai.configure(api_key=GEMINI_API_KEY)
 
@@ -33,7 +41,7 @@ def chatbot(user_message):
 
 @app.route("/chats", methods=['POST'])
 def chat():
-    
+    print("Received request:", request.json)
     user_message = request.json.get("message")
     
     if not user_message:
@@ -46,4 +54,4 @@ def chat():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5002)
