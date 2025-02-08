@@ -1,6 +1,35 @@
+import os
 from flask import Flask, request, jsonify
+import google.generativeai as genai
+from dotenv import load_dotenv
+
+load_dotenv()
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 app = Flask(__name__)
+
+genai.configure(api_key=GEMINI_API_KEY)
+
+def chatbot(user_message):
+    generation_config = {
+        "temperature": 1,
+        "top_p": 0.95,
+        "top_k": 40,
+        "max_output_tokens": 512, 
+        "response_mime_type": "text/plain",
+    }
+    
+    model = genai.GenerativeModel(
+        model_name="gemini-2.0-flash-exp",
+        generation_config=generation_config,
+    )
+    
+    chat_session = model.start_chat(history=[])
+    
+    response = chat_session.send_message(user_message)
+    
+    return response.text
 
 @app.route("/chats", methods=['POST'])
 def chat():
@@ -10,7 +39,11 @@ def chat():
     if not user_message:
         return jsonify({"error": "No message provided."}), 400
     
-    return jsonify({"response": user_message})
+    try:
+        chatbot_response = chatbot(user_message)
+        return jsonify({"response": chatbot_response})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

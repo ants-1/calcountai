@@ -53,8 +53,18 @@ const CurrentWeight: React.FC = () => {
             >
               <Icon name="arrow-left" size={24} color="#4B5563" />
             </TouchableOpacity>
-            
+
             <Text className="text-3xl font-bold mb-10 text-center">Current weight?</Text>
+
+            {/* Progress Indicator */}
+            <View className="flex flex-row justify-center mb-20 gap-5">
+              <View className="rounded-full h-8 w-8 bg-black"></View>
+              <View className="rounded-full h-8 w-8 bg-black"></View>
+              <View className="rounded-full h-8 w-8 bg-gray-200"></View>
+              <View className="rounded-full h-8 w-8 bg-gray-200"></View>
+              <View className="rounded-full h-8 w-8 bg-gray-200"></View>
+              <View className="rounded-full h-8 w-8 bg-gray-200"></View>
+            </View>
 
             {/* Weight Input */}
             <View className="flex flex-row justify-center gap-3">
