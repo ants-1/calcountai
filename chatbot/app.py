@@ -39,6 +39,10 @@ def chatbot(user_message):
     
     return response.text
 
+@app.route("/", methods=["GET"])
+def home():
+    return "Chatbot is running"
+
 @app.route("/chats", methods=['POST'])
 def chat():
     print("Received request:", request.json)

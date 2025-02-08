@@ -1,4 +1,4 @@
 node_modules
 .env
 /backend/dist
-/backend/chatbot/venv
+/chatbot/venv

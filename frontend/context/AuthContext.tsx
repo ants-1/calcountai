@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode } from "react";
 import { UserType } from "../types/UserType";
-import { Alert } from "react-native";
+import { Alert, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
@@ -50,11 +50,30 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
   const router = useRouter();
 
   useEffect(() => {
+    const fetchToken = async () => {
+      const storedToken = Platform.OS === "web" ? localStorage.getItem("token") : await AsyncStorage.getItem("token");
+      if (storedToken) {
+        setToken(storedToken);
+        setIsAuth(true);
+      }
+    };
+    fetchToken();
+  }, [setToken, setIsAuth]);
+
+  useEffect(() => {
     if (token) {
-      AsyncStorage.setItem("token", token);
+      if (Platform.OS === "web") {
+        localStorage.setItem("token", token);
+      } else {
+        AsyncStorage.setItem("token", token);
+      }
       setIsAuth(true);
     } else {
-      AsyncStorage.removeItem("token");
+      if (Platform.OS === "web") {
+        localStorage.removeItem("token");
+      } else {
+        AsyncStorage.removeItem("token");
+      }
       setIsAuth(false);
     }
   }, [token]);
@@ -156,7 +175,11 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
     setUser(null);
     setIsAuth(false);
     setTokenExpiration(null);
-    await AsyncStorage.removeItem("token");
+    if (Platform.OS === "web") {
+      localStorage.removeItem("token");
+    } else {
+      await AsyncStorage.removeItem("token");
+    }
   };
 
   return (
