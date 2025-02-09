@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert, Platform } from "react-native";
 import React, { useState } from "react";
 import useAuth from "@/hooks/useAuth";
 import Constants from "expo-constants";
@@ -14,7 +14,11 @@ const CreateCommunity = () => {
 
   const createCommunity = async () => {
     if (!name || !description || name.length < 3 || description.length < 3) {
-      Alert.alert("Error", "Both name and description must be at least 3 characters long.");
+      if (Platform.OS === "web") {
+        alert("Error: \nBoth name and description must be at least 3 characters long.")
+      } else {
+        Alert.alert("Error", "Both name and description must be at least 3 characters long.");
+      }
       return;
     }
 
@@ -38,11 +42,21 @@ const CreateCommunity = () => {
         throw new Error(`Failed to create community. Status: ${response.status}`);
       }
 
-      Alert.alert("Success", "Community created successfully.");
+      if (Platform.OS === "web") {
+        alert("Success: \nCommunity created successfully.")
+      } else {
+        Alert.alert("Success", "Community created successfully.");
+      }
+
       router.back();
     } catch (error) {
       console.error("Error creating community:", error);
-      Alert.alert("Error", "There was an issue creating the community.");
+
+      if (Platform.OS == "web") {
+        alert("Error: There was an issue creating the community.");
+      } else {
+        Alert.alert("Error", "There was an issue creating the community.");
+      }
     }
   };
 

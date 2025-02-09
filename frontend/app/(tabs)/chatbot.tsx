@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 import React, { useState } from 'react';
-import { SafeAreaView, Text, View, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { SafeAreaView, Text, View, TextInput, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 
 interface Message {
   sender: 'user' | 'bot';
@@ -8,7 +8,7 @@ interface Message {
 }
 
 const Chatbot: React.FC = () => {
-  const TEMP_CHATBOT_API_URL = Constants.expoConfig?.extra?.TEMP_CHATBOT_API_URL;
+  const CHATBOT_API_URL = Constants.expoConfig?.extra?.CHATBOT_API_URL;
 
   const [messages, setMessages] = useState<Message[]>([
     { sender: 'bot', text: 'Welcome to CalCountAI.' },
@@ -24,7 +24,7 @@ const Chatbot: React.FC = () => {
     setMessageInput('');
 
     try {
-      const response = await fetch(`${TEMP_CHATBOT_API_URL}/chats`, {
+      const response = await fetch(`${CHATBOT_API_URL}/chats`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,7 +42,12 @@ const Chatbot: React.FC = () => {
       setMessages((prevMessages) => [...prevMessages, botMessage]);
     } catch (error) {
       console.error('Error:', error);
-      Alert.alert('Error', 'Unable to fetch response from the chatbot.');
+      if (Platform.OS === "web") {
+        alert("Error: \nUnable to fetch response from the chatbot.");
+      } else {
+        Alert.alert('Error', 'Unable to fetch response from the chatbot.');
+      }
+      
     }
   };
 

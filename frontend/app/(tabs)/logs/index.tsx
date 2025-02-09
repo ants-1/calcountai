@@ -1,6 +1,6 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from "react-native-vector-icons/FontAwesome";
 import useAuth from "@/hooks/useAuth";
@@ -112,11 +112,15 @@ const Log: React.FC = () => {
 
       const todayLog = dailyLogs.find(log => log.date.split('T')[0] === today);
       if (todayLog) {
-        Alert.alert(
-          "Log Already Created",
-          "A log for today has already been created.",
-          [{ text: "OK" }]
-        );
+        if (Platform.OS === "web") {
+          alert("Log Already Created \nA log for today has already been created.")
+        } else {
+          Alert.alert(
+            "Log Already Created",
+            "A log for today has already been created.",
+            [{ text: "OK" }]
+          );
+        }
         return;
       }
 
@@ -159,7 +163,11 @@ const Log: React.FC = () => {
         const updatedLog = await response.json();
         setCurrentLog(updatedLog.dailyLog);
       } else {
-        Alert.alert("Failed to remove exercise");
+        if (Platform.OS === "web") {
+          alert("Error: \nFailed to remove exercise.");
+        } else {
+          Alert.alert("Error", "Failed to remove exercise.");
+        }
       }
     } catch (error) {
       console.error("Error removing exercise:", error);

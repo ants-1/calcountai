@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { View, Text, TouchableOpacity, Dimensions, Alert, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, Dimensions, Alert, ScrollView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -97,7 +97,11 @@ const CommunityDetails = () => {
         setCommunity(data.community);
       } catch (error) {
         console.error("Error fetching community:", error);
-        Alert.alert("Error", "Community not found or there was an issue loading the data.");
+        if (Platform.OS === "web") {
+          alert("Error: \nCommunity not found or there was an issue loading the data.");
+        } else {
+          Alert.alert("Error", "Community not found or there was an issue loading the data.");
+        }
       } finally {
         setLoading(false);
       }
@@ -131,95 +135,129 @@ const CommunityDetails = () => {
       }
 
       setIsJoined(true);
-      Alert.alert("Success", "You have successfully joined the community.");
+
+      if (Platform.OS === "web") {
+        alert("Success: \nYou have successfully joined the community.");
+      } else {
+        Alert.alert("Success", "You have successfully joined the community.");
+      }
+
       router.replace(`/community/${id}`);
     } catch (error) {
       console.error("Error joining community:", error);
-      Alert.alert("Error", "There was an issue joining the community.");
+
+      if (Platform.OS === "web") {
+        alert("Error: \nThere was an issue joining the community.")
+      } else {
+        Alert.alert("Error", "There was an issue joining the community.");
+      }
     }
   };
 
   const leaveCommunity = async () => {
-    Alert.alert(
-      "Confirm Leave",
-      "Are you sure you want to leave this community?",
-      [
-        {
-          text: "No",
-          onPress: () => console.log("Cancel Leave"),
-          style: "cancel",
-        },
-        {
-          text: "Yes",
-          onPress: async () => {
-            try {
-              const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
-              const API_URL = `${BACKEND_API_URL}/communities/${id}/leave`;
-              const userId = user?._id;
-
-              const response = await fetch(API_URL, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId }),
-              });
-
-              if (!response.ok) {
-                throw new Error(`Failed to leave community. Status: ${response.status}`);
-              }
-
-              setIsJoined(false);
-              Alert.alert("Success", "You have successfully left the community.");
-              router.replace(`/community/${id}`);
-            } catch (error) {
-              console.error("Error leaving community:", error);
-              Alert.alert("Error", "There was an issue leaving the community.");
-            }
-          },
-        },
-      ],
-      { cancelable: false }
-    );
+    if (Platform.OS === "web") {
+      const confirmLeave = window.confirm("Are you sure you want to leave this community?");
+      if (!confirmLeave) return;
+    } else {
+      const confirmLeave = await new Promise((resolve) =>
+        Alert.alert(
+          "Confirm Leave",
+          "Are you sure you want to leave this community?",
+          [
+            { text: "No", onPress: () => resolve(false), style: "cancel" },
+            { text: "Yes", onPress: () => resolve(true) },
+          ],
+          { cancelable: false }
+        )
+      );
+      if (!confirmLeave) return;
+    }
+  
+    try {
+      const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
+      const API_URL = `${BACKEND_API_URL}/communities/${id}/leave`;
+      const userId = user?._id;
+  
+      const response = await fetch(API_URL, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to leave community. Status: ${response.status}`);
+      }
+  
+      setIsJoined(false);
+  
+      if (Platform.OS === "web") {
+        alert("You have successfully left the community.");
+      } else {
+        Alert.alert("Success", "You have successfully left the community.");
+      }
+  
+      router.replace(`/community/${id}`);
+    } catch (error) {
+      console.error("Error leaving community:", error);
+  
+      if (Platform.OS === "web") {
+        alert("There was an issue leaving the community.");
+      } else {
+        Alert.alert("Error", "There was an issue leaving the community.");
+      }
+    }
   };
 
   const deleteCommunity = async () => {
-    Alert.alert(
-      "Confirm Delete",
-      "Are you sure you want to delete this community?",
-      [
-        {
-          text: "No",
-          onPress: () => console.log("Cancel Delete"),
-          style: "cancel",
-        },
-        {
-          text: "Yes",
-          onPress: async () => {
-            try {
-              const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
-              const API_URL = `${BACKEND_API_URL}/communities/${id}`;
-
-              const response = await fetch(API_URL, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-              });
-
-              if (!response.ok) {
-                throw new Error(`Failed to delete community. Status: ${response.status}`);
-              }
-
-              Alert.alert("Success", "Community has been deleted.");
-              router.push('/(tabs)/community'); // Redirect to communities page after deletion
-            } catch (error) {
-              console.error("Error deleting community:", error);
-              Alert.alert("Error", "There was an issue deleting the community.");
-            }
-          },
-        },
-      ],
-      { cancelable: false }
-    );
+    if (Platform.OS === "web") {
+      const confirmDelete = window.confirm("Are you sure you want to delete this community?");
+      if (!confirmDelete) return;
+    } else {
+      const confirmDelete = await new Promise((resolve) =>
+        Alert.alert(
+          "Confirm Delete",
+          "Are you sure you want to delete this community?",
+          [
+            { text: "No", onPress: () => resolve(false), style: "cancel" },
+            { text: "Yes", onPress: () => resolve(true) },
+          ],
+          { cancelable: false }
+        )
+      );
+      if (!confirmDelete) return;
+    }
+  
+    try {
+      const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
+      const API_URL = `${BACKEND_API_URL}/communities/${id}`;
+  
+      const response = await fetch(API_URL, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to delete community. Status: ${response.status}`);
+      }
+  
+      if (Platform.OS === "web") {
+        alert("Community has been deleted.");
+      } else {
+        Alert.alert("Success", "Community has been deleted.");
+      }
+  
+      router.push("/(tabs)/community");
+    } catch (error) {
+      console.error("Error deleting community:", error);
+  
+      if (Platform.OS === "web") {
+        alert("There was an issue deleting the community.");
+      } else {
+        Alert.alert("Error", "There was an issue deleting the community.");
+      }
+    }
   };
-
+  
   if (loading) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-white">
@@ -241,7 +279,7 @@ const CommunityDetails = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <Header title={community.name} icon="arrow-left" iconSize={25} titleSize="text-3xl"/>
+      <Header title={community.name} icon="arrow-left" iconSize={25} titleSize="text-3xl" />
 
       <View className="px-6 py-4">
         {isJoined === null ? (

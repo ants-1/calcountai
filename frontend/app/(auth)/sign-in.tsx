@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { SafeAreaView, View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
+import { SafeAreaView, View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, Platform } from "react-native";
 import { Link } from "expo-router";
 import useAuth from "@/hooks/useAuth";
 
@@ -19,7 +19,11 @@ const SignIn: React.FC = () => {
 
   const submit = async () => {
     if (!form.email || !form.password) {
-      Alert.alert("Validation Error", "Please enter both email and password.");
+      if (Platform.OS === "web") {
+        alert("Validation Error: \nPlease enter both email and password.");
+      } else {
+        Alert.alert("Validation Error", "Please enter both email and password.");
+      }
       return;
     }
 
@@ -29,6 +33,11 @@ const SignIn: React.FC = () => {
       await login(form.email, form.password);
     } catch (error: any) {
       setIsSubmitting(false);
+      if (Platform.OS === "web") {
+        alert("Login failed.");
+      } else {
+        Alert.alert("Error", "Login failed.");
+      }
     } finally {
       setIsSubmitting(false);
     }

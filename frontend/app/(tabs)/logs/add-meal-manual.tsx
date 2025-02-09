@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Constants from "expo-constants";
@@ -81,12 +81,20 @@ const AddMealManual = () => {
 
   const handleAddMeal = async () => {
     if (!log) {
-      Alert.alert("Error", "Please select a log.");
+      if (Platform.OS === "web") {
+        alert("Error: \nPlease select a log.");
+      } else {
+        Alert.alert("Error", "Please select a log.");
+      }
       return;
     }
 
     if (!meal.name || !meal.calories || !meal.numberOfServings || !meal.servingSize || !meal.mealType) {
-      Alert.alert("Error", "Please fill all required fields.");
+      if (Platform.OS === "web") {
+        alert("Error: \nPlease fill all required fields.");
+      } else {
+        Alert.alert("Error", "Please fill all required fields.");
+      }
       return;
     }
 
@@ -109,7 +117,11 @@ const AddMealManual = () => {
       const rawResponse = await mealResponse.text();
 
       if (!mealResponse.ok) {
-        Alert.alert("Error", "Failed to add meal.");
+        if (Platform.OS === "web") {
+          alert("Error: \nFailed to add meal.");
+        } else {
+          Alert.alert("Error", "Failed to add meal.");
+        }
         return;
       }
 
@@ -119,12 +131,20 @@ const AddMealManual = () => {
 
       if (!mealId) {
         console.error("Invalid meal ID:", mealData);
-        Alert.alert("Error", "Failed to create valid meal.");
+        if (Platform.OS === "web") {
+          alert("Error: \n Failed to create valid meal");
+        } else {
+          Alert.alert("Error", "Failed to create valid meal.");
+        }
         return;
       }
 
       if (log.foods.some((m) => m._id === mealId)) {
-        Alert.alert("Error", "This meal has already been added to the log.");
+        if (Platform.OS === "web") {
+          alert("Error: \nThis meal has already been added to the log.");
+        } else {
+          Alert.alert("Error", "This meal has already been added to the log.");
+        }
         return;
       }
 
@@ -144,16 +164,29 @@ const AddMealManual = () => {
       if (logResponse.ok) {
         const updatedLog = await logResponse.json();
         setLog(updatedLog.dailyLog);
-        Alert.alert("Success", "Meal added successfully!");
+
+        if (Platform.OS === "web") {
+          alert("Success: \nMeal added successfully!");
+        } else {
+          Alert.alert("Success", "Meal added successfully!");
+        }
         router.push("/logs");
       } else {
         const errorLogData = await logResponse.json();
         console.error("Failed to add meal to log:", errorLogData);
-        Alert.alert("Error", "Failed to add meal to log.");
+        if (Platform.OS === "web") {
+          alert("Error: \nFailed to add meal to log.");
+        } else {
+          Alert.alert("Error", "Failed to add meal to log.");
+        }
       }
     } catch (error) {
       console.error("Error adding meal:", error);
-      Alert.alert("Error", "An error occurred while adding the meal.");
+      if (Platform.OS === "web") {
+        alert("Error: \nAn error occurred while adding the meal.");
+      } else {
+        Alert.alert("Error", "An error occurred while adding the meal.");
+      }
     }
   };
 

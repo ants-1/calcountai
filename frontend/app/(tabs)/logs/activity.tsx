@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator, Alert, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
@@ -65,7 +65,11 @@ const ActivityTrackerScreen: React.FC = () => {
     }
 
     if (todayLog.exercises.some((e: any) => e._id === exerciseId)) {
-      Alert.alert("Error", "This activity has already been added to today's log.");
+      if (Platform.OS === "web") {
+        alert("Error: \nThis activity has already been added to today's log.")
+      } else {
+        Alert.alert("Error", "This activity has already been added to today's log.");
+      } 
       return;
     }
 
@@ -84,10 +88,21 @@ const ActivityTrackerScreen: React.FC = () => {
       if (response.ok) {
         const updatedLog = await response.json();
         setTodayLog(updatedLog.dailyLog);
-        Alert.alert("Exercise Added", "Exercise has been added to log");
+
+        if (Platform.OS === "web") {
+          alert("Exercise Added: \nExercise has been added to log");
+        } else {
+          Alert.alert("Exercise Added", "Exercise has been added to log");
+        }
+
         router.push("/(tabs)/logs");
       } else {
-        Alert.alert("Failed to add exercise");
+
+        if (Platform.OS === "web") {
+          alert("Error: \nFailed to add exercise");
+        } else {
+          Alert.alert("Error", "Failed to add exercise");
+        }
       }
     } catch (error) {
       console.error("Error adding exercise:", error);

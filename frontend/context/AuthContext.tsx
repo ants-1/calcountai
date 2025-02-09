@@ -144,7 +144,11 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
       }
     } catch (error: any) {
       console.error("Login error:", error);
-      Alert.alert("Error", error.message || "Failed to login. Please try again.");
+      if (Platform.OS === "web") {
+        alert(`Error: \n` + error.message || "Failed to login. Please try again.");
+      } else {
+        Alert.alert("Error", error.message || "Failed to login. Please try again.");
+      }
     }
   };
 
@@ -166,7 +170,11 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
       }
     } catch (error: any) {
       console.error("Sign-up error:", error);
-      Alert.alert("Error", error.message || "Failed to sign up. Please try again.");
+      if (Platform.OS === "web") {
+        alert("Error \n" + error.message || "Failed to sign up. Please try again.");
+      } else {
+        Alert.alert("Error", error.message || "Failed to sign up. Please try again.");
+      }
     }
   };
 

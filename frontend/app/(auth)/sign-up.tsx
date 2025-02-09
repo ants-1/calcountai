@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
@@ -12,7 +12,7 @@ interface FormState {
 }
 
 const SignUp: React.FC = () => {
-  const { signUp } = useAuth(); 
+  const { signUp } = useAuth();
   const [form, setForm] = useState<FormState>({
     firstName: '',
     lastName: '',
@@ -23,23 +23,39 @@ const SignUp: React.FC = () => {
 
   const validateForm = () => {
     if (!form.firstName || form.firstName.length <= 1) {
-      Alert.alert("Validation Error", "First name must be at least 1 characters.");
+      if (Platform.OS === "web") {
+        alert("Validation Error: \nFirst name must be at least 2 characters.");
+      } else {
+        Alert.alert("Validation Error", "First name must be at least 2 characters.");
+      }
       return false;
     }
 
-    if (!form.lastName || form.lastName.length <= 3) {
-      Alert.alert("Validation Error", "Last name must be at least 4 characters.");
+    if (!form.lastName || form.lastName.length <= 1) {
+      if (Platform.OS == "web") {
+        alert("Validation Error: \nLast name must be at least 2 characters.");
+      } else {
+        Alert.alert("Validation Error", "Last name must be at least 2 characters.");
+      }
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!form.email || !emailRegex.test(form.email)) {
-      Alert.alert("Validation Error", "Please enter a valid email address.");
+      if (Platform.OS = "web") {
+        alert("Validation Error: \nPlease enter a valid email address.");
+      } else {
+        Alert.alert("Validation Error", "Please enter a valid email address.");
+      }
       return false;
     }
 
     if (!form.password || form.password.length <= 7) {
-      Alert.alert("Validation Error", "Password must be at least 8 characters.");
+      if (Platform.OS = "web") {
+        alert("Validation Error: \nPassword must be at least 8 characters.")
+      } else {
+        Alert.alert("Validation Error", "Password must be at least 8 characters.");
+      }
       return false;
     }
 
@@ -106,9 +122,9 @@ const SignUp: React.FC = () => {
         </View>
 
         {/* Sign Up Button */}
-        <View className="flex flex-col items-center">
+        <View className="">
           <TouchableOpacity
-            className="bg-blue-500 py-4 rounded-lg w-[300px]"
+            className="bg-blue-500 py-4 rounded-lg"
             onPress={handleSubmit}
             disabled={isSubmitting}
           >

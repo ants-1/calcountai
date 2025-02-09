@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, Platform } from "react-native";
 import { useRouter } from "expo-router";
-import Icon from "react-native-vector-icons/FontAwesome";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Constants from "expo-constants";
 import useAuth from "@/hooks/useAuth";
@@ -59,12 +58,20 @@ const AddActivity = () => {
 
   const handleAddExercise = async () => {
     if (!log) {
-      Alert.alert("Error", "Please select a log.");
+      if (Platform.OS === "web") {
+        alert("Error: \nPlease select a log");
+      } else {
+        Alert.alert("Error", "Please select a log.");
+      }
       return;
     }
 
     if (!activity.name || !activity.duration || !activity.caloriesBurned) {
-      Alert.alert("Error", "Please fill all required fields.");
+      if (Platform.OS === "web") {
+        alert("Error: \nPlease fill all required fields.");
+      } else {
+        Alert.alert("Error", "Please fill all required fields.");
+      }
       return;
     }
 
@@ -80,7 +87,11 @@ const AddActivity = () => {
       });
 
       if (!exerciseResponse.ok) {
-        Alert.alert("Error", "Failed to add exercise.");
+        if (Platform.OS === "web") {
+          alert("Error \nFailed to add exercise.");
+        } else {
+          Alert.alert("Error", "Failed to add exercise.");
+        }
         return;
       }
 
@@ -90,12 +101,21 @@ const AddActivity = () => {
 
       if (!exerciseId) {
         console.error("Invalid exercise ID:", exerciseData);
-        Alert.alert("Error", "Failed to create valid exercise.");
+
+        if(Platform.OS === "web") {
+          alert("Error: \nFailed to create valid exercise.");
+        } else {
+          Alert.alert("Error", "Failed to create valid exercise.");
+        }
         return;
       }
 
       if (log.exercises.some((e) => e?._id === exerciseId)) {
-        Alert.alert("Error", "This exercise has already been added to the log.");
+        if (Platform.OS === "web") {
+          alert("Error: \n This exercise has already been added to the log.");
+        } else {
+          Alert.alert("Error", "This exercise has already been added to the log.");
+        }
         return;
       }
 
@@ -120,14 +140,27 @@ const AddActivity = () => {
       if (logResponse.ok) {
         const updatedLog = await logResponse.json();
         setLog(updatedLog.dailyLog);
-        Alert.alert("Success", "Activity added successfully!");
+
+        if (Platform.OS === "web") {
+          alert("Success: \nActivity added sucessfully!");
+        } else {
+          Alert.alert("Success", "Activity added successfully!");
+        }
         router.push("/logs");
       } else {
-        Alert.alert("Error", "Failed to add exercise to log.");
+        if (Platform.OS === "web") {
+          alert("Success: \nFailed to add exercise to log.");
+        } else {
+          Alert.alert("Error", "Failed to add exercise to log.");
+        }
       }
     } catch (error) {
       console.error("Error adding exercise:", error);
-      Alert.alert("Error", "An error occurred while adding the exercise.");
+      if (Platform.OS === "web") {
+        alert("Error: \nAn error occurred while adding the exercise.");
+      } else {
+        Alert.alert("Error", "An error occurred while adding the exercise.");
+      }
     }
   };
 

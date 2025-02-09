@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Platform, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -95,7 +95,11 @@ const Profile: React.FC = () => {
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Failed to update profile. Please try again.");
+      if (Platform.OS === "web") {
+        alert("Failed to update profile. Please try again.");
+      } else {
+        Alert.alert("Failed to update profile", "Please try again.");
+      }
     }
   };
 
