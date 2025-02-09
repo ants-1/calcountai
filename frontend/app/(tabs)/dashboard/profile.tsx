@@ -17,12 +17,6 @@ const Profile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [originalData, setOriginalData] = useState({ firstName: "", lastName: "", email: "" });
 
-  useEffect(() => {
-    if (!user) {
-      router.replace("/(auth)/sign-in");
-    }
-  }, [user, router]);
-
   const fetchUser = async () => {
     if (!user?._id) return;
 
