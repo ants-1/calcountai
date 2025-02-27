@@ -5,6 +5,20 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
 import Constants from "expo-constants";
 import Header from "@/components/Header";
+import { TabView, SceneMap, TabBar } from "react-native-tab-view";
+
+// Tabs Screen
+const MyFoodsScreen = () => {
+  <ScrollView>
+
+  </ScrollView>
+}
+
+const SearchScreen = () => {
+  <ScrollView>
+
+  </ScrollView>
+}
 
 const Meals: React.FC = () => {
   const router = useRouter();

@@ -112,7 +112,7 @@ const Profile: React.FC = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white pt-6 px-6">
-      <Header title="Profile" icon="chevron-left" iconSize={25} titleSize="text-3xl"  />
+      <Header title="Profile" icon="chevron-left" iconSize={25} titleSize="text-3xl" />
 
       <View>
         <View className="mt-10 items-center">
@@ -181,7 +181,7 @@ const Profile: React.FC = () => {
       )}
 
       <TouchableOpacity
-        className="mt-6 bg-green-500 py-3 rounded-lg"
+        className="mt-6 bg-gray-500 py-3 rounded-lg"
         onPress={() => router.push("/goal-info")}
       >
         <Text className="text-center text-white font-semibold text-lg">Edit Info</Text>
@@ -189,7 +189,10 @@ const Profile: React.FC = () => {
 
       <TouchableOpacity
         className="mt-6 flex-row items-center justify-center p-3 bg-red-500 rounded-lg"
-        onPress={logout}
+        onPress={() => {
+          logout();
+          router.push("/");
+        }}
       >
         <Icon name="sign-out" size={20} color="#fff" />
         <Text className="ml-3 text-white font-semibold text-lg">Logout</Text>
