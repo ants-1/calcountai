@@ -192,7 +192,7 @@ const AddMealManual = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
-      <Header title="Add Meal" icon="arrow-left" iconSize={25} titleSize="text-3xl" />
+      <Header title="Add Meal" icon="chevron-left" iconSize={25} titleSize="text-3xl" />
 
       <ScrollView showsVerticalScrollIndicator={false} className="px-6">
         {/* Name */}

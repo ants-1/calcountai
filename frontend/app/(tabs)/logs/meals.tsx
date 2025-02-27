@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
@@ -58,7 +58,7 @@ const Meals: React.FC = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white  pt-6">
-      <Header title="Meals" icon="arrow-left" iconSize={25} titleSize="text-3xl" />
+      <Header title="Meals" icon="chevron-left" iconSize={25} titleSize="text-3xl" />
 
       <View className="flex-row items-center space-x-2 mt-5 px-6">
         <TextInput

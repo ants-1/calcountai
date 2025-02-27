@@ -112,7 +112,7 @@ const Profile: React.FC = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white pt-6 px-6">
-      <Header title="Profile" icon="arrow-left" iconSize={25} titleSize="text-3xl"  />
+      <Header title="Profile" icon="chevron-left" iconSize={25} titleSize="text-3xl"  />
 
       <View>
         <View className="mt-10 items-center">

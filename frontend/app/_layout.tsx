@@ -10,7 +10,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (!user) {
-      router.replace("/(auth)/sign-in");
+      router.replace("/");
     }
   }, [user, router]);
 

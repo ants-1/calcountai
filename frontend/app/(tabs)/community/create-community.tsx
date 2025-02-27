@@ -62,7 +62,7 @@ const CreateCommunity = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
-      <Header title="Create Community" icon="arrow-left" iconSize={25} titleSize="text-3xl" />
+      <Header title="Create Community" icon="chevron-left" iconSize={25} titleSize="text-3xl" />
 
       {/* Community Form */}
       <View className="mt-6 px-6">

@@ -166,7 +166,7 @@ const AddActivity = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
-      <Header title="Add Activity" icon="arrow-left" iconSize={25} titleSize="text-3xl" />
+      <Header title="Add Activity" icon="chevron-left" iconSize={25} titleSize="text-3xl" />
 
       <ScrollView showsVerticalScrollIndicator={false} className="px-6 mt-5">
         {/* Name */}

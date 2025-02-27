@@ -129,7 +129,7 @@ const ActivityTrackerScreen: React.FC = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
-      <Header title="Activities" icon="arrow-left" iconSize={25} titleSize="text-3xl" />
+      <Header title="Activities" icon="chevron-left" iconSize={25} titleSize="text-3xl" />
 
       <View className="flex-row items-center space-x-2 px-6 mt-5">
         <TextInput

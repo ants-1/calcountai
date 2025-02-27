@@ -1,6 +1,7 @@
 import Constants from 'expo-constants';
 import React, { useState } from 'react';
 import { SafeAreaView, Text, View, TextInput, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 interface Message {
   sender: 'user' | 'bot';
@@ -72,18 +73,19 @@ const Chatbot: React.FC = () => {
         ))}
       </ScrollView>
 
-      <View className="flex-row items-center p-4 border-t border-gray-200">
+      <View className="flex-row items-center p-4 border-t border-gray-200 bg-gray-100">
         <TextInput
           value={messageInput}
           onChangeText={setMessageInput}
           placeholder="Type a message"
-          className="flex-1 h-12 px-4 border border-gray-300 rounded-lg"
+          className="flex-1 h-12 px-4 border border-gray-300 rounded-lg bg-white"
         />
         <TouchableOpacity
           onPress={sendMessage}
-          className="ml-4 py-3 px-6 bg-blue-500 rounded-lg"
+          className="flex flex-row items-center gap-2 ml-3 py-3.5 px-6 bg-blue-500 rounded-lg"
         >
           <Text className="text-white font-semibold">Send</Text>
+          <Icon name="send" size={12} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>

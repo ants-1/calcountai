@@ -2,16 +2,9 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
+import HeaderType from '../types/HeaderType'
 
-type Header = {
-  title: string;
-  icon: string;
-  iconSize: number;
-  titleSize: string;
-  link?: string;
-};
-
-const Header: React.FC<Header> = ({ title, icon, iconSize, titleSize, link }) => {
+const Header: React.FC<HeaderType> = ({ title, icon, iconSize, titleSize, link }) => {
   const router = useRouter();
 
   const handlePress = () => {

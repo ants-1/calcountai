@@ -6,7 +6,7 @@ import Header from '@/components/Header'
 const Challenges: React.FC = () => {
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
-      <Header title='Challenges' icon='arrow-left' iconSize={25} titleSize='text-3xl' />
+      <Header title='Challenges' icon='chevron-left' iconSize={25} titleSize='text-3xl' />
 
       <ScrollView className="mt-10 px-6">
         <Text className='text-2xl font-semibold text-center'>Personal</Text>

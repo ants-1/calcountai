@@ -8,7 +8,7 @@ import Constants from "expo-constants";
 import useAuth from "@/hooks/useAuth";
 import Header from "@/components/Header";
 
-// Sample Screens
+// Tab Screens
 const InfoScreen = ({ community }: { community: any }) => (
   <ScrollView className="flex-1 p-6">
     <Text className="text-lg text-gray-700">{community.description}</Text>
@@ -279,7 +279,7 @@ const CommunityDetails = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <Header title={community.name} icon="arrow-left" iconSize={25} titleSize="text-3xl" />
+      <Header title={community.name} icon="chevron-left" iconSize={25} titleSize="text-3xl" />
 
       <View className="px-6 py-4">
         {isJoined === null ? (

@@ -73,10 +73,10 @@ const AddMealBarcode = () => {
         onBarcodeScanned={({ type, data }) => handleBarCodeScanned({ type, data })}
       >
         <TouchableOpacity
-          className="absolute top-20 left-5 p-3 bg-gray-200 p-3 rounded-lg"
+          className="absolute top-20 left-5 p-3 bg-gray-200 rounded-lg"
           onPress={() => router.back()}
         >
-          <Icon name="arrow-left" size={24} color="#4B5563" />
+          <Icon name="chevron-left" size={24} color="#4B5563" />
         </TouchableOpacity>
 
         <TouchableOpacity
