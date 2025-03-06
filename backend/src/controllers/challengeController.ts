@@ -1,41 +1,31 @@
 import { NextFunction, Request, Response } from "express";
 import User, { IUser } from "../models/user";
-import Challenge from "../models/challenge";
+import Challenge, { IChallenge } from "../models/challenge";
 import { Types } from "mongoose";
 import Community from "../models/community";
+import challenge from "../models/challenge";
 
-// GET /user/:userId/challenges
+// GET /challenges
 const getAllChallenges = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<any> => {
   try {
-    const { userId } = req.params;
+    const challanges: IChallenge[] = await Challenge.find().exec();
 
-    if (!Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ error: "Invalid user ID" });
+    if (!challanges || challanges.length === 0) {
+      return res.status(404).json({ message: "No challanges found." });
     }
 
-    const user = await User.findById(userId).populate("challenges").exec();
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    if (!user.challenges || user.challenges.length === 0) {
-      return res.status(404).json({ message: "No challenges found" });
-    }
-
-    return res.status(200).json({ challenges: user.challenges });
+    return res.status(200).json({ challanges });
   } catch (err) {
-    console.error("Error fetching challenges:", err);
     return next(err);
   }
 };
 
-// GET /user/:userId/challenges/personal
-const getPersonalChallenges = async (
+// GET /users/:userId/challenges
+const getUserChallenges = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -47,60 +37,35 @@ const getPersonalChallenges = async (
       return res.status(400).json({ error: "Invalid user ID" });
     }
 
-    const user = await User.findById(userId).populate({
-      path: "challenges",
-      match: { challengeType: "Personal" },
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    if (!user.challenges || user.challenges.length === 0) {
-      return res.status(404).json({ message: "No personal challenges found" });
-    }
-
-    return res.status(200).json({ challenges: user.challenges });
-  } catch (err) {
-    return next(err);
-  }
-};
-
-// GET /user/:userId/communities/:communityId/challenges
-const getUserCommunityChallenges = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<any> => {
-  try {
-    const { userId, communityId } = req.params;
-
-    if (
-      !Types.ObjectId.isValid(userId) ||
-      !Types.ObjectId.isValid(communityId)
-    ) {
-      return res.status(400).json({ error: "Invalid user or community ID" });
-    }
-
-    const user = await User.findById(userId).populate("challenges").exec();
-    const community = await Community.findById(communityId)
-      .populate("challenges")
+    const user = await User.findById(userId)
+      .populate<{ challenges: IChallenge[] }>("challenges")
       .exec();
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    if (!community) {
-      return res.status(404).json({ error: "Community not found" });
+      return res
+        .status(404)
+        .json({ error: `User with ID: ${userId} was not found.` });
     }
 
-    const communityChallenges = community.challenges.filter((challengeId) =>
-      user.challenges?.some(
-        (userChallenge) => userChallenge.toString() === challengeId.toString()
-      )
+    const personalChallenges = user.challenges?.filter(
+      (challenge: IChallenge) => challenge.challengeType === "Personal"
+    );
+    const communityChallenges = user.challenges?.filter(
+      (challenge: IChallenge) => challenge.challengeType === "Community"
     );
 
-    return res.status(200).json({ challenges: communityChallenges });
+    if (personalChallenges.length === 0 && communityChallenges.length === 0) {
+      return res.status(404).json({ message: "No challenges found." });
+    }
+
+    return res.status(200).json({
+      personal: {
+        challenges: personalChallenges
+      },
+      community: {
+        challenges: communityChallenges
+      }
+    });
   } catch (err) {
     return next(err);
   }
@@ -150,7 +115,7 @@ const createChallenge = async (
       startDate,
       endDate,
       challengeType,
-    }); 
+    });
 
     if (challengeType.toLowerCase() === "personal") {
       const user = await User.findById(targetId);
@@ -256,12 +221,123 @@ const deleteChallenge = async (
   }
 };
 
+// PUT challenges/:challengeId
+const editChallenge = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  const { challengeId } = req.params;
+  const updatedData = req.body;
+
+  if (!Types.ObjectId.isValid(challengeId)) {
+    return res.status(400).json({ error: "Invalid challenge ID" });
+  }
+
+  const updatedChallenge = await Challenge.findByIdAndUpdate(
+    challengeId,
+    updatedData,
+    {
+      new: true,
+    }
+  );
+
+  if (!updatedChallenge) {
+    return res
+      .status(404)
+      .json({ error: `Challenge with ID: ${challengeId} was not found.` });
+  }
+
+  return res.status(200).json({ updatedChallenge });
+};
+
+// PUT /users/:userId/challenges/:challengeId/leave
+const leaveChallenge = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  try {
+    const { userId, challengeId } = req.params;
+
+    if (
+      !Types.ObjectId.isValid(userId) ||
+      !Types.ObjectId.isValid(challengeId)
+    ) {
+      return res.status(400).json({ error: "Invalid user or challenge ID" });
+    }
+
+    const user = await User.findById(userId);
+    const challenge = await Challenge.findById(challengeId);
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ error: `User with ID: ${userId} was not found.` });
+    }
+
+    if (!challenge) {
+      return res
+        .status(404)
+        .json({ error: `Challenge with ID: ${challengeId} was not found.` });
+    }
+
+    const isUserInChallenge = challenge.participants.some((participantId) =>
+      participantId.equals(user._id)
+    );
+
+    if (!isUserInChallenge) {
+      return res
+        .status(400)
+        .json({ message: "User is not part of this challenge." });
+    }
+
+    challenge.participants = challenge.participants.filter(
+      (participantId) => !participantId.equals(user._id)
+    );
+
+    const stillInChallenge = challenge.participants.some((participantId) =>
+      participantId.equals(user._id)
+    );
+
+    if (stillInChallenge) {
+      return res
+        .status(500)
+        .json({ error: "Failed to remove user from challenge." });
+    }
+
+    user.challenges = user.challenges?.filter(
+      (cId) => !cId.equals(challenge._id)
+    );
+
+    const stillHasChallenge = user.challenges?.some((cId) =>
+      cId.equals(challenge._id)
+    );
+
+    if (stillHasChallenge) {
+      return res
+        .status(500)
+        .json({ error: "Failed to remove challenge from user's list." });
+    }
+
+    await challenge.save();
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ message: "User left the challenge successfully" });
+  } catch (err) {
+    return next(err);
+  }
+};
+
 export default {
   getAllChallenges,
-  getPersonalChallenges,
-  getUserCommunityChallenges,
+  getUserChallenges,
   getCommunityChallenges,
   createChallenge,
   joinChallenge,
   deleteChallenge,
+  editChallenge,
+  leaveChallenge,
 };

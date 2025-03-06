@@ -3,6 +3,11 @@ import React from 'react'
 import ChallengeCard from './ChallengeCard';
 
 const ChallengeList: React.FC<{ challenges: any[] }> = ({ challenges }) => {
+  if (!Array.isArray(challenges)) {
+    console.error("ChallengeList received invalid challenges:", challenges);
+    return <Text className="text-gray-500 text-center mt-10">No challenges available.</Text>;
+  }
+
   const completedChallenges = challenges.filter(challenge => challenge.completed);
   const currentChallenges = challenges.filter(challenge => !challenge.completed);
 

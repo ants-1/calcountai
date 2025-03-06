@@ -1,73 +1,24 @@
-import { View, Text, ScrollView, Dimensions } from 'react-native';
-import React, { useState } from 'react';
+import { View, Text, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '@/components/Header';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import ChallengeList from '@/components/ChallengeList';
+import useChallenge from '@/hooks/useChallenge';
+import useAuth from '@/hooks/useAuth';
 
-const dummyPersonalChallenges = {
-  challenges: [
-    {
-      _id: '6793fa0e2850f2ce97e36efd',
-      name: 'Healthy Eating Challenge',
-      description: 'Eat at least 5 servings of fruits and vegetables every day for two weeks.',
-      percentage: 0,
-      participants: ['6793e83eb0eadb3a79941390'],
-      completed: false,
-      startDate: '2025-02-01T00:00:00.000Z',
-      endDate: '2025-02-14T23:59:59.999Z',
-      challengeType: 'Personal',
-      __v: 1,
-    },
-    {
-      _id: '6793fa0e2850f2ce97e36efc',
-      name: 'Healthy Eating Challenge',
-      description: 'Eat at least 5 servings of fruits and vegetables every day for two weeks.',
-      percentage: 100,
-      participants: ['6793e83eb0eadb3a79941390'],
-      completed: true,
-      startDate: '2025-02-01T00:00:00.000Z',
-      endDate: '2025-02-14T23:59:59.999Z',
-      challengeType: 'Personal',
-      __v: 1,
-    },
-  ],
-};
-
-const dummyCommunityChallenges = {
-  challenges: [
-    {
-      _id: '6793fa0e2850f2ce97e36efd',
-      name: 'Healthy Eating Challenge',
-      description: 'Eat at least 5 servings of fruits and vegetables every day for two weeks.',
-      percentage: 0,
-      participants: ['6793e83eb0eadb3a79941390'],
-      completed: false,
-      startDate: '2025-02-01T00:00:00.000Z',
-      endDate: '2025-02-14T23:59:59.999Z',
-      challengeType: 'Community',
-      __v: 1,
-    },
-  ],
-};
-
-// Tab Screens
-const PersonalChallengeScreen = () => (
+const PersonalChallengeScreen = ({ challenges = [], loading }: { challenges: any[]; loading: boolean }) => (
   <View>
-    <ChallengeList challenges={dummyPersonalChallenges.challenges} />
+    {loading ? <ActivityIndicator size="large" color="#3B82F6" /> : <ChallengeList challenges={challenges || []} />}
   </View>
 );
 
-const CommunityChallengeScreen = () => (
+const CommunityChallengeScreen = ({ challenges = [], loading }: { challenges: any[]; loading: boolean }) => (
   <View>
-    <ChallengeList challenges={dummyCommunityChallenges.challenges} />
+    {loading ? <ActivityIndicator size="large" color="#3B82F6" /> : <ChallengeList challenges={challenges || []} />}
   </View>
 );
 
-const renderScene = SceneMap({
-  personal: PersonalChallengeScreen,
-  community: CommunityChallengeScreen,
-});
 
 const Challenges: React.FC = () => {
   const [index, setIndex] = useState(0);
@@ -75,6 +26,34 @@ const Challenges: React.FC = () => {
     { key: 'personal', title: 'Personal' },
     { key: 'community', title: 'Community' },
   ]);
+  const { user } = useAuth();
+  const userId = user?._id;
+
+  const { fetchUserChallenges, communityChallenges, personalChallenges, } = useChallenge();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadChallenges = async () => {
+      setLoading(true);
+      await fetchUserChallenges(userId);
+      console.log("Community Challenges:", communityChallenges);
+      console.log("Personal Challenges:", personalChallenges);
+      setLoading(false);
+    };
+    loadChallenges();
+  }, []);
+  
+
+  const renderScene = ({ route }: { route: { key: string } }) => {
+    switch (route.key) {
+      case 'personal':
+        return <PersonalChallengeScreen challenges={personalChallenges ?? []} loading={loading} />;
+      case 'community':
+        return <CommunityChallengeScreen challenges={communityChallenges ?? []} loading={loading} />;
+      default:
+        return null;
+    }
+  };  
 
   return (
     <SafeAreaView className="flex-1 bg-white">

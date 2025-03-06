@@ -76,6 +76,70 @@ const getDailyLog = async (
   }
 };
 
+// GET /users/:userId/streaks
+const getStreaks = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { userId } = req.params;
+
+    if (!Types.ObjectId.isValid(userId)) {
+      res.status(400).json({ error: "Invalid user ID" });
+      return;
+    }
+
+    const user = await User.findById(userId).populate({
+      path: "dailyLogs",
+      select: "date",
+    });
+
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    if (!user.dailyLogs || user.dailyLogs.length === 0) {
+      res.status(200).json({ streak: 0 });
+      return;
+    }
+
+    const sortedLogs = user.dailyLogs
+      .map((log) => ({
+        _id: log._id,
+        date: (log as unknown as IDailyLog).date,
+      }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    let streak = 0;
+    let prevDate: Date | null = null;
+    const today = new Date();
+
+    for (const log of sortedLogs) {
+      const logDate = new Date(log.date);
+      if (prevDate) {
+        const diffDays = Math.floor(
+          (logDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        if (diffDays > 1) {
+          streak = 0;
+        }
+      }
+      streak++;
+      prevDate = logDate;
+    }
+
+    if (!prevDate || (today.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24) > 1) {
+      streak = 0;
+    }
+
+    res.status(200).json({ streak });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // POST /users/:userId/dailyLogs
 const createDailyLog = async (
   req: Request,
@@ -190,6 +254,7 @@ const deleteDailyLog = async (
 export default {
   getAllDailyLogs,
   getDailyLog,
+  getStreaks,
   createDailyLog,
   editDailyLog,
   deleteDailyLog,

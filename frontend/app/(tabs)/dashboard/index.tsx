@@ -51,6 +51,26 @@ const fetchWeightGoalData = async (userId: string) => {
   }
 };
 
+const fetchStreaks = async (userId: string) => {
+  try {
+    const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
+    const response = await fetch(`${BACKEND_API_URL}/users/${userId}/streaks`);
+    
+    const textResponse = await response.text();
+
+    const data = JSON.parse(textResponse);
+
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to fetch streak data");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching streak data:", error);
+    return null;
+  }
+}
+
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const userId = user?._id;
@@ -64,9 +84,9 @@ const Dashboard: React.FC = () => {
   const [currentWeight, setCurrentWeight] = useState<number>(75);
   const [recentMeals, setRecentMeals] = useState<any[]>([]);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
+  const [streak, setStreak] = useState<number | null>(null);
 
   const dailyGoal = 2000;
-  const streak = 5;
   const motivationalQuotes = [
     "You don't have to be great to start, but you have to start to be great.",
     "Success starts with self-discipline.",
@@ -111,6 +131,13 @@ const Dashboard: React.FC = () => {
           })
           .catch((error) => console.error("Error fetching weight goal data:", error))
           .finally(() => setLoading(false));
+          fetchStreaks(userId)
+          .then((streakData) => {
+            if (streakData) {
+              setStreak(streakData.streak);
+            }
+          })
+          .catch((error) => console.error("Error fetching streak data:", error));
       }
     }, [userId])
   );
@@ -160,7 +187,7 @@ const Dashboard: React.FC = () => {
         <View className="mt-6 bg-blue-100 p-4 rounded-xl">
           <Text className="text-lg font-semibold text-blue-700">Streak</Text>
           <Text className="text-sm text-blue-500 mt-2">
-            You have logged your activity for {streak} consecutive days!
+            You have logged your activity for {streak || 0} consecutive days!
           </Text>
         </View>
 
