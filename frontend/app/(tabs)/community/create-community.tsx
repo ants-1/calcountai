@@ -1,64 +1,13 @@
-import { View, Text, TextInput, TouchableOpacity, Alert, Platform } from "react-native";
+import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
-import useAuth from "@/hooks/useAuth";
-import Constants from "expo-constants";
-import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "@/components/Header";
+import useCommunity from "@/hooks/useCommunity";
 
 const CreateCommunity = () => {
-  const { user } = useAuth();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const router = useRouter();
-
-  const createCommunity = async () => {
-    if (!name || !description || name.length < 3 || description.length < 3) {
-      if (Platform.OS === "web") {
-        alert("Error: \nBoth name and description must be at least 3 characters long.")
-      } else {
-        Alert.alert("Error", "Both name and description must be at least 3 characters long.");
-      }
-      return;
-    }
-
-    try {
-      const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
-      const API_URL = `${BACKEND_API_URL}/communities`;
-
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          description,
-          createdBy: user?._id,
-          members: [user?._id],
-          challenges: [],
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to create community. Status: ${response.status}`);
-      }
-
-      if (Platform.OS === "web") {
-        alert("Success: \nCommunity created successfully.")
-      } else {
-        Alert.alert("Success", "Community created successfully.");
-      }
-
-      router.back();
-    } catch (error) {
-      console.error("Error creating community:", error);
-
-      if (Platform.OS == "web") {
-        alert("Error: There was an issue creating the community.");
-      } else {
-        Alert.alert("Error", "There was an issue creating the community.");
-      }
-    }
-  };
+  const { createCommunity } = useCommunity();
 
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
@@ -85,7 +34,7 @@ const CreateCommunity = () => {
         />
         <TouchableOpacity
           className="bg-blue-500 p-3 rounded-lg w-full mt-6"
-          onPress={createCommunity}
+          onPress={() => createCommunity(name, description)}
         >
           <Text className="text-white text-center">Create</Text>
         </TouchableOpacity>

@@ -41,30 +41,30 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
       console.error("User ID is undefined");
       return;
     }
-  
+
     try {
       const response = await fetch(`${BACKEND_API_URL}/users/${userId}/challenges`);
-  
+
       if (response.status === 404) {
         console.warn("No challenges found for user.");
         setCommunityChallenges([]);
         setPersonalChallenges([]);
         return;
       }
-  
+
       if (!response.ok) throw new Error("Unable to fetch user challenges");
-  
+
       const data = await response.json();
       console.log("Fetched Challenges:", data);
-  
+
       // Extract challenge arrays correctly
       setCommunityChallenges(data?.community?.challenges || []);
       setPersonalChallenges(data?.personal?.challenges || []);
-  
+
     } catch (error: any) {
       console.error(error.message);
     }
-  };  
+  };
 
   // const fetchCommunityChallenges = async (communityId: string) => {
   //   try {
@@ -127,16 +127,17 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
   // }
 
   return (
-    <ChallengeContext.Provider value={{
-      challenges,
-      personalChallenges,
-      communityChallenges,
-      fetchChallenges,
-      fetchUserChallenges,
-      // fetchCommunityChallenges,
-      createChallenge,
-      joinChallenge
-    }}>
+    <ChallengeContext.Provider
+      value={{
+        challenges,
+        personalChallenges,
+        communityChallenges,
+        fetchChallenges,
+        fetchUserChallenges,
+        // fetchCommunityChallenges,
+        createChallenge,
+        joinChallenge
+      }}>
       {children}
     </ChallengeContext.Provider>
   );

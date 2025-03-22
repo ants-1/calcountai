@@ -2,61 +2,36 @@ import React, { useState } from "react";
 import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import Constants from 'expo-constants';
 import { useFocusEffect } from '@react-navigation/native';
-import { CommunityType } from "@/types/CommunityType";
+import useCommunity from "@/hooks/useCommunity";
 
 type SortOption = 'name' | 'members';
 type SortOrder = 'asc' | 'desc';
 
 const Community: React.FC = () => {
   const router = useRouter();
-  const [communities, setCommunities] = useState<CommunityType[]>([]);
   const [searchText, setSearchText] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [sortOption, setSortOption] = useState<SortOption>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [showSortDropdown, setShowSortDropdown] = useState<boolean>(false);
-
-  // Fetch communities from backend
-  const fetchCommunities = async () => {
-    try {
-      const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
-      const API_URL = `${BACKEND_API_URL}/communities`;
-      const response = await fetch(API_URL);
-
-      if (!response.ok) {
-        throw new Error(`HTTP Error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (!data.communities || !Array.isArray(data.communities)) {
-        throw new Error("API did not return an array");
-      }
-
-      setCommunities(data.communities);
-    } catch (error) {
-      console.error("Error fetching communities:", error);
-      setCommunities([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { communities, fetchCommunities} = useCommunity();
 
   // Re-fetch communities every time the screen is focused
   useFocusEffect(
     React.useCallback(() => {
       setLoading(true);
       fetchCommunities();
+      setLoading(false);
     }, [])
   );
 
-  // Filtered and sorted communities
+  // Filtered communities
   const filteredCommunities = communities.filter((community) =>
     community.name.toLowerCase().includes(searchText.toLowerCase())
   );
 
+  // Sort communitites
   const sortedCommunities = filteredCommunities.sort((a, b) => {
     if (sortOption === 'name') {
       return sortOrder === 'asc'
