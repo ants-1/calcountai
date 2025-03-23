@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import Exercise, { IExercise } from "../models/exercise";
 import { Types } from "mongoose";
 
-// GET /exercises
+// @desc    Retrieve all exercises
+// @route   GET /api/v1/exercises
 const getAllExercises = async (
   req: Request,
   res: Response,
@@ -21,7 +22,8 @@ const getAllExercises = async (
   }
 };
 
-// GET /exercises/:exerciseId
+// @desc    Retrieve select exercise
+// @route   GET /api/v1/exercises/:exerciseId
 const getExercise = async (
   req: Request,
   res: Response,
@@ -48,7 +50,8 @@ const getExercise = async (
   }
 };
 
-// POST /exercises
+// @desc    Create new exercise
+// @route   POST /api/v1/exercises
 const createExercise = async (
   req: Request,
   res: Response,
@@ -73,7 +76,8 @@ const createExercise = async (
   }
 };
 
-// PUT /exercises/:exerciseId
+// @desc    Update selected exercise information
+// @route   PUT /exercises/:exerciseId
 const updateExercise = async (
   req: Request,
   res: Response,
@@ -105,7 +109,8 @@ const updateExercise = async (
   }
 };
 
-// DELETE /exercises/:exerciseId
+// @desc    Delete exercise from database
+// @route   DELETE /api/v1/exercises/:exerciseId
 const deleteExercise = async (
   req: Request,
   res: Response,

@@ -3,6 +3,8 @@ import { IUser } from "../models/user";
 import passport from "passport";
 import generateToken from "../utils/generateToken";
 
+// @desc    Register new user
+// @route   POST /api/v1/auth/sign-up
 const signUp = async (
   req: Request,
   res: Response,
@@ -34,6 +36,8 @@ const signUp = async (
   })(req, res, next);
 };
 
+// @desc    Login user & get token
+// @route   POST /api/v1/auth/login
 const login = async (
   req: Request,
   res: Response,
@@ -63,6 +67,8 @@ const login = async (
   })(req, res, next);
 };
 
+// @desc    Logout user
+// @route   GET /api/v1/auth/logout
 const logout = async (
   req: Request,
   res: Response,

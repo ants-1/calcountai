@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import User, { IUser } from "../models/user";
 
-// GET /users
+// @desc    Retrieve all users from database
+// @route   GET /api/v1/users
 const getAllUsers = async (
   req: Request,
   res: Response,
@@ -20,7 +21,8 @@ const getAllUsers = async (
   }
 };
 
-// GET /users/:id
+// @desc    Retrieve selected user from database
+// @route   GET /api/v1/users/:id
 const getUser = async (
   req: Request,
   res: Response,
@@ -41,7 +43,8 @@ const getUser = async (
   }
 };
 
-// PUT /users/:id
+// @desc    Update user information
+// @route   PUT /api/v1/users/:id
 const updateUserData = async (
   req: Request,
   res: Response,
@@ -70,7 +73,8 @@ const updateUserData = async (
   }
 }
 
-// PUT /users/:id/goal-info
+// @desc    Update user goal information
+// @route   PUT /users/:id/goal-info
 const updateUserGoalInfo = async (
   req: Request,
   res: Response,

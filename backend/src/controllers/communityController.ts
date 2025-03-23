@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { Types } from "mongoose";
 import Community, { ICommunity } from "../models/community";
 
-// GET /communities
+// @desc    Retrieve all communitites 
+// @route   GET /api/v1/communities
 const getAllCommunities = async (
   req: Request,
   res: Response,
@@ -21,7 +22,8 @@ const getAllCommunities = async (
   }
 };
 
-// GET /communities/:communityId
+// @desc    Retrieve selected community
+// @route   GET /api/v1/communities/:communityId
 const getCommunity = async (
   req: Request,
   res: Response,
@@ -45,7 +47,8 @@ const getCommunity = async (
   }
 };
 
-// POST /communities
+// @desc    Create new community
+// @route   POST /api/v1/communities
 const createCommunity = async (
   req: Request,
   res: Response,
@@ -68,7 +71,8 @@ const createCommunity = async (
   }
 };
 
-// POST /communities/:communityId/join
+// @desc    User joins community
+// @route   POST /api/v1/communities/:communityId/join
 const joinCommunity = async (
   req: Request,
   res: Response,
@@ -111,7 +115,8 @@ const joinCommunity = async (
   }
 };
 
-// PUT /communities/:communityId
+// @desc    Update community information
+// @route   PUT /api/v1/communities/:communityId
 const updateCommunity = async (
   req: Request,
   res: Response,
@@ -143,7 +148,8 @@ const updateCommunity = async (
   }
 };
 
-// DELETE /communities/:communityId/leave
+// @desc    User leaves community 
+// @route   DELETE /api/v1/communities/:communityId/leave
 const leaveCommunity = async (
   req: Request,
   res: Response,
@@ -190,7 +196,8 @@ const leaveCommunity = async (
   }
 };
 
-// DELETE /communities/:communityId
+// @desc    Delete community from database
+// @route   DELETE /api/v1/communities/:communityId
 const deleteCommunity = async (
   req: Request,
   res: Response,

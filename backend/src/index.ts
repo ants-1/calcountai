@@ -1,7 +1,7 @@
 import express from "express";
 import passport from "passport";
 import dotenv from "dotenv";
-import connectToDatabase from "./db";
+import connectToDatabase from "./config/db";
 import initialisePassport from "./passport/initialisePassport";
 import bodyParser from "body-parser";
 import session from "express-session";
@@ -49,3 +49,5 @@ app.use("/", routes);
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+export { app };

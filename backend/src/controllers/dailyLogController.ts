@@ -2,10 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import User, { IUser } from "../models/user";
 import DailyLog, { IDailyLog } from "../models/dailyLog";
 import { Types } from "mongoose";
-import Food from "../models/food";
-import Exercise from "../models/exercise";
 
-// GET /users/:userId/dailyLogs
+// @desc    Retrieve all daily logs for user
+// @route   GET /api/v1/users/:userId/dailyLogs
 const getAllDailyLogs = async (
   req: Request,
   res: Response,
@@ -40,7 +39,8 @@ const getAllDailyLogs = async (
   }
 };
 
-// GET /users/:userId/dailyLogs/:dailyLogId
+// @desc    Get daily log for user
+// @route   GET /api/v1/users/:userId/dailyLogs/:dailyLogId
 const getDailyLog = async (
   req: Request,
   res: Response,
@@ -76,7 +76,8 @@ const getDailyLog = async (
   }
 };
 
-// GET /users/:userId/streaks
+// @desc    Get streak number
+// @route   GET /api/v1/users/:userId/streaks
 const getStreaks = async (
   req: Request,
   res: Response,
@@ -140,7 +141,8 @@ const getStreaks = async (
   }
 };
 
-// POST /users/:userId/dailyLogs
+// @desc    Create new daily log
+// @route   POST /api/v1/users/:userId/dailyLogs
 const createDailyLog = async (
   req: Request,
   res: Response,
@@ -178,7 +180,8 @@ const createDailyLog = async (
   }
 };
 
-// PUT /users/:userId/dailyLogs/:dailyLogId
+// @desc    Edit daily log information
+// @route   PUT /users/:userId/dailyLogs/:dailyLogId
 const editDailyLog = async (
   req: Request,
   res: Response,
@@ -216,7 +219,8 @@ const editDailyLog = async (
   }
 };
 
-// DELETE /users/:userId/dailyLogs/:dailyLogId
+// @desc    Delete daily log from database
+// @route   DELETE /api/v1/users/:userId/dailyLogs/:dailyLogId
 const deleteDailyLog = async (
   req: Request,
   res: Response,

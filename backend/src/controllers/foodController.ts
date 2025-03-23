@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import Food, { IFood } from "../models/food";
 import { Types } from "mongoose";
 
-// GET /foods
+// @desc    Retrieve all foods from database
+// @route   GET /api/v1/foods
 const getAllFoods = async (
   req: Request,
   res: Response,
@@ -21,7 +22,8 @@ const getAllFoods = async (
   }
 };
 
-// GET /foods/:foodId
+// @desc    Retrieve selected food from database
+// @route   GET /api/v1/foods/:foodId
 const getFood = async (
   req: Request,
   res: Response,
@@ -46,7 +48,8 @@ const getFood = async (
   }
 };
 
-// POST /foods
+// @desc    Create new food item and add it to database
+// @route   POST /api/v1/foods
 const createFood = async (
   req: Request,
   res: Response,
@@ -76,7 +79,8 @@ const createFood = async (
   }
 };
 
-// PUT /foods/:foodId
+// @desc    Update food information
+// @route   PUT /api/v1/foods/:foodId
 const updateFood = async (
   req: Request,
   res: Response,
@@ -104,7 +108,8 @@ const updateFood = async (
   }
 };
 
-// DELETE /foods/:foodId
+// @desc    Delete food from database
+// @route   DELETE /foods/:foodId
 const deleteFood = async (
   req: Request,
   res: Response,

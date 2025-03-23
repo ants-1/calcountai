@@ -3,9 +3,9 @@ import User, { IUser } from "../models/user";
 import Challenge, { IChallenge } from "../models/challenge";
 import { Types } from "mongoose";
 import Community from "../models/community";
-import challenge from "../models/challenge";
 
-// GET /challenges
+// @desc    Retrieves all challenges
+// @route   GET /api/v1/challenges
 const getAllChallenges = async (
   req: Request,
   res: Response,
@@ -24,7 +24,8 @@ const getAllChallenges = async (
   }
 };
 
-// GET /users/:userId/challenges
+// @desc    Retrieve all challenges belonging to user
+// @route   GET /api/v1/users/:userId/challenges
 const getUserChallenges = async (
   req: Request,
   res: Response,
@@ -71,7 +72,8 @@ const getUserChallenges = async (
   }
 };
 
-// GET /community/:communityId/challenges
+// @desc    Retrieve all challenges belonging to community
+// @route   GET /api/v1/community/:communityId/challenges
 const getCommunityChallenges = async (
   req: Request,
   res: Response,
@@ -96,7 +98,8 @@ const getCommunityChallenges = async (
   }
 };
 
-// POST /challanges
+// @desc    Create new challenge
+// @route   POST /api/v1/challanges
 const createChallenge = async (
   req: Request,
   res: Response,
@@ -148,7 +151,8 @@ const createChallenge = async (
   }
 };
 
-// PUT users/:userId/challenges/:challengeId/join
+// @desc    User joins challenge and added to participants
+// @route   PUT /api/v1/users/:userId/challenges/:challengeId/join
 const joinChallenge = async (
   req: Request,
   res: Response,
@@ -196,7 +200,8 @@ const joinChallenge = async (
   }
 };
 
-// DELETE /challenges/:challengeId
+// @desc    Delete challenge from database
+// @route   DELETE /api/v1/challenges/:challengeId
 const deleteChallenge = async (
   req: Request,
   res: Response,
@@ -221,7 +226,8 @@ const deleteChallenge = async (
   }
 };
 
-// PUT challenges/:challengeId
+// @desc    Edit challenge information
+// @route   PUT /api/v1/challenges/:challengeId
 const editChallenge = async (
   req: Request,
   res: Response,
@@ -251,7 +257,8 @@ const editChallenge = async (
   return res.status(200).json({ updatedChallenge });
 };
 
-// PUT /users/:userId/challenges/:challengeId/leave
+// @desc    User leave challenge and is removed from participants
+// @route   PUT /api/v1/users/:userId/challenges/:challengeId/leave
 const leaveChallenge = async (
   req: Request,
   res: Response,
