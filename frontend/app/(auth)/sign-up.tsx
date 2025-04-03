@@ -5,8 +5,7 @@ import { Link } from 'expo-router';
 import useAuth from '@/hooks/useAuth';
 
 interface FormState {
-  firstName: string;
-  lastName: string;
+  username: string;
   email: string;
   password: string;
 }
@@ -14,32 +13,34 @@ interface FormState {
 const SignUp: React.FC = () => {
   const { signUp } = useAuth();
   const [form, setForm] = useState<FormState>({
-    firstName: '',
-    lastName: '',
+    username: '',
     email: '',
     password: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateForm = () => {
-    if (!form.firstName || form.firstName.length <= 1) {
+    // Check if all fields are emtpy
+    if (!form.username || !form.email || !form.password) {
       if (Platform.OS === "web") {
-        alert("Validation Error: \nFirst name must be at least 2 characters.");
+        alert("Empty Fields: \nAll fields are required.");
       } else {
-        Alert.alert("Validation Error", "First name must be at least 2 characters.");
+        Alert.alert("Empty Fields", "All fields are required.");
       }
       return false;
     }
 
-    if (!form.lastName || form.lastName.length <= 1) {
-      if (Platform.OS == "web") {
-        alert("Validation Error: \nLast name must be at least 2 characters.");
+    // Check if length of username is less than 2
+    if (!form.username || form.username.length <= 1) {
+      if (Platform.OS === "web") {
+        alert("Validation Error: \nUsername must be at least 2 characters.");
       } else {
-        Alert.alert("Validation Error", "Last name must be at least 2 characters.");
+        Alert.alert("Validation Error", "Username must be at least 2 characters.");
       }
       return false;
     }
 
+    // Check email is a valid email address
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!form.email || !emailRegex.test(form.email)) {
       if (Platform.OS = "web") {
@@ -50,11 +51,24 @@ const SignUp: React.FC = () => {
       return false;
     }
 
+    // Check if password length is under 7 characters
     if (!form.password || form.password.length <= 7) {
-      if (Platform.OS = "web") {
-        alert("Validation Error: \nPassword must be at least 8 characters.")
+      if (Platform.OS === "web") {
+        alert("Validation Error: \nPassword must be at least 8 characters.");
       } else {
         Alert.alert("Validation Error", "Password must be at least 8 characters.");
+      }
+      return false;
+    }
+
+    // Check for at least one uppercase letter and one symbol
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+
+    if (!passwordRegex.test(form.password)) {
+      if (Platform.OS === "web") {
+        alert("Validation Error: \nPassword must include at least one uppercase letter and one symbol.");
+      } else {
+        Alert.alert("Validation Error", "Password must include at least one uppercase letter and one symbol.");
       }
       return false;
     }
@@ -72,7 +86,7 @@ const SignUp: React.FC = () => {
     }
 
     try {
-      await signUp(form.firstName, form.lastName, form.email, form.password);
+      await signUp(form.username, form.email, form.password);
     } catch (error) {
       Alert.alert('Sign Up Error', 'An error occurred during sign-up. Please try again.');
     } finally {
@@ -81,30 +95,27 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <View className="w-full justify-evenly min-h-[83vh] px-4 my-6">
-        <View className="mb-8">
-          <Text className="text-4xl font-bold text-center mb-16">Sign Up</Text>
+    <SafeAreaView className="flex-1 bg-white relative">
+      {/* Background Circles */}
+      <View className="absolute top-[-100px] left-[-100px] w-[250px] h-[250px] bg-blue-500 rounded-full opacity-80" />
+      <View className="absolute bottom-[-100px] right-[-100px] w-[250px] h-[250px] bg-blue-500 rounded-full opacity-80" />
+
+      <View className="w-full justify-evenly min-h-[83vh] px-4 my-10">
+        <View className="mb-20">
+          {/* Header */}
+          <Text className="text-5xl font-bold text-center mb-20">Sign Up</Text>
 
           {/* Input Fields */}
           <TextInput
-            className="w-full bg-gray-100 rounded-lg p-5 mb-6"
-            placeholder="First Name"
+            className="w-full bg-gray-100 rounded-full p-5 mb-6"
+            placeholder="Username"
             placeholderTextColor={'#888'}
-            value={form.firstName}
-            onChangeText={(e) => setForm({ ...form, firstName: e })}
+            value={form.username}
+            onChangeText={(e) => setForm({ ...form, username: e })}
           />
 
           <TextInput
-            className="w-full bg-gray-100 rounded-lg p-5 mb-6"
-            placeholder="Last Name"
-            placeholderTextColor={'#888'}
-            value={form.lastName}
-            onChangeText={(e) => setForm({ ...form, lastName: e })}
-          />
-
-          <TextInput
-            className="w-full bg-gray-100 rounded-lg p-5 mb-6"
+            className="w-full bg-gray-100 rounded-full p-5 mb-6"
             placeholder="Email Address"
             placeholderTextColor={'#888'}
             value={form.email}
@@ -112,7 +123,7 @@ const SignUp: React.FC = () => {
           />
 
           <TextInput
-            className="w-full bg-gray-100 rounded-lg p-5 mb-6"
+            className="w-full bg-gray-100 rounded-full p-5 mb-6"
             placeholder="Password"
             placeholderTextColor={'#888'}
             value={form.password}
@@ -122,9 +133,9 @@ const SignUp: React.FC = () => {
         </View>
 
         {/* Sign Up Button */}
-        <View className="">
+        <View className=" flex items-center">
           <TouchableOpacity
-            className="bg-blue-500 py-4 rounded-lg"
+            className="bg-blue-500 py-4 rounded-full w-[300px]"
             onPress={handleSubmit}
             disabled={isSubmitting}
           >

@@ -19,7 +19,7 @@ interface AuthContextType {
   setUser: Dispatch<SetStateAction<UserType | null>>;
   setIsAuth: Dispatch<SetStateAction<boolean>>;
   login: (email: string, password: string) => Promise<void>;
-  signUp: (firstName: string, lastName: string, email: string, password: string) => Promise<void>;
+  signUp: (username: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -135,7 +135,11 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
       });
 
       if (!response.ok) {
-        throw new Error("Login failed");
+        if (Platform.OS === "web") {
+          alert("Error: \nFailed to login. Please try again.");
+        } else {
+          Alert.alert("Error", "Failed to login. Please try again.");
+        }
       } else {
         const data: AuthResponse = await response.json();
         setToken(data.token);
@@ -143,7 +147,6 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
         router.push("/(tabs)/dashboard");
       }
     } catch (error: any) {
-      console.error("Login error:", error);
       if (Platform.OS === "web") {
         alert(`Error: \n` + error.message || "Failed to login. Please try again.");
       } else {
@@ -152,16 +155,20 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
     }
   };
 
-  const signUp = async (firstName: string, lastName: string, email: string, password: string): Promise<void> => {
+  const signUp = async (username: string, email: string, password: string): Promise<void> => {
     try {
       const response = await fetch(`${BACKEND_API_URL}/auth/sign-up`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, lastName, email, password }),
+        body: JSON.stringify({ username, email, password }),
       });
 
       if (!response.ok) {
-        throw new Error("Sign-up failed");
+        if (Platform.OS === "web") {
+          alert("Error \nFailed to sign up. Please try again.");
+        } else {
+          Alert.alert("Error", "Failed to sign up. Please try again.");
+        }
       } else {
         const data: AuthResponse = await response.json();
         setToken(data.token);

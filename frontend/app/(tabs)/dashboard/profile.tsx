@@ -1,106 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Platform, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import Icon from "react-native-vector-icons/FontAwesome";
 import useAuth from "@/hooks/useAuth";
-import Constants from "expo-constants";
 import Header from "@/components/Header";
+import { useUserData } from "@/hooks/useUser";
 
 const Profile: React.FC = () => {
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { username, email, fetchUser, updateProfile, setUsername, setEmail, goal } = useUserData();
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [originalData, setOriginalData] = useState({ firstName: "", lastName: "", email: "" });
-
-  const fetchUser = async () => {
-    if (!user?._id) return;
-
-    try {
-      const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
-      const API_URL = `${BACKEND_API_URL}/users/${user._id}`;
-
-      const response = await fetch(API_URL, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData?.message || `HTTP Error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data.user) {
-        setFirstName(data.user.firstName || "");
-        setLastName(data.user.lastName || "");
-        setEmail(data.user.email || "");
-
-        setOriginalData({
-          firstName: data.user.firstName || "",
-          lastName: data.user.lastName || "",
-          email: data.user.email || "",
-        });
-      } else {
-        throw new Error("Invalid user data received");
-      }
-    } catch (error) {
-      console.error("Error fetching user:", error);
-    }
-  };
-
-  const updateProfile = async () => {
-    if (!user?._id) return;
-
-    try {
-      const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
-      const API_URL = `${BACKEND_API_URL}/users/${user._id}`;
-
-      const updatedUserData = { firstName, lastName, email };
-
-      const response = await fetch(API_URL, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedUserData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData?.message || `HTTP Error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      setFirstName(data.updatedUser.firstName || "");
-      setLastName(data.updatedUser.lastName || "");
-      setEmail(data.updatedUser.email || "");
-
-      setOriginalData({
-        firstName: data.updatedUser.firstName || "",
-        lastName: data.updatedUser.lastName || "",
-        email: data.updatedUser.email || "",
-      });
-
-      setIsEditing(false);
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      if (Platform.OS === "web") {
-        alert("Failed to update profile. Please try again.");
-      } else {
-        Alert.alert("Failed to update profile", "Please try again.");
-      }
-    }
-  };
 
   const handleCancelEdit = () => {
-    setFirstName(originalData.firstName);
-    setLastName(originalData.lastName);
-    setEmail(originalData.email);
+    setUsername(username);
+    setEmail(email);
     setIsEditing(false);
   };
 
@@ -110,35 +26,38 @@ const Profile: React.FC = () => {
     }
   }, [user]);
 
+  const handleSaveChanges = () => {
+    updateProfile(username, email);
+    setIsEditing(false);
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white pt-6 px-6">
+      {/* Header */}
       <Header title="Profile" icon="chevron-left" iconSize={25} titleSize="text-3xl" />
 
+      {/* User's Avater */}
       <View>
         <View className="mt-10 items-center">
           <Icon name="user-circle" size={100} color="#4B5563" />
         </View>
 
+
+
         <View className="mt-6">
+          {/* Update Form */}
           {isEditing ? (
             <>
-              <Text className="text-sm text-gray-500">First Name</Text>
+              <Text className="text-sm text-gray-500">Username</Text>
               <TextInput
-                className="mt-2 p-3 bg-gray-100 rounded-lg"
-                value={firstName}
-                onChangeText={setFirstName}
-              />
-
-              <Text className="mt-4 text-sm text-gray-500">Last Name</Text>
-              <TextInput
-                className="mt-2 p-3 bg-gray-100 rounded-lg"
-                value={lastName}
-                onChangeText={setLastName}
+                className="mt-2 p-4 bg-gray-100 rounded-full"
+                value={username}
+                onChangeText={setUsername}
               />
 
               <Text className="mt-4 text-sm text-gray-500">Email</Text>
               <TextInput
-                className="mt-2 p-3 bg-gray-100 rounded-lg"
+                className="mt-2 p-4 bg-gray-100 rounded-full"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -146,10 +65,50 @@ const Profile: React.FC = () => {
             </>
           ) : (
             <>
+              {/* User Information */}
               <Text className="text-2xl font-semibold mt-4 text-center mb-4">
-                {firstName} {lastName}
+                {username}
               </Text>
               <Text className="text-gray-500 text-center">{email}</Text>
+
+              {/* User's Goal Information */}
+              <Text className="p-4 text-xl font-semibold">Goals</Text>
+              {goal && goal.length > 0 ? (
+                <View className="flex flex-row gap-1 justify-between">
+                  {goal.map((goal: string, index: number) => {
+                    // Define colors for each goal
+                    let buttonColor, textColor;
+                    switch (goal) {
+                      case "Lose Weight":
+                        buttonColor = "bg-yellow-200";
+                        textColor = "text-yellow-700";
+                        break;
+                      case "Get Healthier":
+                        buttonColor = "bg-green-200";
+                        textColor = "text-green-700";
+                        break;
+                      case "Reduce Stress":
+                        buttonColor = "bg-blue-200";
+                        textColor = "text-blue-700";
+                        break;
+                      default:
+                        buttonColor = "bg-gray-200";
+                        textColor = "text-gray-700";
+                    }
+
+                    return (
+                      <TouchableOpacity
+                        key={index}
+                        className={`w-fit p-4 mb-2 rounded-full ${buttonColor}`}
+                      >
+                        <Text className={`text-center text-sm ${textColor}`}>{goal}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              ) : (
+                <Text className="text-gray-500">No goals set.</Text>
+              )}
             </>
           )}
         </View>
@@ -158,14 +117,14 @@ const Profile: React.FC = () => {
       {isEditing ? (
         <View className="mt-6 flex-row justify-between">
           <TouchableOpacity
-            className="flex-1 mr-2 bg-blue-500 py-3 rounded-lg"
-            onPress={updateProfile}
+            className="flex-1 mr-2 bg-blue-500 py-3 rounded-full"
+            onPress={handleSaveChanges}
           >
             <Text className="text-center text-white font-semibold text-lg">Save Changes</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="flex-1 ml-2 bg-gray-300 py-3 rounded-lg"
+            className="flex-1 ml-2 bg-gray-100 py-3 rounded-full"
             onPress={handleCancelEdit}
           >
             <Text className="text-center text-black font-semibold text-lg">Cancel</Text>
@@ -173,29 +132,28 @@ const Profile: React.FC = () => {
         </View>
       ) : (
         <TouchableOpacity
-          className="mt-6 bg-blue-500 py-3 rounded-lg"
+          className="mt-6 bg-gray-100 py-3 rounded-full"
           onPress={() => setIsEditing(true)}
         >
-          <Text className="text-center text-white font-semibold text-lg">Edit Profile</Text>
+          <Text className="text-center text-black text-lg">Edit Profile</Text>
         </TouchableOpacity>
       )}
 
       <TouchableOpacity
-        className="mt-6 bg-gray-500 py-3 rounded-lg"
+        className="mt-6 bg-gray-100 py-3 rounded-full"
         onPress={() => router.push("/goal-info")}
       >
-        <Text className="text-center text-white font-semibold text-lg">Edit Info</Text>
+        <Text className="text-center text-black text-lg">Edit Information</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        className="mt-6 flex-row items-center justify-center p-3 bg-red-500 rounded-lg"
+        className="mt-6 flex-row items-center justify-center p-3 bg-red-500 rounded-full"
         onPress={() => {
           logout();
           router.push("/");
         }}
       >
-        <Icon name="sign-out" size={20} color="#fff" />
-        <Text className="ml-3 text-white font-semibold text-lg">Logout</Text>
+        <Text className="ml-3 text-white  text-lg">Logout</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

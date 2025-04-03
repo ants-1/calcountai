@@ -7,8 +7,6 @@ export interface IChallenge {
   percentage: number;
   participants: Types.ObjectId[];
   completed: Boolean;
-  startDate: Date;
-  endDate: Date;
   challengeType: string;
 }
 
@@ -20,8 +18,6 @@ const ChallengeSchema = new Schema<IChallenge, ChallengeModel>({
   percentage: { type: Number, default: 0, required: true },
   participants: [{ type: Schema.Types.ObjectId, ref: "User" }],
   completed: { type: Boolean, required: true },
-  startDate: { type: Date, required: true },
-  endDate: { type: Date, required: true },
   challengeType: { type: String, required: true },
 });
 

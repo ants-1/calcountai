@@ -57,7 +57,7 @@ const Community: React.FC = () => {
       {/* Search and Create Community Button */}
       <View className="flex-row items-center mt-4">
         <TextInput
-          className="flex-1 p-3 bg-gray-100 rounded-lg text-sm mr-2"
+          className="flex-1 p-3 bg-gray-100 rounded-full text-sm mr-2"
           placeholder="Search for a community..."
           placeholderTextColor="#888"
           value={searchText}
@@ -65,10 +65,10 @@ const Community: React.FC = () => {
         />
 
         <TouchableOpacity
-          className="bg-gray-200 p-3 rounded-lg"
+          className="bg-black p-3 rounded-full"
           onPress={() => setShowSortDropdown((prev) => !prev)}
         >
-          <Text className="text-sm font-semibold text-gray-700">
+          <Text className="text-sm font-semibold text-white">
             Sort: {`${sortOption === 'name' ? 'Name' : 'Members'} ${sortOrder === 'asc' ? 'Ascending' : 'Descending'}`}
           </Text>
         </TouchableOpacity>
@@ -76,7 +76,7 @@ const Community: React.FC = () => {
 
       <View className="relative mt-4">
         <TouchableOpacity
-          className="bg-blue-500 p-3 rounded-lg"
+          className="bg-blue-500 p-3 rounded-full"
           onPress={() => router.push('/community/create-community')}
         >
           <Text className="text-white font-semibold">+ Create</Text>

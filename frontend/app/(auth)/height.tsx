@@ -1,53 +1,51 @@
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Alert } from "react-native";
 import { useUserData } from "@/hooks/useUser";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { convertCmToFeet, convertFeetToCm } from "@/utils/heightFormatter";
+import { isValidHeight } from "@/utils/isValidHeight";
 
 const Height: React.FC = () => {
   const router = useRouter();
-  const { userData, updateUserData } = useUserData();
-  const [height, setHeight] = useState({ value1: "", value2: "" });
+  const { userData, updateUserGoalData } = useUserData();
+  const [height, setHeight] = useState("");
   const [unit, setUnit] = useState<"ft" | "cm">("ft");
 
-  const convertHeight = () => {
-    const feet = parseFloat(height.value1) || 0;
-    const inches = parseFloat(height.value2) || 0;
-
-    if (unit === "ft") {
-      return (feet * 30.48) + (inches * 2.54);
-    } else if (unit === "cm") {
-      return feet;
+  useEffect(() => {
+    if (height) {
+      const convertHeight = unit === "ft" ? convertCmToFeet(parseFloat(height)) : convertFeetToCm(parseFloat(height));
+      setHeight(convertHeight.toString());
     }
-    return 0;
-  };
+  }, [unit]);
 
-  const handleHeightChange = () => {
-    const updatedHeight = convertHeight();
+  // Handle the height update and validation
+  const handleUpdateHeight = () => {
+    if (!isValidHeight(height, unit)) {
+      Alert.alert("Invalid Height", `Please enter a valid height in ${unit}.`);
+      return;
+    }
 
-    const updatedUser = {
-      ...userData,
-      height: updatedHeight,
-    };
+    const finalHeight = unit === "cm" ? parseFloat(height) : convertFeetToCm(parseFloat(height));
 
-    updateUserData(updatedUser);
+    updateUserGoalData({ ...userData, height: finalHeight });
+    console.log(userData);
+    router.push("/dob");
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-    >
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="flex-1 justify-evenly items-center bg-white px-4">
           <View className="w-full">
-            <TouchableOpacity
-              onPress={() => router.back()}
-              className="bg-gray-200 p-3 rounded-lg w-12"
-            >
-              <Icon name="arrow-left" size={24} color="#4B5563" />
-            </TouchableOpacity>
-            <Text className="text-3xl font-bold mb-10 text-center">Your Height?</Text>
+            {/* Header */}
+            <View className="flex flex-row justify-between">
+              <TouchableOpacity className="mt-1" onPress={() => router.back()}>
+                <Icon name="chevron-left" size={25} color="#4B5563" />
+              </TouchableOpacity>
+              <Text className="text-3xl font-bold mb-10 text-center">Your Height</Text>
+              <View></View>
+            </View>
 
             {/* Progress Indicator */}
             <View className="flex flex-row justify-center mb-20 gap-5">
@@ -60,23 +58,14 @@ const Height: React.FC = () => {
             </View>
 
             {/* Height Input */}
-            <View className="flex flex-row justify-center gap-3">
+            <View className="flex flex-row justify-center">
               <TextInput
-                className="w-[40%] bg-gray-200 p-6 rounded-lg text-center text-xl"
+                className="w-[80%] bg-gray-200 p-6 rounded-full text-center text-xl"
                 placeholder="0"
                 keyboardType="numeric"
-                value={height.value1}
-                onChangeText={(text) => setHeight({ ...height, value1: text })}
+                value={height}
+                onChangeText={setHeight}
               />
-              {unit === "ft" && (
-                <TextInput
-                  className="w-[40%] bg-gray-200 p-6 rounded-lg text-center text-xl"
-                  placeholder="0"
-                  keyboardType="numeric"
-                  value={height.value2}
-                  onChangeText={(text) => setHeight({ ...height, value2: text })}
-                />
-              )}
             </View>
 
             <Text className="text-center mt-2 text-lg font-semibold">{unit}</Text>
@@ -100,16 +89,13 @@ const Height: React.FC = () => {
           {/* Continue Button */}
           <View>
             <TouchableOpacity
-              className={`p-4 rounded-lg w-[300px] ${height.value1 ? "bg-blue-500" : "bg-gray-300"}`}
-              disabled={!height.value1}
-              onPress={() => {
-                handleHeightChange();
-                router.push("/dob");
-              }}
+              className={`p-4 rounded-full w-[300px] ${height && isValidHeight(height, unit) ? "bg-blue-500" : "bg-gray-300"}`}
+              disabled={!height || !isValidHeight(height, unit)}
+              onPress={handleUpdateHeight}
             >
               <Text className="text-center text-white font-semibold text-lg">Continue</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("/dashboard")}>
+            <TouchableOpacity onPress={() => router.push("/dashboard")}> 
               <Text className="text-center mt-5 underline">Enter Information Later</Text>
             </TouchableOpacity>
           </View>

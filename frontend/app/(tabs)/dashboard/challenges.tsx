@@ -2,7 +2,7 @@ import { View, Text, ScrollView, Dimensions, ActivityIndicator } from 'react-nat
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '@/components/Header';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { TabView, TabBar } from 'react-native-tab-view';
 import ChallengeList from '@/components/ChallengeList';
 import useChallenge from '@/hooks/useChallenge';
 import useAuth from '@/hooks/useAuth';

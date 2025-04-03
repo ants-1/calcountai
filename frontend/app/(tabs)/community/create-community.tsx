@@ -15,17 +15,17 @@ const CreateCommunity = () => {
 
       {/* Community Form */}
       <View className="mt-6 px-6">
-        <Text className="mt-4 text">Community Name</Text>
+        <Text className="mt-4 mb-2 pl-4 text">Community Name</Text>
         <TextInput
-          className="border-2 border-gray-300 p-3 rounded-lg w-full mb-4"
+          className="w-full bg-gray-100 rounded-full p-5 mb-4"
           placeholder="Enter Name..."
           placeholderTextColor="#888"
           value={name}
           onChangeText={setName}
         />
-        <Text className="mt-4 text">Community Description</Text>
+        <Text className="mt-4 mb-2 pl-4 text">Community Description</Text>
         <TextInput
-          className="border-2 border-gray-300 p-3 rounded-lg w-full mb-4"
+          className="w-full bg-gray-100 rounded-full p-5 mb-4"
           placeholder="Enter Description..."
           placeholderTextColor="#888"
           value={description}
@@ -33,7 +33,7 @@ const CreateCommunity = () => {
           multiline
         />
         <TouchableOpacity
-          className="bg-blue-500 p-3 rounded-lg w-full mt-6"
+          className="bg-blue-500 p-4 rounded-full w-full mt-6"
           onPress={() => createCommunity(name, description)}
         >
           <Text className="text-white text-center">Create</Text>

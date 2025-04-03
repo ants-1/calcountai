@@ -54,8 +54,7 @@ const updateUserData = async (
     const { id } = req.params;
 
     const updatedUser = {
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
+      username: req.body.username,
       email: req.body.email,
     };
 

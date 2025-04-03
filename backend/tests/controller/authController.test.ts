@@ -1,5 +1,5 @@
 import request from "supertest";
-import { app } from "../../src/index";
+import { app, server } from "../../src/index";
 import mongoose from "mongoose";
 import User from "../../src/models/user";
 import { describe, expect, beforeAll, afterAll, it } from "@jest/globals";
@@ -10,15 +10,18 @@ describe("Auth Controller Tests", () => {
 
   beforeAll(async () => {
     // Connect to test database
-    if (mongoose.connection.readyState === 0) { 
+    if (mongoose.connection.readyState === 0) {
       await mongoose.connect(process.env.DB_TEST_URL || "");
     }
+
+    await User.deleteMany({ email: "testuser@example.com" });
   });
 
   afterAll(async () => {
     // Delete all users after testing
     await User.deleteMany({ email: "testuser@example.com" });
     await mongoose.connection.close();
+    server.close();
   });
 
   // Test sign up for a new user with the correct information
@@ -41,6 +44,22 @@ describe("Auth Controller Tests", () => {
     expect(res.body.user.password).not.toBe("Test@1234");
     token = res.body.token;
     userId = res.body.user._id;
+  });
+
+  // Test sign up for a new user with a missing field
+  it("should not sign up a new user with missing field", async () => {
+    const res = await request(app).post("/api/v1/auth/sign-up").send({
+      firstName: "Test",
+      lastName: "User",
+      // Missing 'email' field
+      password: "Test@1234",
+    });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty(
+      "error",
+      "Sign up failed. User already exists or invalid data."
+    );
   });
 
   // Test login for an existing user with the correct information

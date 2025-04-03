@@ -1,143 +1,44 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import useAuth from "@/hooks/useAuth";
-import Constants from "expo-constants";
 import { useFocusEffect } from "expo-router";
 import Header from "@/components/Header";
-
-const fetchLatestDailyLog = async (userId: string) => {
-  try {
-    const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
-    const response = await fetch(`${BACKEND_API_URL}/users/${userId}/dailyLogs`);
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to fetch logs");
-    }
-
-    if (!data.dailyLogs || data.dailyLogs.length === 0) {
-      return null;
-    }
-
-    // Sort logs by date in descending order (latest first)
-    const sortedLogs = data.dailyLogs.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-    return sortedLogs[0];
-  } catch (error) {
-    console.error("Error fetching logs:", error);
-    return null;
-  }
-};
-
-const fetchWeightGoalData = async (userId: string) => {
-  try {
-    const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
-    const response = await fetch(`${BACKEND_API_URL}/users/${userId}`);
-
-    const textResponse = await response.text();
-
-    const data = JSON.parse(textResponse);
-
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to fetch weight goal data");
-    }
-
-    return data.user;
-  } catch (error) {
-    console.error("Error fetching weight goal data:", error);
-    return null;
-  }
-};
-
-const fetchStreaks = async (userId: string) => {
-  try {
-    const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
-    const response = await fetch(`${BACKEND_API_URL}/users/${userId}/streaks`);
-    
-    const textResponse = await response.text();
-
-    const data = JSON.parse(textResponse);
-
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to fetch streak data");
-    }
-
-    return data;
-  } catch (error) {
-    console.error("Error fetching streak data:", error);
-    return null;
-  }
-}
+import { motivationalQuotes } from "@/utils/motivationalQuotes";
+import { useUserData } from "@/hooks/useUser";
+import useLog from "@/hooks/useLog";
+import { FoodType } from "@/types/FoodType";
+import { ActivityType } from "@/types/ActivityType";
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const userId = user?._id;
   const router = useRouter();
 
-  const [latestLog, setLatestLog] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [caloriesConsumed, setCaloriesConsumed] = useState(0);
-  const [caloriesBurned, setCaloriesBurned] = useState(0);
-  const [weightGoal, setWeightGoal] = useState<number | null>(null);
-  const [currentWeight, setCurrentWeight] = useState<number>(75);
-  const [recentMeals, setRecentMeals] = useState<any[]>([]);
-  const [recentActivities, setRecentActivities] = useState<any[]>([]);
-  const [streak, setStreak] = useState<number | null>(null);
 
-  const dailyGoal = 2000;
-  const motivationalQuotes = [
-    "You don't have to be great to start, but you have to start to be great.",
-    "Success starts with self-discipline.",
-    "Push yourself because no one else is going to do it for you.",
-    "The only bad workout is the one that didn’t happen.",
-    "Believe you can and you're halfway there."
-  ];
+  const { streak, currentWeight, targetWeight, fetchWeightGoalData, fetchStreak } = useUserData();
+  const { currentLog, fetchDailyLogs, createNewDailyLog } = useLog();
+
   const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
-
+  const dailyGoal = 2000;
+  const caloriesConsumed = currentLog?.foods?.reduce((sum: number, food: FoodType) => sum + food.calories, 0) || 0;
+  const caloriesBurned = currentLog?.exercises?.reduce((sum: number, exercise: ActivityType) => sum + exercise.caloriesBurned, 0) || 0;
   const remainingCalories = dailyGoal - caloriesConsumed + caloriesBurned;
-  const weightProgress = weightGoal ? ((currentWeight - weightGoal) / currentWeight) * 100 : 0;
+
+  // Calculate weight progress
+  const weightProgress = targetWeight && currentWeight
+    ? ((currentWeight - targetWeight) / targetWeight) * 100
+    : 0;
 
   useFocusEffect(
     React.useCallback(() => {
       if (userId) {
         setLoading(true);
-        fetchLatestDailyLog(userId)
-          .then((log) => {
-            if (log) {
-              setLatestLog(log);
-
-              // Calculate calories consumed and burned dynamically
-              const consumed = log.foods?.reduce((sum: number, food: any) => sum + food.calories, 0) || 0;
-              const burned = log.exercises?.reduce((sum: number, exercise: any) => sum + exercise.caloriesBurned, 0) || 0;
-
-              setCaloriesConsumed(consumed);
-              setCaloriesBurned(burned);
-
-              // Set recent meals and activities from the log
-              setRecentMeals(log.foods || []);
-              setRecentActivities(log.exercises || []);
-            }
-          })
-          .catch((error) => console.error("Error fetching log:", error));
-
-        fetchWeightGoalData(userId)
-          .then((userData) => {
-            if (userData) {
-              setWeightGoal(userData.targetWeight);
-              setCurrentWeight(userData.currentWeight);
-            }
-          })
-          .catch((error) => console.error("Error fetching weight goal data:", error))
-          .finally(() => setLoading(false));
-          fetchStreaks(userId)
-          .then((streakData) => {
-            if (streakData) {
-              setStreak(streakData.streak);
-            }
-          })
-          .catch((error) => console.error("Error fetching streak data:", error));
+        fetchDailyLogs().finally(() => setLoading(false));
+        fetchWeightGoalData(userId).finally(() => setLoading(false));
+        fetchStreak(userId);
       }
     }, [userId])
   );
@@ -196,10 +97,10 @@ const Dashboard: React.FC = () => {
           <Text className="text-lg font-semibold text-green-700">Weight Goal</Text>
           {loading ? (
             <ActivityIndicator size="small" color="#4B5563" />
-          ) : weightGoal !== null ? (
+          ) : targetWeight !== null ? (
             <>
               <Text className="text-sm text-green-500 mt-2">
-                Your goal is to reach {weightGoal?.toFixed(2)} kg. You're currently at {currentWeight?.toFixed(2)} kg.
+                Your goal is to reach {targetWeight?.toFixed(2)} kg. You're currently at {currentWeight?.toFixed(2)} kg.
               </Text>
               <View className="w-full bg-gray-300 h-2 mt-2 rounded-xl">
                 <View
@@ -219,9 +120,9 @@ const Dashboard: React.FC = () => {
           <Text className="text-sm text-gray-500 mt-2">{getProgressMessage()}</Text>
         </View>
 
-        {/* Completed Challenges Section */}
+        {/* Challenges Section */}
         <View className="mt-10 bg-gray-100 p-4 rounded-xl">
-          <Text className="text-lg font-semibold text-gray-700">Completed Challenges</Text>
+          <Text className="text-lg font-semibold text-gray-700">Challenges</Text>
           <TouchableOpacity
             className="mt-4 bg-blue-500 py-2 px-4 rounded-lg"
             onPress={() => router.push("/(tabs)/dashboard/challenges")}
@@ -237,8 +138,8 @@ const Dashboard: React.FC = () => {
           <Text className="text-lg font-semibold text-gray-700">Recent Meals</Text>
           {loading ? (
             <ActivityIndicator size="small" color="#4B5563" />
-          ) : latestLog?.foods?.length > 0 ? (
-            latestLog.foods.map((meal: any, index: number) => (
+          ) : currentLog?.foods?.length > 0 ? (
+            currentLog.foods.map((meal: any, index: number) => (
               <View key={index} className="flex-row justify-between items-center mt-4">
                 <Text className="text-sm text-gray-600">{meal.name}</Text>
                 <Text className="text-sm text-gray-500">{meal.calories} kcal</Text>
@@ -260,8 +161,8 @@ const Dashboard: React.FC = () => {
           <Text className="text-lg font-semibold text-gray-700">Recent Activities</Text>
           {loading ? (
             <ActivityIndicator size="small" color="#4B5563" />
-          ) : latestLog?.exercises?.length > 0 ? (
-            latestLog.exercises.map((exercise: any, index: number) => (
+          ) : currentLog?.exercises?.length > 0 ? (
+            currentLog.exercises.map((exercise: any, index: number) => (
               <View key={index} className="flex-row justify-between items-center mt-4">
                 <Text className="text-sm text-gray-600">{exercise.name}</Text>
                 <Text className="text-sm text-gray-500">{exercise.caloriesBurned} kcal</Text>

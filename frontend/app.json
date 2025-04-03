@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "extra": {
-      "BACKEND_API_URL": "http://192.168.1.57:5001/api/v1",
+      "BACKEND_API_URL": "http://192.168.1.96:5001/api/v1",
       "CHATBOT_API_URL": "https://calcountai-chatbot.onrender.com",
       "router": {
         "origin": false

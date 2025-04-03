@@ -1,10 +1,10 @@
 export interface UserType {
   _id: string;
-  firstName: string;
-  lastName: string;
+  username: string;
   email: string;
   avatar?: string;
   password: string;
+  gender?: string;
   goal?: string;
   currentWeight?: number;
   targetWeight?: number;
@@ -12,9 +12,6 @@ export interface UserType {
   height?: string;
   dateOfBirth?: string;
   streak?: number;
-  pendingFriendRequests?: []; 
-  friendRequests?: [];
-  friends?: [];
   dailyLogs?: [];
   challenges?: []; 
 }

@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { Types } from "mongoose";
 import Community, { ICommunity } from "../models/community";
+import User, { IUser } from "../models/user";
 
-// @desc    Retrieve all communitites 
+// @desc    Retrieve all communitites
 // @route   GET /api/v1/communities
 const getAllCommunities = async (
   req: Request,
@@ -32,9 +33,13 @@ const getCommunity = async (
   try {
     const { communityId } = req.params;
 
-    const community: ICommunity | null = await Community.findById(communityId)
-      .populate("members", "-password")
-      .populate("challenges")
+    if (!Types.ObjectId.isValid(communityId)) {
+      return res.status(400).json({ error: "Invalid community ID" });
+    }
+
+    const community = await Community.findById(communityId)
+      .populate({ path: "members", select: "username email" })
+      .populate({ path: "challenges" })
       .exec();
 
     if (!community) {
@@ -46,6 +51,7 @@ const getCommunity = async (
     return next(err);
   }
 };
+
 
 // @desc    Create new community
 // @route   POST /api/v1/communities
@@ -148,7 +154,7 @@ const updateCommunity = async (
   }
 };
 
-// @desc    User leaves community 
+// @desc    User leaves community
 // @route   DELETE /api/v1/communities/:communityId/leave
 const leaveCommunity = async (
   req: Request,

@@ -16,7 +16,7 @@ const CommunitySchema = new Schema<ICommunity, CommunityModel>({
   description: { type: String, required: true },
   members: [{ type: Schema.Types.ObjectId, ref: "User" }],
   createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  challenges: [{ type: Schema.Types.ObjectId, ref: "Challenge" }]
+  challenges: [{ type: Schema.Types.ObjectId, ref: "Challenge" }],  
 });
 
 export default mongoose.model<ICommunity, CommunityModel>(

@@ -44,14 +44,19 @@ const SignIn: React.FC = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <View className="w-full justify-evenly min-h-[83vh] px-4 my-6">
+    <SafeAreaView className="flex-1 bg-white relative">
+
+      {/* Background Circles */}
+      <View className="absolute top-[-100px] left-[-100px] w-[250px] h-[250px] bg-blue-500 rounded-full opacity-80" />
+      <View className="absolute bottom-[-100px] right-[-100px] w-[250px] h-[250px] bg-blue-500 rounded-full opacity-80" />
+
+      <View className="w-full justify-evenly min-h-[83vh] px-4 my-10">
         <View className="mb-48">
-          <Text className="text-4xl font-bold text-center mb-16">Login</Text>
+          <Text className="text-5xl font-bold text-center mb-20">Login</Text>
 
           {/* Email Input */}
           <TextInput
-            className="w-full bg-gray-100 rounded-lg p-5 mb-6"
+            className="w-full bg-gray-100 rounded-full p-5 mb-6"
             placeholder="Email Address"
             placeholderTextColor="#888"
             value={form.email}
@@ -60,7 +65,7 @@ const SignIn: React.FC = () => {
 
           {/* Password Input */}
           <TextInput
-            className="w-full bg-gray-100 rounded-lg p-5 mb-6"
+            className="w-full bg-gray-100 rounded-full p-5 mb-6"
             placeholder="Password"
             placeholderTextColor="#888"
             value={form.password}
@@ -69,9 +74,9 @@ const SignIn: React.FC = () => {
           />
         </View>
 
-        <View>
+        <View className=" flex items-center">
           <TouchableOpacity
-            className="bg-blue-500 py-4 rounded-lg"
+            className="bg-blue-500 py-4 rounded-full w-[300px]"
             onPress={submit}
             disabled={isSubmitting}
           >

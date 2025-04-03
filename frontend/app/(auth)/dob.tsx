@@ -1,45 +1,40 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Keyboard } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Alert } from "react-native";
 import { useRouter } from "expo-router";
-import Constants from "expo-constants";
 import { useUserData } from "@/hooks/useUser";
-import useAuth from "@/hooks/useAuth";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { isValidDate } from "@/utils/isValidDate";
 
 const DoB: React.FC = () => {
   const router = useRouter();
-  const { userData } = useUserData();
+  const { submitUpdateUserData } = useUserData();
   const [dob, setDob] = useState({ day: "", month: "", year: "" });
-  const { user } = useAuth();
 
-  // Update the user data on submit
+  // Update the user's goal data on submit
   const handleSubmit = async () => {
-    const updatedUser = {
-      ...userData,
-      dob: {
-        day: dob.day,
-        month: dob.month,
-        year: dob.year,
-      },
-    };
+    const { day, month, year } = dob;
 
-    try {
-      const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
-      const response = await fetch(`${BACKEND_API_URL}/users/${user?._id}/goal-info`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedUser),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update user data');
+    // Validate the date
+    if (!isValidDate(day, month, year)) {
+      if (Platform.OS === "web") {
+        alert("Invalid Date\nPlease enter a valid date of birth.");
+      } else {
+        Alert.alert("Invalid Date", "Please enter a valid date of birth.");
       }
+      return;
+    }
 
+    const updatedDob = { day, month, year };
+    try {
+      await submitUpdateUserData(updatedDob);
       router.push("/dashboard");
     } catch (error) {
-      console.error("Error updating user data:", error);
+      // console.error("Error updating user data:", error);
+      if (Platform.OS === "web") {
+        alert("Error\nError updating user data.");
+      } else {
+        Alert.alert("Error", "Error updating user data.");
+      }
     }
   };
 
@@ -51,13 +46,16 @@ const DoB: React.FC = () => {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="flex-1 justify-evenly items-center bg-white px-4">
           <View className="w-full">
-            <TouchableOpacity
-              onPress={() => router.back()}
-              className="bg-gray-200 p-3 rounded-lg w-12"
-            >
-              <Icon name="arrow-left" size={24} color="#4B5563" />
-            </TouchableOpacity>
-            <Text className="text-3xl font-bold mb-10 text-center">Date of Birth?</Text>
+            {/* Header */}
+            <View className="flex flex-row justify-between">
+              <TouchableOpacity className="mt-1" onPress={() => router.back()}>
+                <Icon name="chevron-left" size={25} color="#4B5563" />
+              </TouchableOpacity>
+
+              <Text className="text-3xl font-bold mb-10 text-center">Date of Birth</Text>
+
+              <View></View>
+            </View>
 
             {/* Progress Indicator */}
             <View className="flex flex-row justify-center mb-20 gap-5">
@@ -115,7 +113,7 @@ const DoB: React.FC = () => {
           {/* Submit Button */}
           <View>
             <TouchableOpacity
-              className={`p-4 rounded-lg w-[300px] ${dob.day && dob.month && dob.year ? "bg-blue-500" : "bg-gray-300"}`}
+              className={`p-4 rounded-full w-[300px] ${dob.day && dob.month && dob.year ? "bg-blue-500" : "bg-gray-300"}`}
               disabled={!dob.day || !dob.month || !dob.year}
               onPress={handleSubmit}
             >

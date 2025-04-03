@@ -15,13 +15,12 @@ const initialiseSignUp = (): void => {
       },
       async (req: Request, email: string, password: string, done) => {
         try {
-          const { firstName, lastName } = req.body;
+          const { username } = req.body;
 
           const hashedPassword = await bcrypt.hash(password, 10);
 
           const newUser = await User.create({
-            firstName,
-            lastName,
+            username,
             email,
             password: hashedPassword,
           });

@@ -9,12 +9,15 @@ import Header from "@/components/Header";
 import useAuth from "@/hooks/useAuth";
 
 // Tab Screens
-const InfoScreen = ({ community }: { community: any }) => (
+
+// Feed Screen
+const FeedScreen = ({ community }: { community: any }) => (
   <ScrollView className="flex-1 p-6">
     <Text className="text-lg text-gray-700">{community.description}</Text>
   </ScrollView>
 );
 
+// Challenge Screen
 const ChallengesScreen = ({ challenges }: { challenges: any[] }) => (
   <ScrollView className="p-6">
     {challenges.length > 0 ? (
@@ -32,6 +35,7 @@ const ChallengesScreen = ({ challenges }: { challenges: any[] }) => (
   </ScrollView>
 );
 
+// People Screen
 const PeopleScreen = ({ members, creatorId }: { members: any[]; creatorId: string }) => (
   <ScrollView className="p-6">
     {members.length > 0 ? (
@@ -40,7 +44,7 @@ const PeopleScreen = ({ members, creatorId }: { members: any[]; creatorId: strin
           <View className="flex flex-row gap-2">
             <Icon name="user-circle" size={25} color="#4B5563" />
             <Text className="text-lg text-gray-800">
-              {member.firstName} {member.lastName}
+              {member.username}
             </Text>
           </View>
           {member._id === creatorId && <Text className="text-lg font-semibold mb-1">Creator</Text>}
@@ -56,17 +60,17 @@ const CommunityDetails = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { community, fetchCommunity, joinCommunity, leaveCommunity, deleteCommunity, isJoined, setIsJoined } = useCommunity();
-  const { user } = useAuth(); // Get the authenticated user
+  const { user } = useAuth(); 
   const [index, setIndex] = useState(0);
 
   const routes = [
-    { key: "info", title: "Info" },
+    { key: "feed", title: "Feed" },
     { key: "challenges", title: "Challenges" },
     { key: "people", title: "People" },
   ];
 
   const renderScene = SceneMap({
-    info: () => (community ? <InfoScreen community={community} /> : null),
+    feed: () => (community ? <FeedScreen community={community} /> : null),
     challenges: () => (community ? <ChallengesScreen challenges={community.challenges} /> : null),
     people: () => (community ? <PeopleScreen members={community.members} creatorId={community.createdBy} /> : null),
   });
@@ -96,31 +100,36 @@ const CommunityDetails = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
+      {/* Header */}
       <Header title={community.name} icon="chevron-left" iconSize={25} titleSize="text-3xl" />
 
+      <Text className="text-lg text-gray-700 text-center px-6 py-2">{community.description}</Text>
+
+      {/* Join, Leave and Delete Community Button */}
       <View className="px-6 py-4">
         {isJoined === null ? (
           <Text className="text-lg text-gray-700">Checking membership...</Text>
         ) : isJoined ? (
           <View>
             {!isCreator && (
-              <TouchableOpacity className="p-3 bg-red-500 rounded-lg" onPress={() => leaveCommunity?.(id as string)}>
+              <TouchableOpacity className="p-3 bg-red-500 rounded-full" onPress={() => leaveCommunity?.(id as string)}>
                 <Text className="text-white text-center">Leave Community</Text>
               </TouchableOpacity>
             )}
             {isCreator && (
-              <TouchableOpacity className="p-3 bg-red-700 rounded-lg" onPress={() => deleteCommunity?.(id as string)}>
+              <TouchableOpacity className="p-3 bg-red-700 rounded-full" onPress={() => deleteCommunity?.(id as string)}>
                 <Text className="text-white text-center">Delete Community</Text>
               </TouchableOpacity>
             )}
           </View>
         ) : (
-          <TouchableOpacity className="p-3 bg-blue-500 rounded-lg" onPress={() => joinCommunity?.(id as string)}>
+          <TouchableOpacity className="p-3 bg-blue-500 rounded-full" onPress={() => joinCommunity?.(id as string)}>
             <Text className="text-white text-center">Join Community</Text>
           </TouchableOpacity>
         )}
       </View>
 
+      {/* Community Tab */}
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}

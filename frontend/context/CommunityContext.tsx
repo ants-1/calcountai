@@ -61,6 +61,7 @@ export const CommunityProvider: React.FC<CommunityProviderProps> = ({ children }
       if (!data.community) throw new Error("API did not return valid community data");
 
       setCommunity(data.community);
+      console.log(data);
     } catch (error: any) {
       console.error("Error fetching community:", error);
 
@@ -240,19 +241,18 @@ export const CommunityProvider: React.FC<CommunityProviderProps> = ({ children }
   }
 
   return (
-    <CommunityContext.Provider
-      value={{
-        community,
-        communities,
-        fetchCommunities,
-        fetchCommunity,
-        joinCommunity,
-        createCommunity,
-        leaveCommunity,
-        deleteCommunity,
-        isJoined,
-        setIsJoined,
-      }}>
+    <CommunityContext.Provider value={{
+      community,
+      communities,
+      fetchCommunities,
+      fetchCommunity,
+      joinCommunity,
+      createCommunity,
+      leaveCommunity,
+      deleteCommunity,
+      isJoined,
+      setIsJoined,
+    }}>
       {children}
     </CommunityContext.Provider>
   )

@@ -78,11 +78,11 @@ const Chatbot: React.FC = () => {
           value={messageInput}
           onChangeText={setMessageInput}
           placeholder="Type a message"
-          className="flex-1 h-12 px-4 border border-gray-300 rounded-lg bg-white"
+          className="flex-1 h-12 px-4 border border-gray-300 rounded-full bg-white"
         />
         <TouchableOpacity
           onPress={sendMessage}
-          className="flex flex-row items-center gap-2 ml-3 py-3.5 px-6 bg-blue-500 rounded-lg"
+          className="flex flex-row items-center gap-2 ml-3 py-3.5 px-6 bg-blue-500 rounded-full"
         >
           <Text className="text-white font-semibold">Send</Text>
           <Icon name="send" size={12} color="#FFFFFF" />

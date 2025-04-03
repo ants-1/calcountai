@@ -6,7 +6,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 
 const PersonalInfo: React.FC = () => {
   const router = useRouter();
-  const { userData, updateUserData } = useUserData();
+  const { userData, updateUserGoalData } = useUserData();
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
 
   const genders = ["Male", "Female", "Other"];
@@ -17,19 +17,23 @@ const PersonalInfo: React.FC = () => {
       gender: selectedGender,
     };
 
-    updateUserData(updatedUser);
+    updateUserGoalData(updatedUser);
+    console.log(userData);
   };
 
   return (
-    <View className="flex-1 justify-evenly items-center bg-white px-4">
+    <View className="flex-1 justify-evenly items-center bg-white px-6">
       <View className="w-full">
-        <TouchableOpacity
-          onPress={() => router.back()}
-          className="bg-gray-200 p-3 rounded-lg w-12"
-        >
-          <Icon name="arrow-left" size={24} color="#4B5563" />
-        </TouchableOpacity>
-        <Text className="text-3xl font-bold mb-10 text-center">Personal Info</Text>
+        {/* Header */}
+        <View className="flex flex-row justify-between">
+          <TouchableOpacity className="mt-1" onPress={() => router.back()}>
+            <Icon name="chevron-left" size={25} color="#4B5563" />
+          </TouchableOpacity>
+
+          <Text className="text-3xl font-bold mb-10 text-center">Personal Info</Text>
+
+          <View></View>
+        </View>
 
         {/* Progress Indicator */}
         <View className="flex flex-row justify-center mb-20 gap-5">
@@ -45,7 +49,7 @@ const PersonalInfo: React.FC = () => {
         {genders.map((gender) => (
           <TouchableOpacity
             key={gender}
-            className={`w-full p-6 mb-4 rounded-lg ${selectedGender === gender ? "bg-blue-500" : "bg-gray-200"}`}
+            className={`w-full p-6 mb-4 rounded-full ${selectedGender === gender ? "bg-blue-500" : "bg-gray-200"}`}
             onPress={() => setSelectedGender(gender)}
           >
             <Text className={`text-center ${selectedGender === gender ? "text-white font-bold" : "text-black"}`}>
@@ -58,7 +62,7 @@ const PersonalInfo: React.FC = () => {
       {/* Continue Button */}
       <View>
         <TouchableOpacity
-          className={`p-4 rounded-lg w-[300px] ${selectedGender ? "bg-blue-500" : "bg-gray-300"}`}
+          className={`p-4 rounded-full w-[300px] ${selectedGender ? "bg-blue-500" : "bg-gray-300"}`}
           disabled={!selectedGender}
           onPress={() => {
             handleGenderChange();

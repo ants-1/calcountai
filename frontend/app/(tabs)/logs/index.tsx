@@ -1,157 +1,34 @@
 import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from "react-native-vector-icons/FontAwesome";
 import useAuth from "@/hooks/useAuth";
 import Constants from "expo-constants";
-
-// Types for data
-interface Food {
-  _id: string;
-  name: string;
-  calories: number;
-  mealType: string;
-}
-
-interface Exercise {
-  _id: string;
-  name: string;
-  caloriesBurned: number;
-}
-
-interface Log {
-  _id: string;
-  date: string;
-  foods: Food[];
-  exercises: Exercise[];
-  completed: boolean;
-}
+import useLog from '@/hooks/useLog';
+import { FoodType } from '@/types/FoodType';
+import { ExerciseType } from '@/types/ExerciseType';
 
 const Log: React.FC = () => {
   const router = useRouter();
   const { user } = useAuth();
-  const [dailyLogs, setDailyLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [currentLog, setCurrentLog] = useState<Log | null>(null);
   const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
+  const { dailyLogs, currentLog, setCurrentLog, fetchDailyLogs, createNewDailyLog, handlePrevious, handleNext } = useLog();
 
   useFocusEffect(
     React.useCallback(() => {
       setLoading(true);
-      fetchDailyLogs();
+      fetchDailyLogs().finally(() => setLoading(false));;
+      setLoading(false);
     }, [])
   );
-
-  const fetchDailyLogs = async () => {
-    try {
-      const response = await fetch(`${BACKEND_API_URL}/users/${user?._id}/dailyLogs`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch logs");
-      }
-
-      const data = await response.json();
-      const logs: Log[] = data.dailyLogs;
-      setDailyLogs(logs);
-
-      const today = new Date().toISOString().split('T')[0];
-      const todayLog = logs.find(log => log.date.split('T')[0] === today);
-
-      if (!todayLog) {
-        const newLog = {
-          date: today,
-          foods: [],
-          exercises: [],
-          completed: false,
-        };
-
-        const newLogResponse = await fetch(`${BACKEND_API_URL}/users/${user?._id}/dailyLogs`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newLog),
-        });
-
-        if (!newLogResponse.ok) {
-          throw new Error("Failed to create log for today");
-        }
-
-        const createdLog = await newLogResponse.json();
-        setCurrentLog(createdLog.dailyLog);
-        setDailyLogs([...logs, createdLog.dailyLog]);
-      } else {
-        setCurrentLog(todayLog);
-      }
-    } catch (error) {
-      console.error("Error fetching or creating log:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (!currentLog) return;
-
-    const index = dailyLogs.findIndex(log => log._id === currentLog._id);
-    if (index > 0) {
-      setCurrentLog(dailyLogs[index - 1]);
-    }
-  };
-
-  const handleNext = () => {
-    if (!currentLog) return;
-
-    const index = dailyLogs.findIndex(log => log._id === currentLog._id);
-    if (index < dailyLogs.length - 1) {
-      setCurrentLog(dailyLogs[index + 1]);
-    }
-  };
-
-  const handleCreateNewLog = async () => {
-    try {
-      const today = new Date().toISOString().split('T')[0];
-
-      const todayLog = dailyLogs.find(log => log.date.split('T')[0] === today);
-      if (todayLog) {
-        if (Platform.OS === "web") {
-          alert("Log Already Created \nA log for today has already been created.")
-        } else {
-          Alert.alert(
-            "Log Already Created",
-            "A log for today has already been created.",
-            [{ text: "OK" }]
-          );
-        }
-        return;
-      }
-
-      const newLog = {
-        date: today,
-        foods: [],
-        exercises: [],
-        completed: false,
-      };
-
-      const response = await fetch(`${BACKEND_API_URL}/users/${user?._id}/dailyLogs`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newLog),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create log");
-      }
-
-      await fetchDailyLogs();
-    } catch (error) {
-      console.error("Error creating log:", error);
-    }
-  };
 
   const handleRemoveExercise = async (exerciseId: string) => {
     if (!currentLog) return;
 
     try {
-      const updatedExercises = currentLog.exercises.filter(exercise => exercise._id !== exerciseId);
+      const updatedExercises = currentLog.exercises?.filter(exercise => exercise._id !== exerciseId);
 
       const response = await fetch(`${BACKEND_API_URL}/users/${user?._id}/dailyLogs/${currentLog._id}`, {
         method: "PUT",
@@ -179,12 +56,13 @@ const Log: React.FC = () => {
   }
 
   const dailyGoal = 2000;
-  const caloriesConsumed = currentLog?.foods?.reduce((sum, food) => sum + food.calories, 0) || 0;
-  const caloriesBurned = currentLog?.exercises?.reduce((sum, exercise) => sum + exercise.caloriesBurned, 0) || 0;
+  const caloriesConsumed = currentLog?.foods?.reduce((sum: any, food: FoodType) => sum + food.calories, 0) || 0;
+  const caloriesBurned = currentLog?.exercises?.reduce((sum: any, exercise: ExerciseType) => sum + exercise.caloriesBurned, 0) || 0;
   const remainingCalories = dailyGoal - caloriesConsumed + caloriesBurned;
 
   return (
     <SafeAreaView className="flex-1 bg-white px-4 pt-6">
+      {/* Header */}
       <View className="flex flex-row justify-between items-center">
         <View></View>
         <View className='ml-8'>
@@ -194,13 +72,13 @@ const Log: React.FC = () => {
           </Text>
         </View>
 
-        <TouchableOpacity onPress={handleCreateNewLog}>
+        <TouchableOpacity onPress={createNewDailyLog}>
           <Icon name="plus" size={24} color="#4B5563" />
         </TouchableOpacity>
       </View>
 
       <ScrollView className="mt-4" showsVerticalScrollIndicator={false}>
-        {dailyLogs.length === 0 ? (
+        {dailyLogs?.length === 0 ? (
           <Text className="text-center mt-6 text-gray-500">No logs available. Creating one now...</Text>
         ) : currentLog ? (
           <>
@@ -243,12 +121,15 @@ const Log: React.FC = () => {
               </TouchableOpacity>
             </View>
 
+            
             <View className='flex flex-row justify-between mt-8'>
-              <TouchableOpacity onPress={() => router.push("/(tabs)/logs/meals")} className='bg-blue-500 p-5 rounded-lg w-36'>
+              {/* Add Meal Button */}
+              <TouchableOpacity onPress={() => router.push("/(tabs)/logs/meals")} className='bg-blue-500 p-5 rounded-full w-36'>
                 <Text className='text-white text-center'>+ Add Meal</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => router.push("/(tabs)/logs/activity")} className='bg-blue-500 p-5 rounded-lg w-36'>
+              {/* Add Activity Button */}
+              <TouchableOpacity onPress={() => router.push("/(tabs)/logs/activity")} className='bg-blue-500 p-5 rounded-full w-36'>
                 <Text className='text-white text-center'>+ Add Activity</Text>
               </TouchableOpacity>
             </View>

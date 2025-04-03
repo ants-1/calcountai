@@ -46,8 +46,8 @@ app.use(passport.session());
 // Routes
 app.use("/", routes);
 
-app.listen(PORT, "0.0.0.0", () => {
+const server = app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-export { app };
+export { app, server };
