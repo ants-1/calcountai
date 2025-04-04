@@ -61,6 +61,7 @@ const SignIn: React.FC = () => {
             placeholderTextColor="#888"
             value={form.email}
             onChangeText={(e) => setForm({ ...form, email: e })}
+            returnKeyType="done"
           />
 
           {/* Password Input */}
@@ -71,6 +72,7 @@ const SignIn: React.FC = () => {
             value={form.password}
             secureTextEntry
             onChangeText={(e) => setForm({ ...form, password: e })}
+            returnKeyType="done"
           />
         </View>
 

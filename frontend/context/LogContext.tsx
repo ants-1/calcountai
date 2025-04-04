@@ -33,6 +33,7 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
 
       const response = await fetch(`${BACKEND_API_URL}/users/${user._id}/dailyLogs`);
 
+      // Replace with alerts
       // if (!response.ok) throw new Error("Failed to fetch logs");
       
       const data = await response.json();

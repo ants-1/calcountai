@@ -1,20 +1,18 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from "react-native-vector-icons/FontAwesome";
-import useAuth from "@/hooks/useAuth";
-import Constants from "expo-constants";
 import useLog from '@/hooks/useLog';
 import { FoodType } from '@/types/FoodType';
 import { ExerciseType } from '@/types/ExerciseType';
+import useActivity from '@/hooks/useActivity';
 
 const Log: React.FC = () => {
   const router = useRouter();
-  const { user } = useAuth();
   const [loading, setLoading] = useState<boolean>(true);
-  const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
-  const { dailyLogs, currentLog, setCurrentLog, fetchDailyLogs, createNewDailyLog, handlePrevious, handleNext } = useLog();
+  const { dailyLogs, currentLog, fetchDailyLogs, createNewDailyLog, handlePrevious, handleNext } = useLog();
+  const { removeExercise } = useActivity();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -25,30 +23,7 @@ const Log: React.FC = () => {
   );
 
   const handleRemoveExercise = async (exerciseId: string) => {
-    if (!currentLog) return;
-
-    try {
-      const updatedExercises = currentLog.exercises?.filter(exercise => exercise._id !== exerciseId);
-
-      const response = await fetch(`${BACKEND_API_URL}/users/${user?._id}/dailyLogs/${currentLog._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ exercises: updatedExercises }),
-      });
-
-      if (response.ok) {
-        const updatedLog = await response.json();
-        setCurrentLog(updatedLog.dailyLog);
-      } else {
-        if (Platform.OS === "web") {
-          alert("Error: \nFailed to remove exercise.");
-        } else {
-          Alert.alert("Error", "Failed to remove exercise.");
-        }
-      }
-    } catch (error) {
-      console.error("Error removing exercise:", error);
-    }
+    removeExercise(exerciseId, currentLog);
   };
 
   if (loading) {
@@ -121,7 +96,7 @@ const Log: React.FC = () => {
               </TouchableOpacity>
             </View>
 
-            
+
             <View className='flex flex-row justify-between mt-8'>
               {/* Add Meal Button */}
               <TouchableOpacity onPress={() => router.push("/(tabs)/logs/meals")} className='bg-blue-500 p-5 rounded-full w-36'>
@@ -140,8 +115,8 @@ const Log: React.FC = () => {
               <View key={mealType} className="mt-4 bg-gray-100 p-4 rounded-xl">
                 <Text className="text-lg font-semibold text-gray-700">{mealType}</Text>
                 {currentLog.foods
-                  ?.filter((food) => food.mealType?.toLowerCase() === mealType.toLowerCase())
-                  .map((food) => (
+                  ?.filter((food: FoodType) => food.mealType?.toLowerCase() === mealType.toLowerCase())
+                  .map((food: FoodType) => (
                     <View key={food._id} className="flex-row justify-between items-center mt-4">
                       <Text className="text-sm text-gray-600">{food.name}</Text>
                       <Text className="text-sm text-gray-500">{food.calories} kcal</Text>
@@ -154,7 +129,7 @@ const Log: React.FC = () => {
             <Text className="text-2xl font-semibold text-center mt-10">Activities</Text>
             <View className="mt-4 bg-gray-100 p-4 rounded-xl">
               <Text className="text-lg font-semibold text-gray-700">Activities</Text>
-              {currentLog.exercises?.map((exercise) => {
+              {currentLog.exercises?.map((exercise: ExerciseType) => {
                 const key = exercise._id || `${exercise.name}-${exercise.caloriesBurned}`;
                 return (
                   <View key={key} className="flex-row justify-between items-center mt-4">

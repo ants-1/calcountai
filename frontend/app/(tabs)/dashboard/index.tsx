@@ -139,7 +139,7 @@ const Dashboard: React.FC = () => {
           {loading ? (
             <ActivityIndicator size="small" color="#4B5563" />
           ) : currentLog?.foods?.length > 0 ? (
-            currentLog.foods.map((meal: any, index: number) => (
+            currentLog.foods.slice(0, 3).map((meal: any, index: number) => (
               <View key={index} className="flex-row justify-between items-center mt-4">
                 <Text className="text-sm text-gray-600">{meal.name}</Text>
                 <Text className="text-sm text-gray-500">{meal.calories} kcal</Text>
@@ -162,7 +162,7 @@ const Dashboard: React.FC = () => {
           {loading ? (
             <ActivityIndicator size="small" color="#4B5563" />
           ) : currentLog?.exercises?.length > 0 ? (
-            currentLog.exercises.map((exercise: any, index: number) => (
+            currentLog.exercises.slice(0, 3).map((exercise: any, index: number) => (
               <View key={index} className="flex-row justify-between items-center mt-4">
                 <Text className="text-sm text-gray-600">{exercise.name}</Text>
                 <Text className="text-sm text-gray-500">{exercise.caloriesBurned} kcal</Text>

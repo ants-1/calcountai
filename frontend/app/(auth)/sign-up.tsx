@@ -112,6 +112,7 @@ const SignUp: React.FC = () => {
             placeholderTextColor={'#888'}
             value={form.username}
             onChangeText={(e) => setForm({ ...form, username: e })}
+            returnKeyType="done"
           />
 
           <TextInput
@@ -120,6 +121,7 @@ const SignUp: React.FC = () => {
             placeholderTextColor={'#888'}
             value={form.email}
             onChangeText={(e) => setForm({ ...form, email: e })}
+            returnKeyType="done"
           />
 
           <TextInput
@@ -129,6 +131,7 @@ const SignUp: React.FC = () => {
             value={form.password}
             secureTextEntry
             onChangeText={(e) => setForm({ ...form, password: e })}
+            returnKeyType="done"
           />
         </View>
 

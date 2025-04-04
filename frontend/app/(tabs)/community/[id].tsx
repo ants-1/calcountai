@@ -10,14 +10,14 @@ import useAuth from "@/hooks/useAuth";
 
 // Tab Screens
 
-// Feed Screen
+// Feed Tab
 const FeedScreen = ({ community }: { community: any }) => (
   <ScrollView className="flex-1 p-6">
     <Text className="text-lg text-gray-700">{community.description}</Text>
   </ScrollView>
 );
 
-// Challenge Screen
+// Challenge Tab
 const ChallengesScreen = ({ challenges }: { challenges: any[] }) => (
   <ScrollView className="p-6">
     {challenges.length > 0 ? (
