@@ -65,13 +65,14 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
       if (dailyLogs.some(log => log.date.split("T")[0] === today)) {
         if (Platform.OS === "web") {
           alert("Log Already Created \nA log for today has already been created.")
-        } else {
-          Alert.alert(
-            "Log Already Created",
-            "A log for today has already been created.",
-            [{ text: "OK" }]
-          );
-        }
+        } 
+        // else {
+        //   Alert.alert(
+        //     "Log Already Created",
+        //     "A log for today has already been created.",
+        //     [{ text: "OK" }]
+        //   );
+        // }
         return null;
       }
 

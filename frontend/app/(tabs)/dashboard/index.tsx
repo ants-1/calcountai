@@ -18,7 +18,7 @@ const Dashboard: React.FC = () => {
 
   const [loading, setLoading] = useState(true);
 
-  const { streak, currentWeight, targetWeight, fetchWeightGoalData, fetchStreak } = useUserData();
+  const { streak, currentWeight, targetWeight, goal, fetchWeightGoalData, fetchStreak } = useUserData();
   const { currentLog, fetchDailyLogs, createNewDailyLog } = useLog();
 
   const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
@@ -36,6 +36,7 @@ const Dashboard: React.FC = () => {
     React.useCallback(() => {
       if (userId) {
         setLoading(true);
+        createNewDailyLog();
         fetchDailyLogs().finally(() => setLoading(false));
         fetchWeightGoalData(userId).finally(() => setLoading(false));
         fetchStreak(userId);
@@ -59,10 +60,12 @@ const Dashboard: React.FC = () => {
 
       <ScrollView>
         {/* Motivational Support Section */}
-        <View className="mt-6 bg-yellow-100 p-4 rounded-xl">
-          <Text className="text-lg font-semibold text-yellow-700">Motivation for You</Text>
-          <Text className="text-base text-gray-600 mt-2">{randomQuote}</Text>
-        </View>
+        {goal.includes("Reduce Stress") && (
+          <View className="mt-6 bg-blue-100 p-4 rounded-xl">
+            <Text className="text-lg font-semibold text-blue-700">Motivation for You</Text>
+            <Text className="text-base text-gray-600 mt-2">{randomQuote}</Text>
+          </View>
+        )}
 
         {/* Calorie Progress Section */}
         <View className="mt-6 bg-gray-100 p-4 rounded-xl">
@@ -85,34 +88,38 @@ const Dashboard: React.FC = () => {
         </View>
 
         {/* Streak Section */}
-        <View className="mt-6 bg-blue-100 p-4 rounded-xl">
-          <Text className="text-lg font-semibold text-blue-700">Streak</Text>
-          <Text className="text-sm text-blue-500 mt-2">
-            You have logged your activity for {streak || 0} consecutive days!
-          </Text>
-        </View>
+        {goal.includes("Get Healthier") && (
+          <View className="mt-6 bg-green-100 p-4 rounded-xl">
+            <Text className="text-lg font-semibold text-green-700">Streak</Text>
+            <Text className="text-sm text-green-500 mt-2">
+              You have logged your activity for {streak || 0} consecutive days!
+            </Text>
+          </View>
+        )}
 
         {/* Weight Goal Section */}
-        <View className="mt-6 bg-green-100 p-4 rounded-xl">
-          <Text className="text-lg font-semibold text-green-700">Weight Goal</Text>
-          {loading ? (
-            <ActivityIndicator size="small" color="#4B5563" />
-          ) : targetWeight !== null ? (
-            <>
-              <Text className="text-sm text-green-500 mt-2">
-                Your goal is to reach {targetWeight?.toFixed(2)} kg. You're currently at {currentWeight?.toFixed(2)} kg.
-              </Text>
-              <View className="w-full bg-gray-300 h-2 mt-2 rounded-xl">
-                <View
-                  className="bg-green-500 h-2 rounded-xl"
-                  style={{ width: `${Math.max(0, Math.min(weightProgress, 100))}%` }}
-                />
-              </View>
-            </>
-          ) : (
-            <Text className="text-sm text-gray-500 mt-2">No weight goal set yet.</Text>
-          )}
-        </View>
+        {goal.includes("Lose Weight") && (
+          <View className="mt-6 bg-yellow-100 p-4 rounded-xl">
+            <Text className="text-lg font-semibold text-yellow-700">Weight Goal</Text>
+            {loading ? (
+              <ActivityIndicator size="small" color="#4B5563" />
+            ) : targetWeight !== null ? (
+              <>
+                <Text className="text-sm text-yellow-500 mt-2">
+                  Your goal is to reach {targetWeight?.toFixed(2)} kg. You're currently at {currentWeight?.toFixed(2)} kg.
+                </Text>
+                <View className="w-full bg-gray-300 h-2 mt-2 rounded-xl">
+                  <View
+                    className="bg-yellow-500 h-2 rounded-xl"
+                    style={{ width: `${Math.max(0, Math.min(weightProgress, 100))}%` }}
+                  />
+                </View>
+              </>
+            ) : (
+              <Text className="text-sm text-gray-500 mt-2">No weight goal set yet.</Text>
+            )}
+          </View>
+        )}
 
         {/* Daily Progress Message */}
         <View className="mt-6 bg-gray-100 p-4 rounded-xl">
