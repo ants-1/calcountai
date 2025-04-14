@@ -1,11 +1,12 @@
+import { ParticipantType } from "./ParticipantType";
+
 export interface ChallengeType {
     _id: string;
     name: string;
+    level: number;
     description: string;
     percentage: number;
-    participants?: [string];
+    participants?: [ParticipantType];
     completed: boolean;
-    startDate?: Date;
-    endDate?: Date;
-    challengeType: string;
+    challengeType: "Streak" | "Meal" | "Activity" | "Goal" ;
 }

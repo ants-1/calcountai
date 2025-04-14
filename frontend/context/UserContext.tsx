@@ -2,6 +2,7 @@ import React, { createContext, useState, ReactNode } from "react";
 import Constants from "expo-constants";
 import useAuth from "@/hooks/useAuth";
 import { Alert, Platform } from "react-native";
+import useChallenge from "@/hooks/useChallenge";
 
 interface UserContextType {
   userData: any;
@@ -38,6 +39,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [currentWeight, setCurrentWeight] = useState<any>(null);
   const [targetWeight, setTargetWeight] = useState<any>(null);
   const { user } = useAuth();
+  const { challengeCheck } = useChallenge(); 
   const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
 
   // Set user goal data in the context
@@ -161,6 +163,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       }
 
       setStreak(data.streak);
+      challengeCheck(userId, "Streak", data.streak);
     } catch (error) {
       console.error("Error fetching weight goal data");
     }

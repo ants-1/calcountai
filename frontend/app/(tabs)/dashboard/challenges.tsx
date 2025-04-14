@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Dimensions, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '@/components/Header';
@@ -7,53 +7,50 @@ import ChallengeList from '@/components/ChallengeList';
 import useChallenge from '@/hooks/useChallenge';
 import useAuth from '@/hooks/useAuth';
 
-const PersonalChallengeScreen = ({ challenges = [], loading }: { challenges: any[]; loading: boolean }) => (
+const AllChallengesTab = ({ challenges = [], loading }: { challenges: any[]; loading: boolean }) => (
   <View>
-    {loading ? <ActivityIndicator size="large" color="#3B82F6" /> : <ChallengeList challenges={challenges || []} />}
+    {loading ? <ActivityIndicator size="large" className='mt-20' color="#3B82F6" /> : <ChallengeList challenges={challenges || []} />}
   </View>
 );
 
-const CommunityChallengeScreen = ({ challenges = [], loading }: { challenges: any[]; loading: boolean }) => (
+const OwnChallengesTab = ({ challenges = [], loading }: { challenges: any[]; loading: boolean }) => (
   <View>
-    {loading ? <ActivityIndicator size="large" color="#3B82F6" /> : <ChallengeList challenges={challenges || []} />}
+    {loading ? <ActivityIndicator size="large" className='mt-20' color="#3B82F6" /> : <ChallengeList challenges={challenges || []} />}
   </View>
 );
-
 
 const Challenges: React.FC = () => {
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'personal', title: 'Personal' },
-    { key: 'community', title: 'Community' },
+    { key: 'all', title: 'All' },
+    { key: 'own', title: 'Own' },
   ]);
   const { user } = useAuth();
   const userId = user?._id;
 
-  const { fetchUserChallenges, communityChallenges, personalChallenges, } = useChallenge();
+  const { fetchUserChallenges, fetchChallenges, challenges, userChallenges } = useChallenge();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadChallenges = async () => {
       setLoading(true);
       await fetchUserChallenges(userId);
-      console.log("Community Challenges:", communityChallenges);
-      console.log("Personal Challenges:", personalChallenges);
+      await fetchChallenges();
       setLoading(false);
     };
     loadChallenges();
   }, []);
-  
 
   const renderScene = ({ route }: { route: { key: string } }) => {
     switch (route.key) {
-      case 'personal':
-        return <PersonalChallengeScreen challenges={personalChallenges ?? []} loading={loading} />;
-      case 'community':
-        return <CommunityChallengeScreen challenges={communityChallenges ?? []} loading={loading} />;
+      case 'all':
+        return <AllChallengesTab challenges={challenges ?? []} loading={loading} />;
+      case 'own':
+        return <OwnChallengesTab challenges={userChallenges ?? []} loading={loading} />;
       default:
         return null;
     }
-  };  
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">

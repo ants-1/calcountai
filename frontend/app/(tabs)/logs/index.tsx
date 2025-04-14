@@ -11,7 +11,7 @@ import useActivity from '@/hooks/useActivity';
 const Log: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
-  const { dailyLogs, currentLog, fetchDailyLogs, createNewDailyLog, handlePrevious, handleNext } = useLog();
+  const { dailyLogs, currentLog, fetchDailyLogs, handlePrevious, handleNext } = useLog();
   const { removeExercise } = useActivity();
 
   useFocusEffect(
@@ -34,21 +34,35 @@ const Log: React.FC = () => {
   const caloriesConsumed = currentLog?.foods?.reduce((sum: any, food: FoodType) => sum + food.calories, 0) || 0;
   const caloriesBurned = currentLog?.exercises?.reduce((sum: any, exercise: ExerciseType) => sum + exercise.caloriesBurned, 0) || 0;
   const remainingCalories = dailyGoal - caloriesConsumed + caloriesBurned;
+  console.log(currentLog);
 
   return (
     <SafeAreaView className="flex-1 bg-white px-4 pt-6">
       {/* Header */}
       <View className="flex flex-row justify-between items-center">
-        <View></View>
-        <View className='ml-8'>
+        {/* Previous Log Button */}
+        <TouchableOpacity
+          disabled={!currentLog || dailyLogs[0]?._id === currentLog._id}
+          onPress={handlePrevious}
+          className={`${!currentLog || dailyLogs[0]?._id === currentLog._id ? 'opacity-50' : ''}`}
+        >
+          <Icon name="chevron-left" size={24} color={(!currentLog || dailyLogs[0]?._id === currentLog._id) ? '#9CA3AF' : '#4B5563'} />
+        </TouchableOpacity>
+
+        <View>
           <Text className="text-3xl font-bold text-center">Daily Logs</Text>
           <Text className="font-semibold text-center">
             {currentLog ? new Date(currentLog.date).toLocaleDateString() : "No Logs"}
           </Text>
         </View>
 
-        <TouchableOpacity onPress={createNewDailyLog}>
-          <Icon name="plus" size={24} color="#4B5563" />
+        {/* Next Log Button */}
+        <TouchableOpacity
+          disabled={!currentLog || dailyLogs[dailyLogs.length - 1]?._id === currentLog._id}
+          onPress={handleNext}
+          className={`${!currentLog || dailyLogs[dailyLogs.length - 1]?._id === currentLog._id ? 'opacity-50' : ''}`}
+        >
+          <Icon name="chevron-right" size={24} color={(!currentLog || dailyLogs[dailyLogs.length - 1]?._id === currentLog._id) ? '#9CA3AF' : '#4B5563'} />
         </TouchableOpacity>
       </View>
 
@@ -76,26 +90,6 @@ const Log: React.FC = () => {
                   : 'You have exceeded your daily calorie goal!'}
               </Text>
             </View>
-
-            {/* Navigation Buttons */}
-            <View className="flex-row justify-between mt-8">
-              <TouchableOpacity
-                disabled={!currentLog || dailyLogs[0]?._id === currentLog._id}
-                onPress={handlePrevious}
-                className={`bg-gray-200 p-3 rounded-lg ${!currentLog || dailyLogs[0]?._id === currentLog._id ? 'opacity-50' : ''}`}
-              >
-                <Icon name="arrow-left" size={24} color={(!currentLog || dailyLogs[0]?._id === currentLog._id) ? '#9CA3AF' : '#4B5563'} />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                disabled={!currentLog || dailyLogs[dailyLogs.length - 1]?._id === currentLog._id}
-                onPress={handleNext}
-                className={`bg-gray-200 p-3 rounded-lg ${!currentLog || dailyLogs[dailyLogs.length - 1]?._id === currentLog._id ? 'opacity-50' : ''}`}
-              >
-                <Icon name="arrow-right" size={24} color={(!currentLog || dailyLogs[dailyLogs.length - 1]?._id === currentLog._id) ? '#9CA3AF' : '#4B5563'} />
-              </TouchableOpacity>
-            </View>
-
 
             <View className='flex flex-row justify-between mt-8'>
               {/* Add Meal Button */}

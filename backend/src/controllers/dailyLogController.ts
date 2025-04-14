@@ -162,8 +162,6 @@ const createDailyLog = async (
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Check if daily log with same date already exist
-
     const dailyLog = await DailyLog.create({
       foods,
       exercises,

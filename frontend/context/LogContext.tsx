@@ -61,46 +61,44 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
   const createNewDailyLog = async () => {
     try {
       const today = new Date().toISOString().split("T")[0];
-
-      if (dailyLogs.some(log => log.date.split("T")[0] === today)) {
-        if (Platform.OS === "web") {
-          alert("Log Already Created \nA log for today has already been created.")
-        } 
-        // else {
-        //   Alert.alert(
-        //     "Log Already Created",
-        //     "A log for today has already been created.",
-        //     [{ text: "OK" }]
-        //   );
-        // }
-        return null;
-      }
-
+  
+      // Fetch latest logs to ensure no duplicate creation
+      const res = await fetch(`${BACKEND_API_URL}/users/${user?._id}/dailyLogs`);
+      const data = await res.json();
+      const logs = data.dailyLogs || [];
+  
+      // If today's log exists, just stop
+      const existingTodayLog = logs.find((log: any) => log.date.split("T")[0] === today);
+      if (existingTodayLog) return null;
+  
       const newLog = {
         date: today,
         foods: [],
         exercises: [],
         completed: false,
       };
-
+  
       const response = await fetch(`${BACKEND_API_URL}/users/${user?._id}/dailyLogs`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newLog),
       });
-
+  
       if (!response.ok) throw new Error("Failed to create log");
-
+  
       const createdLog = await response.json();
-      setDailyLogs(prevLogs => [...prevLogs, createdLog.dailyLog]);
-      setCurrentLog(createdLog.dailyLog);
-
-      return createdLog.dailyLog;
+      const newDailyLog = createdLog.dailyLog;
+  
+      setDailyLogs(prev => [...prev, newDailyLog]);
+      setCurrentLog(newDailyLog);
+  
+      return newDailyLog;
     } catch (error) {
       console.error("Error creating log:", error);
       return null;
     }
   };
+  
 
   const handlePrevious = () => {
     if (!currentLog) return;

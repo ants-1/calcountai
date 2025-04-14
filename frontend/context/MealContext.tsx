@@ -4,6 +4,7 @@ import { Alert, Platform } from "react-native";
 import useAuth from "@/hooks/useAuth";
 import { useRouter } from "expo-router";
 import { MealResponse } from "@/types/MealResponse";
+import useChallenge from "@/hooks/useChallenge";
 
 interface MealContextType {
   meals: any;
@@ -25,6 +26,7 @@ export const MealProvider: React.FC<MealProviderProps> = ({ children }) => {
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
   const { user } = useAuth();
   const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
+  const { challengeCheck } = useChallenge();
 
   // Fetch all meals in database
   const fetchMeals = async () => {
@@ -105,6 +107,8 @@ export const MealProvider: React.FC<MealProviderProps> = ({ children }) => {
         } else {
           Alert.alert("Success", "Meal added successfully!");
         }
+
+        challengeCheck(user?._id, "Meal", null);
         router.push("/logs");
       } else {
         const errorLogData = await logResponse.json();

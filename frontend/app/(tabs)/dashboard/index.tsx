@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -10,6 +10,7 @@ import { useUserData } from "@/hooks/useUser";
 import useLog from "@/hooks/useLog";
 import { FoodType } from "@/types/FoodType";
 import { ActivityType } from "@/types/ActivityType";
+import useChallenge from "@/hooks/useChallenge";
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
@@ -20,6 +21,7 @@ const Dashboard: React.FC = () => {
 
   const { streak, currentWeight, targetWeight, goal, fetchWeightGoalData, fetchStreak } = useUserData();
   const { currentLog, fetchDailyLogs, createNewDailyLog } = useLog();
+  const { fetchChallenges, fetchUserChallenges, userChallenges } = useChallenge();
 
   const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
   const dailyGoal = 2000;
@@ -39,7 +41,9 @@ const Dashboard: React.FC = () => {
         createNewDailyLog();
         fetchDailyLogs().finally(() => setLoading(false));
         fetchWeightGoalData(userId).finally(() => setLoading(false));
+        fetchUserChallenges(userId);
         fetchStreak(userId);
+        fetchChallenges();
       }
     }, [userId])
   );
@@ -60,7 +64,7 @@ const Dashboard: React.FC = () => {
 
       <ScrollView>
         {/* Motivational Support Section */}
-        {goal.includes("Reduce Stress") && (
+        {goal?.includes("Reduce Stress") && (
           <View className="mt-6 bg-blue-100 p-4 rounded-xl">
             <Text className="text-lg font-semibold text-blue-700">Motivation for You</Text>
             <Text className="text-base text-gray-600 mt-2">{randomQuote}</Text>
@@ -88,7 +92,7 @@ const Dashboard: React.FC = () => {
         </View>
 
         {/* Streak Section */}
-        {goal.includes("Get Healthier") && (
+        {goal?.includes("Get Healthier") && (
           <View className="mt-6 bg-green-100 p-4 rounded-xl">
             <Text className="text-lg font-semibold text-green-700">Streak</Text>
             <Text className="text-sm text-green-500 mt-2">
@@ -98,7 +102,7 @@ const Dashboard: React.FC = () => {
         )}
 
         {/* Weight Goal Section */}
-        {goal.includes("Lose Weight") && (
+        {goal?.includes("Lose Weight") && (
           <View className="mt-6 bg-yellow-100 p-4 rounded-xl">
             <Text className="text-lg font-semibold text-yellow-700">Weight Goal</Text>
             {loading ? (
@@ -130,6 +134,29 @@ const Dashboard: React.FC = () => {
         {/* Challenges Section */}
         <View className="mt-10 bg-gray-100 p-4 rounded-xl">
           <Text className="text-lg font-semibold text-gray-700">Challenges</Text>
+          {loading ? (
+            <ActivityIndicator size="small" color="#4B5563" />
+          ) : userChallenges?.length > 0 ? (
+            userChallenges.slice(0, 3).map((challenge: any, index: number) => (
+              <View key={index} className="flex-row justify-between items-center mt-4">
+                <Text className="text-sm text-gray-600">{challenge.name}</Text>
+                {(() => {
+                  const level = Number(challenge.level);
+                  const participant = challenge.participants?.find((p: any) => p.user === userId || p.user?._id === userId);
+                  const progress = participant?.progress ?? 0;
+                  const percentage = level > 0 ? Math.min((progress / level) * 100, 100) : 0;
+
+                  return (
+                    <Text className="text-sm text-gray-500">
+                      {Math.round(percentage)}%
+                    </Text>
+                  );
+                })()}
+              </View>
+            ))
+          ) : (
+            <Text className="text-sm text-gray-500 mt-2">No challenges.</Text>
+          )}
           <TouchableOpacity
             className="mt-4 bg-blue-500 py-2 px-4 rounded-lg"
             onPress={() => router.push("/(tabs)/dashboard/challenges")}

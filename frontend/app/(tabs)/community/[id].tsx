@@ -17,23 +17,24 @@ const FeedScreen = ({ community }: { community: any }) => (
   </ScrollView>
 );
 
+// CHANGE TO FEED TAB
 // Challenge Tab
-const ChallengesScreen = ({ challenges }: { challenges: any[] }) => (
-  <ScrollView className="p-6">
-    {challenges.length > 0 ? (
-      challenges.map((challenge) => (
-        <View key={challenge._id}>
-          <View className="flex flex-row justify-between items-center w-full bg-gray-200 p-2 rounded-xl">
-            <Text className="p-3 flex-1">{challenge.description}</Text>
-            <Text className="bg-green-300 p-2.5 rounded-xl w-auto text-center h-10">{challenge.challengeType}</Text>
-          </View>
-        </View>
-      ))
-    ) : (
-      <Text className="text-lg text-gray-700">No challenges available yet.</Text>
-    )}
-  </ScrollView>
-);
+// const ChallengesScreen = ({ challenges }: { challenges: any[] }) => (
+//   <ScrollView className="p-6">
+//     {challenges.length > 0 ? (
+//       challenges.map((challenge) => (
+//         <View key={challenge._id}>
+//           <View className="flex flex-row justify-between items-center w-full bg-gray-200 p-2 rounded-xl">
+//             <Text className="p-3 flex-1">{challenge.description}</Text>
+//             <Text className="bg-green-300 p-2.5 rounded-xl w-auto text-center h-10">{challenge.challengeType}</Text>
+//           </View>
+//         </View>
+//       ))
+//     ) : (
+//       <Text className="text-lg text-gray-700">No challenges available yet.</Text>
+//     )}
+//   </ScrollView>
+// );
 
 // People Screen
 const PeopleScreen = ({ members, creatorId }: { members: any[]; creatorId: string }) => (
@@ -65,13 +66,13 @@ const CommunityDetails = () => {
 
   const routes = [
     { key: "feed", title: "Feed" },
-    { key: "challenges", title: "Challenges" },
+    // { key: "challenges", title: "Challenges" },
     { key: "people", title: "People" },
   ];
 
   const renderScene = SceneMap({
     feed: () => (community ? <FeedScreen community={community} /> : null),
-    challenges: () => (community ? <ChallengesScreen challenges={community.challenges} /> : null),
+    // challenges: () => (community ? <ChallengesScreen challenges={community.challenges} /> : null),
     people: () => (community ? <PeopleScreen members={community.members} creatorId={community.createdBy} /> : null),
   });
 

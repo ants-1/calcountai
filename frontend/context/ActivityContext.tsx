@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import useAuth from "@/hooks/useAuth";
 import useLog from "@/hooks/useLog";
 import { ActivityType } from "@/types/ActivityType";
+import useChallenge from "@/hooks/useChallenge";
 
 interface ActivityContextType {
   activities: any;
@@ -27,6 +28,7 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
   const router = useRouter();
   const userId = user?._id;
   const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
+  const { challengeCheck } = useChallenge();
 
   // Fetch exercises from backend
   const fetchExercises = async () => {
@@ -76,6 +78,7 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
           Alert.alert("Exercise Added", "Exercise has been added to log");
         }
 
+        challengeCheck(userId, "Activity", null);
         router.push("/(tabs)/logs");
       } else {
 
@@ -161,6 +164,8 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
         } else {
           Alert.alert("Success", "Activity added successfully!");
         }
+
+        challengeCheck(userId, "Activity", null);
         router.push("/logs");
       } else {
         if (Platform.OS === "web") {

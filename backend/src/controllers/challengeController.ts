@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import User, { IUser } from "../models/user";
 import Challenge, { IChallenge } from "../models/challenge";
 import { Types } from "mongoose";
-import Community from "../models/community";
 
 // @desc    Retrieves all challenges
 // @route   GET /api/v1/challenges
@@ -12,13 +11,13 @@ const getAllChallenges = async (
   next: NextFunction
 ): Promise<any> => {
   try {
-    const challanges: IChallenge[] = await Challenge.find().exec();
+    const challenges: IChallenge[] = await Challenge.find().exec();
 
-    if (!challanges || challanges.length === 0) {
+    if (!challenges || challenges.length === 0) {
       return res.status(404).json({ message: "No challanges found." });
     }
 
-    return res.status(200).json({ challanges });
+    return res.status(200).json({ challenges });
   } catch (err) {
     return next(err);
   }
@@ -48,51 +47,15 @@ const getUserChallenges = async (
         .json({ error: `User with ID: ${userId} was not found.` });
     }
 
-    const personalChallenges = user.challenges?.filter(
-      (challenge: IChallenge) => challenge.challengeType === "Personal"
-    );
-    const communityChallenges = user.challenges?.filter(
-      (challenge: IChallenge) => challenge.challengeType === "Community"
-    );
+    const userChallenges = user.challenges;
 
-    if (personalChallenges.length === 0 && communityChallenges.length === 0) {
+    if (!userChallenges || userChallenges.length === 0) {
       return res.status(404).json({ message: "No challenges found." });
     }
 
     return res.status(200).json({
-      personal: {
-        challenges: personalChallenges
-      },
-      community: {
-        challenges: communityChallenges
-      }
+      challenges: userChallenges,
     });
-  } catch (err) {
-    return next(err);
-  }
-};
-
-// @desc    Retrieve all challenges belonging to community
-// @route   GET /api/v1/community/:communityId/challenges
-const getCommunityChallenges = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<any> => {
-  try {
-    const { communityId } = req.body;
-
-    const community = await Community.findById(communityId).exec();
-
-    if (!community) {
-      return res.status(404).json({ message: "No community found" });
-    }
-
-    if (!community || community.challenges.length) {
-      return res.status(404).json({ message: "No challenges found" });
-    }
-
-    return res.status(200).json({ challenges: community.challenges });
   } catch (err) {
     return next(err);
   }
@@ -106,41 +69,23 @@ const createChallenge = async (
   next: NextFunction
 ): Promise<any> => {
   try {
-    const { name, description, startDate, endDate, challengeType, targetId } =
-      req.body;
+    const { name, level, description, challengeType } = req.body;
 
+    // Validate challenge type
+    if (!["Streak", "Meal", "Activity", "Goal"].includes(challengeType)) {
+      return res.status(400).json({ error: "Invalid challenge type" });
+    }
+
+    // Create the challenge
     const newChallenge = await Challenge.create({
       name,
+      level,
       description,
       percentage: 0,
       participants: [],
       completed: false,
-      startDate,
-      endDate,
       challengeType,
     });
-
-    if (challengeType.toLowerCase() === "personal") {
-      const user = await User.findById(targetId);
-
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      user.challenges?.push(newChallenge._id);
-      await user.save();
-    } else if (challengeType.toLowerCase() === "community") {
-      const community = await Community.findById(targetId);
-
-      if (!community) {
-        return res.status(404).json({ error: "Community not found" });
-      }
-
-      community.challenges.push(newChallenge._id);
-      await community.save();
-    } else {
-      return res.status(400).json({ error: "Invalid challenge type" });
-    }
 
     return res.status(201).json({
       message: "Challenge created successfully",
@@ -168,29 +113,31 @@ const joinChallenge = async (
       return res.status(400).json({ error: "Invalid user or challenge ID" });
     }
 
-    const userObjectId = new Types.ObjectId(userId);
-    const challengeObjectId = new Types.ObjectId(challengeId);
-
-    const challenge = await Challenge.findById(challengeObjectId);
-    const user = await User.findById(userObjectId);
-
-    if (!challenge) {
-      return res.status(404).json({ error: "Challenge not found" });
-    }
+    const user = await User.findById(userId);
+    const challenge = await Challenge.findById(challengeId);
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    if (!challenge.participants.includes(userObjectId)) {
-      challenge.participants.push(userObjectId);
-      await challenge.save();
+    if (!challenge) {
+      return res.status(404).json({ error: "Challenge not found" });
     }
 
-    if (!user.challenges?.includes(challengeObjectId)) {
-      user.challenges?.push(challengeObjectId);
-      await user.save();
+    const alreadyParticipant = challenge.participants.some((p) =>
+      p.user.equals(user._id)
+    );
+
+    if (!alreadyParticipant) {
+      challenge.participants.push({ user: user._id, progress: 0 });
     }
+
+    if (!user.challenges?.some((cid) => cid.equals(challenge._id))) {
+      user.challenges?.push(challenge._id);
+    }
+
+    await challenge.save();
+    await user.save();
 
     return res
       .status(200)
@@ -220,6 +167,12 @@ const deleteChallenge = async (
       return res.status(404).json({ error: "Challenge not found" });
     }
 
+    // Remove challenge from all users
+    await User.updateMany(
+      { challenges: challenge._id },
+      { $pull: { challenges: challenge._id } }
+    );
+
     return res.status(200).json({ message: "Challenge deleted successfully" });
   } catch (err) {
     return next(err);
@@ -233,28 +186,63 @@ const editChallenge = async (
   res: Response,
   next: NextFunction
 ): Promise<any> => {
-  const { challengeId } = req.params;
-  const updatedData = req.body;
+  try {
+    const { challengeId } = req.params;
+    const { participants, ...updatedData } = req.body;
 
-  if (!Types.ObjectId.isValid(challengeId)) {
-    return res.status(400).json({ error: "Invalid challenge ID" });
-  }
-
-  const updatedChallenge = await Challenge.findByIdAndUpdate(
-    challengeId,
-    updatedData,
-    {
-      new: true,
+    if (!Types.ObjectId.isValid(challengeId)) {
+      return res.status(400).json({ error: "Invalid challenge ID" });
     }
-  );
 
-  if (!updatedChallenge) {
-    return res
-      .status(404)
-      .json({ error: `Challenge with ID: ${challengeId} was not found.` });
+    const updatedChallenge = await Challenge.findByIdAndUpdate(
+      challengeId,
+      updatedData,
+      { new: true }
+    );
+
+    if (!updatedChallenge) {
+      return res.status(404).json({
+        error: `Challenge with ID: ${challengeId} was not found.`,
+      });
+    }
+
+    let allCompleted = true;
+
+    if (participants && Array.isArray(participants)) {
+      for (let participant of participants) {
+        const { user, progress } = participant;
+
+        if (user && typeof progress === "number") {
+          const clampedProgress = Math.min(progress, updatedChallenge.level);
+
+          const existing = updatedChallenge.participants.find(
+            (p) => p.user.toString() === user.toString()
+          );
+
+          if (existing) {
+            existing.progress = clampedProgress;
+          } else {
+            updatedChallenge.participants.push({
+              user,
+              progress: clampedProgress,
+            });
+          }
+        }
+      }
+
+      // ✅ Now re-check ALL participants
+      const allCompletedCheck = updatedChallenge.participants.every(
+        (p) => p.progress >= updatedChallenge.level
+      );
+      updatedChallenge.completed = allCompletedCheck;
+
+      await updatedChallenge.save();
+    }
+
+    return res.status(200).json({ updatedChallenge });
+  } catch (err) {
+    return next(err);
   }
-
-  return res.status(200).json({ updatedChallenge });
 };
 
 // @desc    User leave challenge and is removed from participants
@@ -289,43 +277,21 @@ const leaveChallenge = async (
         .json({ error: `Challenge with ID: ${challengeId} was not found.` });
     }
 
-    const isUserInChallenge = challenge.participants.some((participantId) =>
-      participantId.equals(user._id)
+    const initialCount = challenge.participants.length;
+
+    challenge.participants = challenge.participants.filter(
+      (p) => !p.user.equals(user._id)
     );
 
-    if (!isUserInChallenge) {
+    if (challenge.participants.length === initialCount) {
       return res
         .status(400)
         .json({ message: "User is not part of this challenge." });
     }
 
-    challenge.participants = challenge.participants.filter(
-      (participantId) => !participantId.equals(user._id)
-    );
-
-    const stillInChallenge = challenge.participants.some((participantId) =>
-      participantId.equals(user._id)
-    );
-
-    if (stillInChallenge) {
-      return res
-        .status(500)
-        .json({ error: "Failed to remove user from challenge." });
-    }
-
     user.challenges = user.challenges?.filter(
       (cId) => !cId.equals(challenge._id)
     );
-
-    const stillHasChallenge = user.challenges?.some((cId) =>
-      cId.equals(challenge._id)
-    );
-
-    if (stillHasChallenge) {
-      return res
-        .status(500)
-        .json({ error: "Failed to remove challenge from user's list." });
-    }
 
     await challenge.save();
     await user.save();
@@ -341,7 +307,6 @@ const leaveChallenge = async (
 export default {
   getAllChallenges,
   getUserChallenges,
-  getCommunityChallenges,
   createChallenge,
   joinChallenge,
   deleteChallenge,

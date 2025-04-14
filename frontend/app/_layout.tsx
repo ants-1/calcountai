@@ -24,23 +24,23 @@ export default function RootLayout() {
 
   return (
     <AuthContextProvider>
-      <UserProvider>
-        <LogProvider>
-          <MealProvider>
-            <ActivityProvider>
-              <CommunityProvider>
-                <ChallengeProvider>
+      <ChallengeProvider>
+        <UserProvider>
+          <LogProvider>
+            <MealProvider>
+              <ActivityProvider>
+                <CommunityProvider>
                   <Stack>
                     <Stack.Screen name="index" options={{ headerShown: false }} />
                     <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                     <Stack.Screen name="(auth)" options={{ headerShown: false }} />
                   </Stack>
-                </ChallengeProvider>
-              </CommunityProvider>
-            </ActivityProvider>
-          </MealProvider>
-        </LogProvider>
-      </UserProvider>
+                </CommunityProvider>
+              </ActivityProvider>
+            </MealProvider>
+          </LogProvider>
+        </UserProvider>
+      </ChallengeProvider>
     </AuthContextProvider>
   );
 }

@@ -11,10 +11,6 @@ router.get(
   "/users/:userId/challenges", 
   challengeController.getUserChallenges
 );
-router.get(
-  "/community/:communityId/challenges",
-  challengeController.getCommunityChallenges
-);
 router.post(
   "/challenges",
   challengeController.createChallenge

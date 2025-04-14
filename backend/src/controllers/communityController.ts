@@ -39,7 +39,6 @@ const getCommunity = async (
 
     const community = await Community.findById(communityId)
       .populate({ path: "members", select: "username email" })
-      .populate({ path: "challenges" })
       .exec();
 
     if (!community) {
