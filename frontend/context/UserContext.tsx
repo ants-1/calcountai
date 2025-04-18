@@ -21,6 +21,7 @@ interface UserContextType {
   userGoalData: any;
   currentWeight: any;
   targetWeight: any;
+  weightHistory: any;
 }
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -36,6 +37,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [username, setUsername] = useState<any>(null);
   const [email, setEmail] = useState<any>(null);
   const [goal, setGoal] = useState<any>(null);
+  const [weightHistory, setWeightHistory] = useState<any>(null);
   const [currentWeight, setCurrentWeight] = useState<any>(null);
   const [targetWeight, setTargetWeight] = useState<any>(null);
   const { user } = useAuth();
@@ -144,6 +146,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       setCurrentWeight(data.user.currentWeight);
       setTargetWeight(data.user.targetWeight);
       setGoal(data.user.goal);
+      setWeightHistory(data.user.weightHistory);
     } catch (error) {
       console.error("Error fetching weight goal data");
     }
@@ -186,7 +189,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       streak,
       userGoalData,
       currentWeight,
-      targetWeight
+      targetWeight,
+      weightHistory
     }}>
       {children}
     </UserContext.Provider>

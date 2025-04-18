@@ -8,6 +8,7 @@ const DashboardLayout = () => {
       <Stack.Screen name="challenges" options={{ headerShown: false }} />
       <Stack.Screen name="profile" options={{ headerShown: false }} />
       <Stack.Screen name="rewards" options={{ headerShown: false }} />
+      <Stack.Screen name='weight-history' options={{ headerShown: false }} />
     </Stack>
   )
 }

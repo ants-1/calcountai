@@ -1,7 +1,7 @@
 import request from "supertest";
-import { app, server } from "../../src/index";
+import { app, server } from "../src/index";
 import mongoose from "mongoose";
-import User from "../../src/models/user";
+import User from "../src/models/user";
 import { describe, expect, beforeAll, afterAll, it } from "@jest/globals";
 
 describe("Auth Controller Tests", () => {

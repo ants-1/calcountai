@@ -27,7 +27,11 @@ const CurrentWeight: React.FC = () => {
     }
 
     // Convert the weight to the correct unit before updating
-    const finalWeight = unit === "kg" ? parseFloat(weight) : convertStoneToKg(parseFloat(weight));
+    let finalWeight = weight;
+
+    if (unit === "st") {
+      finalWeight = convertStoneToKg(parseFloat(weight))
+    } 
 
     updateUserGoalData({ ...userData, currentWeight: finalWeight });
     console.log(userData);

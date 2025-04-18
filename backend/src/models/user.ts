@@ -10,6 +10,7 @@ export interface IUser {
   currentWeight?: Number;
   targetWeight?: Number;
   activityLevel?: string;
+  weightHistory?: { weight: number; date: Date }[];
   height?: string;
   dateOfBirth?: string;
   streak?: Number;
@@ -23,11 +24,17 @@ const UserSchema = new Schema<IUser, UserModel>({
   username: { type: String, minlength: 1, maxlength: 100, required: true },
   email: { type: String, maxlength: 256, required: true, unique: true },
   password: { type: String },
-  gender: { type: String},
-  goal: { type: [String] }, 
+  gender: { type: String },
+  goal: { type: [String] },
   currentWeight: { type: Number },
   targetWeight: { type: Number },
   activityLevel: { type: String },
+  weightHistory: [
+    {
+      weight: { type: Number },
+      date: { type: Date, default: Date.now },
+    },
+  ],
   height: { type: String },
   dateOfBirth: { type: String },
   streak: { type: Number },

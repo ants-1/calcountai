@@ -18,8 +18,9 @@ const Dashboard: React.FC = () => {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
 
-  const { streak, currentWeight, targetWeight, goal, fetchWeightGoalData, fetchStreak } = useUserData();
+  const { weightHistory, streak, currentWeight, targetWeight, goal, fetchWeightGoalData, fetchStreak } = useUserData();
   const { currentLog, fetchDailyLogs, createNewDailyLog } = useLog();
   const { fetchChallenges, fetchUserChallenges, userChallenges } = useChallenge();
 
@@ -29,17 +30,27 @@ const Dashboard: React.FC = () => {
   const caloriesBurned = currentLog?.exercises?.reduce((sum: number, exercise: ActivityType) => sum + exercise.caloriesBurned, 0) || 0;
   const remainingCalories = dailyGoal - caloriesConsumed + caloriesBurned;
 
-  // Calculate weight progress
-  const weightProgress = targetWeight && currentWeight
-    ? ((currentWeight - targetWeight) / targetWeight) * 100
-    : 0;
+  // new weight progress function - maybe it should have it's own file
+  useEffect(() => {
+    if (currentWeight && targetWeight && weightHistory?.[0]?.weight) {
+      const startWeight = weightHistory[0].weight;
+      const endWeight = targetWeight;
+      const totalChange = startWeight - endWeight;
+      const currentChange = startWeight - currentWeight;
+      const percentage = (currentChange / totalChange) * 100;
+      const currentProgress = Math.max(0, Math.min(percentage, 100));
+      setProgress(currentProgress);
+    }
+  }, [currentWeight, targetWeight, weightHistory]);
+
 
   useFocusEffect(
     React.useCallback(() => {
       if (userId) {
         setLoading(true);
-        createNewDailyLog();
         fetchDailyLogs().finally(() => setLoading(false));
+        // Bug: creates duplicate logs 
+        createNewDailyLog();
         fetchWeightGoalData(userId).finally(() => setLoading(false));
         fetchUserChallenges(userId);
         fetchStreak(userId);
@@ -115,9 +126,23 @@ const Dashboard: React.FC = () => {
                 <View className="w-full bg-gray-300 h-2 mt-2 rounded-xl">
                   <View
                     className="bg-yellow-500 h-2 rounded-xl"
-                    style={{ width: `${Math.max(0, Math.min(weightProgress, 100))}%` }}
+                    style={{ width: `${progress}%` }}
                   />
                 </View>
+
+                {progress >= 99.5 && (
+                  <Text className="text-center text-yellow-500 mt-2 font-semibold">
+                    Well done for completing your goal!
+                  </Text>
+                )}
+
+                {/* View Weight History Button */}
+                <TouchableOpacity
+                  className="mt-4 bg-yellow-500 py-2 px-4 rounded-full"
+                  onPress={() => router.push("/(tabs)/dashboard/weight-history")}
+                >
+                  <Text className="text-center text-white font-semibold text-lg">View Activities</Text>
+                </TouchableOpacity>
               </>
             ) : (
               <Text className="text-sm text-gray-500 mt-2">No weight goal set yet.</Text>
@@ -157,8 +182,9 @@ const Dashboard: React.FC = () => {
           ) : (
             <Text className="text-sm text-gray-500 mt-2">No challenges.</Text>
           )}
+          {/* View Challenges Button */}
           <TouchableOpacity
-            className="mt-4 bg-blue-500 py-2 px-4 rounded-lg"
+            className="mt-4 bg-blue-500 py-2 px-4 rounded-full"
             onPress={() => router.push("/(tabs)/dashboard/challenges")}
           >
             <Text className="text-center text-white font-semibold text-lg">
@@ -183,7 +209,7 @@ const Dashboard: React.FC = () => {
             <Text className="text-sm text-gray-500 mt-2">No meals logged today.</Text>
           )}
           <TouchableOpacity
-            className="mt-4 bg-blue-500 py-2 px-4 rounded-lg"
+            className="mt-4 bg-blue-500 py-2 px-4 rounded-full"
             onPress={() => router.push("/logs")}
           >
             <Text className="text-center text-white font-semibold text-lg">View Logs</Text>
@@ -206,7 +232,7 @@ const Dashboard: React.FC = () => {
             <Text className="text-sm text-gray-500 mt-2">No activities logged today.</Text>
           )}
           <TouchableOpacity
-            className="mt-4 bg-blue-500 py-2 px-4 rounded-lg"
+            className="mt-4 bg-blue-500 py-2 px-4 rounded-full"
             onPress={() => router.push("/(tabs)/logs")}
           >
             <Text className="text-center text-white font-semibold text-lg">View Activities</Text>

@@ -9,6 +9,7 @@ export interface UserType {
   currentWeight?: number;
   targetWeight?: number;
   activityLevel?: string;
+  weightHistory?: { weight: number; date: Date }[];
   height?: string;
   dateOfBirth?: string;
   streak?: number;
