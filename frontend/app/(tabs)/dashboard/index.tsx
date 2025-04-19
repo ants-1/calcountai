@@ -49,8 +49,6 @@ const Dashboard: React.FC = () => {
       if (userId) {
         setLoading(true);
         fetchDailyLogs().finally(() => setLoading(false));
-        // Bug: creates duplicate logs 
-        createNewDailyLog();
         fetchWeightGoalData(userId).finally(() => setLoading(false));
         fetchUserChallenges(userId);
         fetchStreak(userId);

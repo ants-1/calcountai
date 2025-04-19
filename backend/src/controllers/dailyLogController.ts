@@ -164,6 +164,9 @@ const createDailyLog = async (
 
     const dailyLog = await DailyLog.create({
       foods,
+      protein: 0,
+      fats: 0,
+      carbs:
       exercises,
       completed,
       date,
@@ -178,7 +181,7 @@ const createDailyLog = async (
   }
 };
 
-// @desc    Edit daily log information
+// @desc    Edit daily log information and update total nutrients
 // @route   PUT /users/:userId/dailyLogs/:dailyLogId
 const editDailyLog = async (
   req: Request,
@@ -187,35 +190,64 @@ const editDailyLog = async (
 ): Promise<any> => {
   try {
     const { userId, dailyLogId } = req.params;
-    const updateData = req.body;
+    const updateData = req.body; // This should contain the foods and optionally protein, fat, carbs
 
+    // Check if userId is a valid MongoDB ObjectId
     if (!Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ error: "Invalid user ID" });
     }
 
+    // Find user by ID
     const user: IUser | null = await User.findById(userId);
-
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
+    // Find the daily log by its ID and update
     const updatedDailyLog = await DailyLog.findByIdAndUpdate(
       dailyLogId,
       updateData,
       {
         new: true,
       }
-    ).populate("foods", "exercises");
+    ).populate("foods"); // Populate the foods in the daily log (so we have all food details)
 
     if (!updatedDailyLog) {
-      return res.status(404).json({ error: " Daily log not found" });
+      return res.status(404).json({ error: "Daily log not found" });
     }
 
+    // Ensure foods is defined and is an array
+    const foods = updatedDailyLog.foods || [];
+
+    // Calculate the total protein, fat, and carbs
+    let totalProtein = 0;
+    let totalFats = 0;
+    let totalCarbs = 0;
+
+    // Loop through all the foods in the updated log
+    foods.forEach((food: any) => {
+      totalProtein += food.protein || 0;
+      totalFats += food.fat || 0;
+      totalCarbs += food.carbohydrates || 0;
+    });
+
+    // Update the daily log with the calculated totals
+    updatedDailyLog.protein = totalProtein;
+    updatedDailyLog.fats = totalFats;
+    updatedDailyLog.carbs = totalCarbs;
+
+    // Save the updated daily log
+    await updatedDailyLog.save();
+
     return res.status(200).json({ dailyLog: updatedDailyLog });
+
   } catch (err) {
     next(err);
   }
 };
+
+
+
 
 // @desc    Delete daily log from database
 // @route   DELETE /api/v1/users/:userId/dailyLogs/:dailyLogId

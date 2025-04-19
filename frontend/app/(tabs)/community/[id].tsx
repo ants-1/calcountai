@@ -1,61 +1,13 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { View, Text, TouchableOpacity, Dimensions, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
-import Icon from "react-native-vector-icons/FontAwesome";
 import { useEffect, useState } from "react";
 import useCommunity from "@/hooks/useCommunity";
 import Header from "@/components/Header";
 import useAuth from "@/hooks/useAuth";
-
-// Tab Screens
-
-// Feed Tab
-const FeedScreen = ({ community }: { community: any }) => (
-  <ScrollView className="flex-1 p-6">
-    <Text className="text-lg text-gray-700">{community.description}</Text>
-  </ScrollView>
-);
-
-// CHANGE TO FEED TAB
-// Challenge Tab
-// const ChallengesScreen = ({ challenges }: { challenges: any[] }) => (
-//   <ScrollView className="p-6">
-//     {challenges.length > 0 ? (
-//       challenges.map((challenge) => (
-//         <View key={challenge._id}>
-//           <View className="flex flex-row justify-between items-center w-full bg-gray-200 p-2 rounded-xl">
-//             <Text className="p-3 flex-1">{challenge.description}</Text>
-//             <Text className="bg-green-300 p-2.5 rounded-xl w-auto text-center h-10">{challenge.challengeType}</Text>
-//           </View>
-//         </View>
-//       ))
-//     ) : (
-//       <Text className="text-lg text-gray-700">No challenges available yet.</Text>
-//     )}
-//   </ScrollView>
-// );
-
-// People Screen
-const PeopleScreen = ({ members, creatorId }: { members: any[]; creatorId: string }) => (
-  <ScrollView className="p-6">
-    {members.length > 0 ? (
-      members.map((member) => (
-        <View key={member._id} className="flex flex-row justify-between items-center w-full mb-4 bg-gray-200 p-4 rounded-lg">
-          <View className="flex flex-row gap-2">
-            <Icon name="user-circle" size={25} color="#4B5563" />
-            <Text className="text-lg text-gray-800">
-              {member.username}
-            </Text>
-          </View>
-          {member._id === creatorId && <Text className="text-lg font-semibold mb-1">Creator</Text>}
-        </View>
-      ))
-    ) : (
-      <Text className="text-lg text-gray-700">No members available yet.</Text>
-    )}
-  </ScrollView>
-);
+import FeedTab from "@/components/FeedTab";
+import PeopleTab from "@/components/PeopleTab";
 
 const CommunityDetails = () => {
   const router = useRouter();
@@ -66,14 +18,12 @@ const CommunityDetails = () => {
 
   const routes = [
     { key: "feed", title: "Feed" },
-    // { key: "challenges", title: "Challenges" },
     { key: "people", title: "People" },
   ];
 
   const renderScene = SceneMap({
-    feed: () => (community ? <FeedScreen community={community} /> : null),
-    // challenges: () => (community ? <ChallengesScreen challenges={community.challenges} /> : null),
-    people: () => (community ? <PeopleScreen members={community.members} creatorId={community.createdBy} /> : null),
+    feed: () => (community ? <FeedTab community={community} /> : null),
+    people: () => (community ? <PeopleTab members={community.members} creatorId={community.createdBy} /> : null),
   });
 
   useEffect(() => {

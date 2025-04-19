@@ -35,7 +35,7 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
 
       // Replace with alerts
       // if (!response.ok) throw new Error("Failed to fetch logs");
-      
+
       const data = await response.json();
       const logs = data.dailyLogs || [];
       setDailyLogs(logs);
@@ -45,10 +45,6 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
 
       if (!todayLog) {
         todayLog = await createNewDailyLog();
-      }
-
-      if (!currentLog) {
-        createNewDailyLog();
       }
 
       setCurrentLog(todayLog);
@@ -61,44 +57,39 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
   const createNewDailyLog = async () => {
     try {
       const today = new Date().toISOString().split("T")[0];
-  
-      // Fetch latest logs to ensure no duplicate creation
-      const res = await fetch(`${BACKEND_API_URL}/users/${user?._id}/dailyLogs`);
-      const data = await res.json();
-      const logs = data.dailyLogs || [];
-  
-      // If today's log exists, just stop
-      const existingTodayLog = logs.find((log: any) => log.date.split("T")[0] === today);
-      if (existingTodayLog) return null;
-  
+
       const newLog = {
         date: today,
         foods: [],
         exercises: [],
         completed: false,
       };
-  
+
       const response = await fetch(`${BACKEND_API_URL}/users/${user?._id}/dailyLogs`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newLog),
       });
-  
-      if (!response.ok) throw new Error("Failed to create log");
-  
+
+      if (!response.ok) {
+        const errMsg = await response.text();
+        throw new Error(errMsg || "Failed to create log");
+      }
+
       const createdLog = await response.json();
       const newDailyLog = createdLog.dailyLog;
-  
+
       setDailyLogs(prev => [...prev, newDailyLog]);
       setCurrentLog(newDailyLog);
-  
+
       return newDailyLog;
     } catch (error) {
       console.error("Error creating log:", error);
       return null;
     }
   };
-  
+
+
 
   const handlePrevious = () => {
     if (!currentLog) return;
