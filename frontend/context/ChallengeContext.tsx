@@ -13,7 +13,7 @@ interface ChallengeContextType {
   leaveChallenge: (userId: string | undefined, challengeId: string) => Promise<void>;
   updateChallenge: (userId: string | undefined, challengeId: string, progress: number) => Promise<void>;
   challengeCheck: (userId: string | undefined, selectedChallengeType: string, challengeData: string | null) => void;
-  shareChallenge: () => Promise<void>;
+  shareChallenge: (userId: string, communityId: string, challengeId: string) => Promise<void>;
 }
 
 interface ChallengeProviderProps {
@@ -202,9 +202,26 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
     await Promise.all(updatePromises);
   };
 
-  const shareChallenge = async () => {
+  const shareChallenge = async (userId: string, communityId: string, challengeId: string) => {
     try {
+      const response = await fetch(`${BACKEND_API_URL}/communities/${communityId}/feeds`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: userId,
+          challengeId: challengeId,
+        }),
+  
+      });
 
+      if (!response.ok) {
+        Alert.alert('Error', 'Unable to share challenge');
+        throw new Error("Unable to share challenge");
+      } else {
+        Alert.alert('Success', 'Challenge has been shared');
+      }
     } catch (error: any) {
       console.error(error.message);
     }

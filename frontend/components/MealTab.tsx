@@ -1,15 +1,23 @@
+import useAuth from "@/hooks/useAuth";
 import useLog from "@/hooks/useLog";
 import { FoodType } from "@/types/FoodType";
-import { ScrollView, View, Text } from "react-native";
+import { ScrollView, View, Text, TouchableOpacity } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const MealTab = () => {
-  const { currentLog } = useLog();
+  const { user } = useAuth()
+  const { currentLog, removeLogMeal } = useLog();
+  const userId = user?._id;
+
+  const handleRemoveMeal = (mealId: string) => {
+    removeLogMeal(currentLog._id, mealId, userId);
+  }
 
   return (
     <ScrollView className="mt-4">
       {/* Meals Section */}
       {['Breakfast', 'Lunch', 'Dinner', 'Snacks'].map((mealType) => {
-        const filteredFoods = currentLog.foods?.filter(
+        const filteredFoods = currentLog?.foods?.filter(
           (food: FoodType) => food.mealType?.toLowerCase() === mealType.toLowerCase()
         ) || [];
 
@@ -25,9 +33,14 @@ const MealTab = () => {
               <Text className="text-sm text-gray-500">No {mealType.toLowerCase()} items logged.</Text>
             ) : (
               filteredFoods.map((food: FoodType) => (
-                <View key={food._id} className="flex-row justify-between items-center mt-2">
+                <View key={food._id} className="flex-row justify-between items-center my-2">
                   <Text className="text-sm text-gray-600">{food.name}</Text>
-                  <Text className="text-sm text-gray-500">{food.calories} kcal</Text>
+                  <View className="flex flex-row">
+                    <Text className="text-sm text-gray-500 mr-2">{food.calories} kcal</Text>
+                    <TouchableOpacity onPress={() => handleRemoveMeal(food._id)}>
+                      <Icon name="remove" size={20} color="#FF0000" />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               ))
             )}

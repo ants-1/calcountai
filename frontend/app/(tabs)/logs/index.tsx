@@ -104,15 +104,15 @@ const Log: React.FC = () => {
               <View className='flex flex-row justify-evenly mt-4'>
                 <View className='w-24 p-2 flex justify-center items-center gap-2 bg-gray-100 rounded-lg'>
                   <Text className='text-gray-700 font-semibold'>Protein</Text>
-                  <Text className='text-gray-500'>{currentLog.protein}g</Text>
+                  <Text className='text-gray-500'>{currentLog.protein.toFixed(2)}g</Text>
                 </View>
                 <View className='w-24 p-2 flex justify-center items-center gap-2 bg-gray-100 rounded-lg'>
                   <Text className='text-gray-700 font-semibold'>Fats</Text>
-                  <Text className='text-gray-500'>{currentLog.fats}g</Text>
+                  <Text className='text-gray-500'>{currentLog.fats.toFixed(2)}g</Text>
                 </View>
                 <View className='w-24 p-2 flex justify-center items-center gap-2 bg-gray-100 rounded-lg'>
                   <Text className='text-gray-700 font-semibold'>Carbs</Text>
-                  <Text className='text-gray-500'>{currentLog.carbs}g</Text>
+                  <Text className='text-gray-500'>{currentLog.carbs.toFixed(2)}g</Text>
                 </View>
               </View>
 

@@ -8,9 +8,11 @@ import useChallenge from "@/hooks/useChallenge";
 
 interface MealContextType {
   meals: any;
+  apiMeals: any;
   selectedMeal: any;
   setSelectedMeal: any;
   fetchMeals: () => Promise<void>;
+  fetchAPIMeals: (name: any) => Promise<void>;
   addMeals: (meal: any, log: any) => Promise<void>;
 }
 
@@ -23,6 +25,7 @@ export const MealContext = createContext<MealContextType | undefined>(undefined)
 export const MealProvider: React.FC<MealProviderProps> = ({ children }) => {
   const router = useRouter();
   const [meals, setMeals] = useState<any[]>([]);
+  const [apiMeals, setApiMeals] = useState<any[]>([]);
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
   const { user } = useAuth();
   const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
@@ -39,6 +42,19 @@ export const MealProvider: React.FC<MealProviderProps> = ({ children }) => {
     }
   };
 
+  // Fetch all meals from spoonacular API
+  const fetchAPIMeals = async (name: any) => {
+    try {
+      const response = await fetch(`${BACKEND_API_URL}/foods/api?name=${encodeURIComponent(name)}`);
+      
+      const data = await response.json();
+      setApiMeals(data.foods || []);
+    } catch (error) {
+      console.error("Error fetching meals", error);
+    }
+  }
+
+  // Add meal to log and database
   const addMeals = async (meal: any, log: any) => {
     try {
       const mealResponse = await fetch(`${BACKEND_API_URL}/foods`, {
@@ -132,10 +148,12 @@ export const MealProvider: React.FC<MealProviderProps> = ({ children }) => {
   return (
     <MealContext.Provider
       value={{
+        apiMeals,
         meals,
         selectedMeal,
         setSelectedMeal,
         fetchMeals,
+        fetchAPIMeals,
         addMeals,
       }}>
       {children}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, ScrollView, Dimensions } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import Header from "@/components/Header";
@@ -14,13 +14,22 @@ const Meals: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { meals, fetchMeals } = useMeal();
+  const [searchLoading, setSearchLoading] = useState(false);
+  const { meals, apiMeals, fetchMeals, fetchAPIMeals } = useMeal();
 
   const [index, setIndex] = useState(0);
   const routes = [
     { key: "myfoods", title: "My Foods" },
     { key: "search", title: "Search" },
   ];
+
+  const handleSearch = async () => {
+    if (searchText.trim().length > 1) {
+      setSearchLoading(true);
+      await fetchAPIMeals(searchText);
+      setSearchLoading(false);
+    }
+  };
 
   const MyFoodsScreen = () => {
     return (
@@ -33,11 +42,19 @@ const Meals: React.FC = () => {
       </View>
     );
   };
-  
+
   const SearchScreen = () => {
     return (
-      <View className="px-6 py-4">
-        <Text className="text-gray-500">Search functionality coming soon!</Text>
+      <View>
+        {searchLoading ? (
+          <ActivityIndicator size="large" color="#4B5563" className="mt-6" />
+        ) : searchText.trim().length <= 1 ? (
+          <Text className="text-gray-500  mt-6 text-center">Type at least 2 letters and hit search.</Text>
+        ) : apiMeals.length === 0 ? (
+          <Text className="text-gray-500 mt-6 text-center">No foods found for "{searchText}".</Text>
+        ) : (
+          MealsList(apiMeals)
+        )}
       </View>
     );
   };
@@ -46,7 +63,6 @@ const Meals: React.FC = () => {
     myfoods: MyFoodsScreen,
     search: SearchScreen,
   });
-  
 
   useEffect(() => {
     fetchMeals().finally(() => setLoading(false));
@@ -67,7 +83,6 @@ const Meals: React.FC = () => {
     }
   });
 
-  // Sorting options
   const sortOptions = [
     { label: "Name Ascending", option: "name", order: "asc" },
     { label: "Name Descending", option: "name", order: "desc" },
@@ -76,12 +91,12 @@ const Meals: React.FC = () => {
   ];
 
   return (
-    <SafeAreaView className="flex-1 bg-white  pt-6">
+    <SafeAreaView className="flex-1 bg-white pt-6">
       <Header title="Meals" icon="chevron-left" iconSize={25} titleSize="text-3xl" />
 
       <View className="flex-row items-center space-x-2 mt-5 px-6">
         <TextInput
-          className="flex-1 bg-gray-100 p-3 mr-3 rounded-full"
+          className="flex-1 bg-gray-100 p-3 mr-2 rounded-full"
           placeholder="Search for food..."
           placeholderTextColor="#888"
           value={searchText}
@@ -89,19 +104,19 @@ const Meals: React.FC = () => {
         />
         <TouchableOpacity
           className="bg-blue-500 px-4 py-3 rounded-full"
-          onPress={() => router.push("/(tabs)/logs/add-meal-manual")}
+          onPress={handleSearch}
         >
-          <Text className="text-white font-semibold">+ Add</Text>
+          <Text className="text-white font-semibold">Search</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Sort Dropdown */}
+      {/* Sort + Scan */}
       <View className="flex-row justify-between relative mt-4 px-6">
-        <TouchableOpacity
-          className="bg-black p-3 rounded-full"
-          onPress={() => router.push("/(tabs)/logs/add-meal-barcode")}
+      <TouchableOpacity
+          className="bg-black px-4 py-3 rounded-full"
+          onPress={() => router.push("/(tabs)/logs/add-meal-manual")}
         >
-          <Text className="text-white">Scan a Barcode</Text>
+          <Text className="text-white font-semibold">+ Add</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -135,7 +150,7 @@ const Meals: React.FC = () => {
 
       <View className="mb-6"></View>
 
-      {/* Food Tab */}
+      {/* Tab View */}
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}

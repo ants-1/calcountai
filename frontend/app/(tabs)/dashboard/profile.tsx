@@ -107,7 +107,7 @@ const Profile: React.FC = () => {
                   })}
                 </View>
               ) : (
-                <Text className="text-gray-500">No goals set.</Text>
+                <Text className="text-gray-500 ml-6">No goals set.</Text>
               )}
             </>
           )}

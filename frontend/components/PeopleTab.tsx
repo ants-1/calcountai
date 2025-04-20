@@ -2,10 +2,10 @@ import { ScrollView, View, Text } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 const PeopleTab = ({ members, creatorId }: { members: any[]; creatorId: string }) => (
-  <ScrollView className="p-6">
+  <ScrollView className="p-4">
     {members.length > 0 ? (
       members.map((member) => (
-        <View key={member._id} className="flex flex-row justify-between items-center w-full mb-4 bg-gray-200 p-4 rounded-lg">
+        <View key={member._id} className="flex flex-row justify-between items-center w-full mb-4 bg-gray-100 p-4 rounded-lg">
           <View className="flex flex-row gap-2">
             <Icon name="user-circle" size={25} color="#4B5563" />
             <Text className="text-lg text-gray-800">

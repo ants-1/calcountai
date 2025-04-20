@@ -2,6 +2,7 @@ import React, { createContext, useState, ReactNode } from "react";
 import Constants from "expo-constants";
 import { Alert, Platform } from "react-native";
 import useAuth from "@/hooks/useAuth";
+import { useRouter } from "expo-router";
 
 interface LogContextType {
   dailyLogs: any[];
@@ -9,6 +10,8 @@ interface LogContextType {
   setCurrentLog: (log: any) => void;
   fetchDailyLogs: () => Promise<void>;
   createNewDailyLog: () => Promise<void>;
+  removeLogMeal: (dailyLogId: string, mealId: string, userId: string | undefined) => Promise<void>;
+  removeLogActivity: (dailyLogId: string, activityId: string, userId: string | undefined) => Promise<void>;
   handlePrevious: () => void;
   handleNext: () => void;
 }
@@ -20,6 +23,7 @@ interface LogProviderProps {
 export const LogContext = createContext<LogContextType | undefined>(undefined);
 
 export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
+  const router = useRouter();
   const [dailyLogs, setDailyLogs] = useState<any[]>([]);
   const [currentLog, setCurrentLog] = useState<any>({});
 
@@ -61,6 +65,9 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
       const newLog = {
         date: today,
         foods: [],
+        protein: 0,
+        carbs: 0,
+        fats: 0,
         exercises: [],
         completed: false,
       };
@@ -89,7 +96,39 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
     }
   };
 
+  const removeLogMeal = async (dailyLogId: string, mealId: string, userId: string | undefined) => {
+    const response = await fetch(`${BACKEND_API_URL}/dailyLogs/${dailyLogId}/meals/${mealId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: userId }),
+    });
 
+    if (!response.ok) {
+      Alert.alert("Error", "Unable to remove meal from log.");
+      router.replace("/(tabs)/logs");
+      return;
+    }
+
+    Alert.alert("Success", "Meal successfully removed from log.");
+    router.replace("/(tabs)/logs");
+  }
+
+  const removeLogActivity = async (dailyLogId: string, activityId: string, userId: string | undefined) => {
+    const response = await fetch(`${BACKEND_API_URL}/dailyLogs/${dailyLogId}/activities/${activityId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: userId }),
+    });
+
+    if (!response.ok) {
+      Alert.alert("Error", "Unable to remove meal from log.");
+      router.replace("/(tabs)/logs");
+      return;
+    }
+
+    Alert.alert("Success", "Meal successfully removed from log.");
+    router.replace("/(tabs)/logs");
+  }
 
   const handlePrevious = () => {
     if (!currentLog) return;
@@ -117,6 +156,8 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
         setCurrentLog,
         fetchDailyLogs,
         createNewDailyLog,
+        removeLogMeal,
+        removeLogActivity,
         handlePrevious,
         handleNext
       }}>

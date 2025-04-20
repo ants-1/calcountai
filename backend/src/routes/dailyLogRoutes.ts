@@ -25,5 +25,13 @@ router.delete(
   "/users/:userId/dailyLogs/:dailyLogId",
   dailyLogController.deleteDailyLog
 );
+router.put(
+  "/dailyLogs/:dailyLogId/meals/:mealId",
+  dailyLogController.deleteLogMeal
+);
+router.put(
+  "/dailyLogs/:dailyLogId/activities/:activityId",
+  dailyLogController.deleteLogActivity
+);
 
 export default router;

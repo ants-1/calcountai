@@ -83,7 +83,6 @@ const createChallenge = async (
       description,
       percentage: 0,
       participants: [],
-      completed: false,
       challengeType,
     });
 
@@ -129,7 +128,11 @@ const joinChallenge = async (
     );
 
     if (!alreadyParticipant) {
-      challenge.participants.push({ user: user._id, progress: 0 });
+      challenge.participants.push({
+        user: user._id,
+        progress: 0,
+        completed: false,
+      });
     }
 
     if (!user.challenges?.some((cid) => cid.equals(challenge._id))) {
@@ -194,56 +197,52 @@ const editChallenge = async (
       return res.status(400).json({ error: "Invalid challenge ID" });
     }
 
-    const updatedChallenge = await Challenge.findByIdAndUpdate(
-      challengeId,
-      updatedData,
-      { new: true }
-    );
-
-    if (!updatedChallenge) {
+    // Fetch the challenge
+    const challenge = await Challenge.findById(challengeId);
+    if (!challenge) {
       return res.status(404).json({
         error: `Challenge with ID: ${challengeId} was not found.`,
       });
     }
 
-    let allCompleted = true;
+    // Update non-participant fields
+    Object.assign(challenge, updatedData);
 
+    // Update participants if provided
     if (participants && Array.isArray(participants)) {
       for (let participant of participants) {
         const { user, progress } = participant;
 
         if (user && typeof progress === "number") {
-          const clampedProgress = Math.min(progress, updatedChallenge.level);
+          const clampedProgress = Math.min(progress, challenge.level);
+          const isCompleted = clampedProgress >= challenge.level;
 
-          const existing = updatedChallenge.participants.find(
+          const existing = challenge.participants.find(
             (p) => p.user.toString() === user.toString()
           );
 
           if (existing) {
             existing.progress = clampedProgress;
+            existing.completed = isCompleted;
           } else {
-            updatedChallenge.participants.push({
+            challenge.participants.push({
               user,
               progress: clampedProgress,
+              completed: isCompleted,
             });
           }
         }
       }
-
-      // ✅ Now re-check ALL participants
-      const allCompletedCheck = updatedChallenge.participants.every(
-        (p) => p.progress >= updatedChallenge.level
-      );
-      updatedChallenge.completed = allCompletedCheck;
-
-      await updatedChallenge.save();
     }
 
-    return res.status(200).json({ updatedChallenge });
+    await challenge.save();
+
+    return res.status(200).json({ updatedChallenge: challenge });
   } catch (err) {
     return next(err);
   }
 };
+
 
 // @desc    User leave challenge and is removed from participants
 // @route   PUT /api/v1/users/:userId/challenges/:challengeId/leave

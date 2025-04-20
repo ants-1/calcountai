@@ -8,8 +8,10 @@ import { CommunityType } from "@/types/CommunityType";
 interface CommunityContextType {
   community: any;
   communities: CommunityType[];
+  userCommunities: any;
   fetchCommunities: () => Promise<void>;
   fetchCommunity: (id: string) => Promise<void>;
+  fetchUserCommunities: (userId: string | undefined) => Promise<void>;
   joinCommunity: (id: string) => Promise<void>;
   createCommunity: (name: string, description: string) => Promise<void>;
   leaveCommunity: (id: string) => Promise<void>;
@@ -29,6 +31,7 @@ export const CommunityProvider: React.FC<CommunityProviderProps> = ({ children }
   const router = useRouter();
   const [communities, setCommunities] = useState<CommunityType[]>([]);
   const [community, setCommunity] = useState<any>(null);
+  const [userCommunities, setUserCommunities] = useState<any>(null);
   const [isJoined, setIsJoined] = useState<boolean | null>(null);
   const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
 
@@ -72,6 +75,23 @@ export const CommunityProvider: React.FC<CommunityProviderProps> = ({ children }
       }
     }
   };
+
+  const fetchUserCommunities = async (userId: string | undefined) => {
+    try {
+      const API_URL = `${BACKEND_API_URL}/users/${userId}/communities`;
+      const response = await fetch(API_URL);
+
+      if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
+
+      const data = await response.json();
+
+      if (!data.communities || !Array.isArray(data.communities)) throw new Error("API did not return an array");
+
+      setUserCommunities(data.communities);
+    } catch (error: any) {
+      console.error("Error fetching user communities:", error);
+    }
+  }
 
   const joinCommunity = async (id: string) => {
     try {
@@ -244,8 +264,10 @@ export const CommunityProvider: React.FC<CommunityProviderProps> = ({ children }
     <CommunityContext.Provider value={{
       community,
       communities,
+      userCommunities,
       fetchCommunities,
       fetchCommunity,
+      fetchUserCommunities,
       joinCommunity,
       createCommunity,
       leaveCommunity,

@@ -9,7 +9,6 @@ const LogsLayout = () => {
       <Stack.Screen name="add-activity" options={{ headerShown: false }} />
       <Stack.Screen name="meals" options={{ headerShown: false }} />
       <Stack.Screen name="add-meal-manual" options={{ headerShown: false }} />
-      <Stack.Screen name="add-meal-barcode" options={{ headerShown: false }} />
     </Stack>
   );
 };

@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import User, { IUser } from "../models/user";
 import DailyLog, { IDailyLog } from "../models/dailyLog";
+import Food from "../models/food";
+import Exercise from "../models/exercise";
 import { Types } from "mongoose";
 
 // @desc    Retrieve all daily logs for user
@@ -131,7 +133,10 @@ const getStreaks = async (
       prevDate = logDate;
     }
 
-    if (!prevDate || (today.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24) > 1) {
+    if (
+      !prevDate ||
+      (today.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24) > 1
+    ) {
       streak = 0;
     }
 
@@ -166,7 +171,7 @@ const createDailyLog = async (
       foods,
       protein: 0,
       fats: 0,
-      carbs:
+      carbs: 0,
       exercises,
       completed,
       date,
@@ -240,14 +245,10 @@ const editDailyLog = async (
     await updatedDailyLog.save();
 
     return res.status(200).json({ dailyLog: updatedDailyLog });
-
   } catch (err) {
     next(err);
   }
 };
-
-
-
 
 // @desc    Delete daily log from database
 // @route   DELETE /api/v1/users/:userId/dailyLogs/:dailyLogId
@@ -285,6 +286,132 @@ const deleteDailyLog = async (
   }
 };
 
+// @desc    Remove meal from user's daily log
+// @route   PUT /api/v1/dailyLogs/:dailyLogId/meals/:mealId
+const deleteLogMeal = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  try {
+    const { dailyLogId, mealId } = req.params;
+    const { userId } = req.body;
+
+    const user = await User.findById(userId);
+
+    // Check if user exist
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const dailyLog = await DailyLog.findById(dailyLogId);
+
+    // Check if daily log exist
+    if (!dailyLog) {
+      return res.status(404).json({ error: "Daily log not found" });
+    }
+
+    const meal = await Food.findById(mealId);
+
+    // Check if meal exist
+    if (!meal) {
+      return res.status(404).json({ error: "Meal not found" });
+    }
+
+    // Check if meal exist in log
+    const logMeal = dailyLog.foods?.findIndex((id) => id.toString() === mealId);
+
+    if (logMeal === -1 || logMeal === undefined) {
+      return res
+        .status(404)
+        .json({ error: "Meal not found in this daily log " });
+    }
+
+    // Remove meal from daily log's food array
+    dailyLog.foods?.splice(logMeal, 1);
+
+    // Subtract nutritional values from daily log
+    dailyLog.protein = Math.max(
+      0,
+      (dailyLog.protein as number) - ((meal.protein as number) || 0)
+    );
+    dailyLog.fats = Math.max(
+      0,
+      (dailyLog.fats as number) - ((meal.fat as number) || 0)
+    );
+    dailyLog.carbs = Math.max(
+      0,
+      (dailyLog.carbs as number) - ((meal.carbohydrates as number) || 0)
+    );
+
+    await dailyLog.save();
+
+    return res.status(200).json({
+      message: "Meal removed from daily log successfully",
+      updatedLog: dailyLog,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Remove activity from user's daily log
+// @route   PUT /api/v1/dailyLogs/:dailyLogId/activities/:activityId
+const deleteLogActivity = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  try {
+    const { dailyLogId, activityId } = req.params;
+    const { userId } = req.body;
+
+    const user = await User.findById(userId);
+
+    // Check if user exist
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const dailyLog = await DailyLog.findById(dailyLogId);
+
+    // Check if daily log exist
+    if (!dailyLog) {
+      return res.status(404).json({ error: "Daily log not found" });
+    }
+
+    const activity = await Exercise.findById(activityId);
+
+    // Check if activity exist
+    if (!activity) {
+      return res.status(404).json({ error: "Activity not found" });
+    }
+
+    // Check if activity exist in log
+    const logActivity = dailyLog.exercises?.findIndex(
+      (id) => id.toString() === activityId
+    );
+
+    if (logActivity === -1 || logActivity === undefined) {
+      return res
+        .status(404)
+        .json({ error: "Activity not found in this daily log" });
+    }
+
+    // Remove activity from daily log's exercise array
+    dailyLog.exercises?.splice(logActivity, 1);
+
+    await dailyLog.save();
+
+    return res.status(200).json({
+      message: "Activity removed from daily log successfully",
+      updatedLog: dailyLog,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   getAllDailyLogs,
   getDailyLog,
@@ -292,4 +419,6 @@ export default {
   createDailyLog,
   editDailyLog,
   deleteDailyLog,
+  deleteLogMeal,
+  deleteLogActivity,
 };

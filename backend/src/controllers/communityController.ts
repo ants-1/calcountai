@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { Types } from "mongoose";
 import Community, { ICommunity } from "../models/community";
 import User, { IUser } from "../models/user";
+import Challenge from "../models/challenge";
 
 // @desc    Retrieve all communitites
 // @route   GET /api/v1/communities
@@ -51,6 +52,35 @@ const getCommunity = async (
   }
 };
 
+// @desc    Retrieve all communities that the user belongs to
+// @route   GET /api/v1/users/:userId/communities
+const getUserCommunities = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  try {
+    const { userId } = req.params;
+    
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found"});
+    }
+
+    const userCommunities = await Community.find({ members: userId });
+
+    if (!userCommunities) {
+      return res.status(404).json({ message: "User belongs to no communities"});
+    }
+
+    return res.status(200).json({
+      communities: userCommunities
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
 
 // @desc    Create new community
 // @route   POST /api/v1/communities
@@ -67,8 +97,6 @@ const createCommunity = async (
       createdBy: req.body.createdBy,
       challenges: req.body.challenges,
     });
-
-    // Get User and add to
 
     return res.status(200).json({ newCommunity });
   } catch (err) {
@@ -232,12 +260,69 @@ const deleteCommunity = async (
   }
 };
 
+// @desc    Add content to selected community feed
+// @route   POST /api/v1/communities/:communityId/feeds
+const createCommunityPost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  try {
+    const { communityId } = req.params;
+    const { userId, challengeId } = req.body;
+
+    const community = await Community.findById(communityId);
+    if (!community) {
+      return res.status(404).json({ message: "Community not found" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const challenge = await Challenge.findById(challengeId);
+    if (!challenge) {
+      return res.status(404).json({ message: "Challenge not found" });
+    }
+
+    // Find this user in the challenge's participants
+    const participant = challenge.participants.find(
+      (p) => p.user.toString() === userId
+    );
+
+    if (!participant) {
+      return res.status(400).json({ message: "User is not a participant of this challenge" });
+    } else if (!participant.completed) {
+      return res.status(400).json({ message: "User has not completed this challenge" });
+    }
+
+    const postMessage = `${user.username} has completed the "${challenge.name}" challenge.`;
+
+    const newPost = {
+      username: user.username,
+      content: postMessage,
+      createdAt: new Date(),
+    };
+
+    community.feed.push(newPost);
+    await community.save();
+
+    res.status(200).json({ message: "Feed post added", feed: community.feed });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+
 export default {
   getAllCommunities,
   getCommunity,
+  getUserCommunities,
   createCommunity,
   leaveCommunity,
   joinCommunity,
   updateCommunity,
   deleteCommunity,
+  createCommunityPost,
 };

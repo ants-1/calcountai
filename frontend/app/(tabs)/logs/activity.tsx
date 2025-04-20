@@ -11,7 +11,7 @@ type SortOrder = "asc" | "desc";
 
 const ActivityTrackerScreen: React.FC = () => {
   const router = useRouter();
-  const { activities, fetchExercises, addExerciseToLog } = useActivity();
+  const { activities, fetchExercises } = useActivity();
 
   const [searchText, setSearchText] = useState<string>("");
   const [sortOption, setSortOption] = useState<SortOption>("name");

@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import Food, { IFood } from "../models/food";
 import { Types } from "mongoose";
+import dotenv from "dotenv";
+import formatSpoonacularData from "../utils/formatData";
+
+dotenv.config();
 
 // @desc    Retrieve all foods from database
 // @route   GET /api/v1/foods
@@ -17,6 +21,45 @@ const getAllFoods = async (
     }
 
     return res.status(200).json({ foods });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+// @desc    Retrieve all foods from Spoonacular API
+// @route   GET /api/v1/foods/api
+const getAllAPIFoods = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  try {
+    const { name } = req.query;
+    const apiKey = process.env.SPOONACULAR_API_KEY;
+
+    if (!name || typeof name !== "string") {
+      return res
+        .status(400)
+        .json({ error: "Missing or invalid 'name' query parameter." });
+    }
+
+    const spoonacularAPIUrl = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${apiKey}&query=${name}&addRecipeNutrition=True`;
+    const response = await fetch(spoonacularAPIUrl);
+
+    if (!response.ok) {
+      throw new Error(`Spoonacular API error: ${response.statusText}`);
+    }
+    const data = await response.json();
+
+    const foodData = (data.results || []).map((item: any) =>
+      formatSpoonacularData(item)
+    );
+
+    if (!foodData) {
+      return res.status(404).json({ message: "No food data found." });
+    }
+
+    return res.json({ foods: foodData });
   } catch (err) {
     return next(err);
   }
@@ -62,9 +105,9 @@ const createFood = async (
       numberOfServings: req.body.numberOfServings,
       servingSize: req.body.servingSize,
       mealType: req.body.mealType,
-      protein: req.body.protein || null,
-      fat: req.body.fat || null,
-      carbohydrates: req.body.carbohydrates || null,
+      protein: req.body.protein || 0,
+      fat: req.body.fat || 0,
+      carbohydrates: req.body.carbohydrates || 0,
     });
 
     if (!newFood) {
@@ -125,10 +168,12 @@ const deleteFood = async (
     const deletedFood = await Food.findByIdAndDelete(foodId);
 
     if (!deletedFood) {
-        return res.status(404).json({ error: "Food not found" });
+      return res.status(404).json({ error: "Food not found" });
     }
 
-    return res.status(200).json({ message: "Food successfully deleted", foodId })
+    return res
+      .status(200)
+      .json({ message: "Food successfully deleted", foodId });
   } catch (err) {
     return next(err);
   }
@@ -136,6 +181,7 @@ const deleteFood = async (
 
 export default {
   getAllFoods,
+  getAllAPIFoods,
   getFood,
   createFood,
   updateFood,

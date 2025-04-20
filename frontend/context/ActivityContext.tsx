@@ -12,7 +12,6 @@ interface ActivityContextType {
   fetchExercises: () => Promise<void>;
   addExerciseToLog: (id: string) => Promise<void>;
   addExercise: (activity: any, log: any) => Promise<void>;
-  removeExercise: (exerciseId: string, log: any) => Promise<void>;
 }
 
 interface ActivityProviderProps {
@@ -184,39 +183,6 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
     }
   }
 
-  const removeExercise = async (exerciseId: string, log: any) => {
-    if (!log) return;
-
-    try {
-      const updatedExercises = log.exercise?.filter((exercise: ActivityType) => exercise._id !== exerciseId);
-
-
-      const response = await fetch(`${BACKEND_API_URL}/users/${user?._id}/dailyLogs/${currentLog._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ exercises: updatedExercises }),
-      });
-
-      if (response.ok) {
-        const updatedLog = await response.json();
-        setCurrentLog(updatedLog.dailyLog);
-      } else {
-        if (Platform.OS === "web") {
-          alert("Error: \nFailed to remove exercise.");
-        } else {
-          Alert.alert("Error", "Failed to remove exercise.");
-        }
-      }
-
-    } catch (error) {
-      if (Platform.OS === "web") {
-        alert("Error: \nError while removing exercise.");
-      } else {
-        Alert.alert("Error", "Error while removing exercise.");
-      }
-    }
-  }
-
   return (
     <ActivityContext.Provider
       value={{
@@ -224,7 +190,6 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
         fetchExercises,
         addExerciseToLog,
         addExercise,
-        removeExercise,
       }}>
       {children}
     </ActivityContext.Provider>

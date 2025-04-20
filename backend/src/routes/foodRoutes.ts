@@ -4,6 +4,7 @@ import foodController from "../controllers/foodController";
 const router = express.Router();
 
 router.get("/foods", foodController.getAllFoods);
+router.get("/foods/api", foodController.getAllAPIFoods);
 router.get("/foods/:foodId", foodController.getFood);
 router.post("/foods", foodController.createFood);
 router.put("/foods/:foodId", foodController.updateFood);
