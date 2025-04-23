@@ -14,7 +14,7 @@ const getAllChallenges = async (
     const challenges: IChallenge[] = await Challenge.find().exec();
 
     if (!challenges || challenges.length === 0) {
-      return res.status(404).json({ message: "No challanges found." });
+      return res.status(404).json({ message: "No challenges found." });
     }
 
     return res.status(200).json({ challenges });
@@ -44,7 +44,7 @@ const getUserChallenges = async (
     if (!user) {
       return res
         .status(404)
-        .json({ error: `User with ID: ${userId} was not found.` });
+        .json({ error: `User was not found.` });
     }
 
     const userChallenges = user.challenges;
@@ -201,7 +201,7 @@ const editChallenge = async (
     const challenge = await Challenge.findById(challengeId);
     if (!challenge) {
       return res.status(404).json({
-        error: `Challenge with ID: ${challengeId} was not found.`,
+        error: `Challenge was not found.`,
       });
     }
 
@@ -267,13 +267,13 @@ const leaveChallenge = async (
     if (!user) {
       return res
         .status(404)
-        .json({ error: `User with ID: ${userId} was not found.` });
+        .json({ error: `User was not found.` });
     }
 
     if (!challenge) {
       return res
         .status(404)
-        .json({ error: `Challenge with ID: ${challengeId} was not found.` });
+        .json({ error: `Challenge was not found.` });
     }
 
     const initialCount = challenge.participants.length;

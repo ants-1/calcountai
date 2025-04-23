@@ -195,33 +195,29 @@ const editDailyLog = async (
 ): Promise<any> => {
   try {
     const { userId, dailyLogId } = req.params;
-    const updateData = req.body; // This should contain the foods and optionally protein, fat, carbs
+    const updateData = req.body;
 
-    // Check if userId is a valid MongoDB ObjectId
     if (!Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ error: "Invalid user ID" });
     }
 
-    // Find user by ID
     const user: IUser | null = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Find the daily log by its ID and update
     const updatedDailyLog = await DailyLog.findByIdAndUpdate(
       dailyLogId,
       updateData,
       {
         new: true,
       }
-    ).populate("foods"); // Populate the foods in the daily log (so we have all food details)
+    ).populate("foods");
 
     if (!updatedDailyLog) {
       return res.status(404).json({ error: "Daily log not found" });
     }
 
-    // Ensure foods is defined and is an array
     const foods = updatedDailyLog.foods || [];
 
     // Calculate the total protein, fat, and carbs
@@ -281,6 +277,8 @@ const deleteDailyLog = async (
     );
 
     await user.save();
+
+    return res.status(204);
   } catch (err) {
     next(err);
   }

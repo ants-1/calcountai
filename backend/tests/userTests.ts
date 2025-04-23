@@ -50,8 +50,6 @@ export default function userTests(authInfo: { token: string; userId: string }) {
         .get(`/api/v1/users/${authInfo.userId}`)
         .set("Authorization", `Bearer ${authInfo.token}`);
 
-      console.log("userId:", authInfo.userId);
-      console.log("req user id:", res.body.user._id);
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty("user");
       expect(res.body.user._id).toBe(authInfo.userId);

@@ -1,9 +1,11 @@
-process.env.NODE_ENV = "test";
-
 import mongoose from "mongoose";
-import { beforeAll, afterAll } from "@jest/globals";
+import { beforeAll, afterAll, jest } from "@jest/globals";
 import authTests from "./authTests";
 import userTests from "./userTests";
+import dailyLogTests from "./dailyLogTests";
+import foodTests from "./foodTests";
+import exerciseTests from "./exerciseTests";
+import challengeTests from "./challengeTests";
 
 let authInfo = {
   token: "",
@@ -11,18 +13,26 @@ let authInfo = {
 };
 
 beforeAll(async () => {
-  if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(process.env.DB_TEST_URL || "");
-  }
-  const collections = await mongoose.connection.db?.collections();
+  try {
+    if (mongoose.connection.readyState === 0) {
+      const testDBUrl = process.env.DB_TEST_URL;
+      console.log('db url:', testDBUrl);
+      await mongoose.connect(testDBUrl || "");
+    }
+    const collections = await mongoose.connection.db?.collections();
 
-  if (!collections) {
-    return;
-  }
+    if (!collections) {
+      return;
+    }
 
-  // Delete all data in database before starting tests
-  for (const collection of collections) {
-    await collection.deleteMany({});
+    // Delete all data in database before starting tests
+    for (const collection of collections) {
+      await collection.deleteMany({});
+    }
+
+  } catch (err) {
+    console.error("Error during beforeAll when testing: ", err);
+    throw err;
   }
 });
 
@@ -42,15 +52,7 @@ afterAll(async () => {
 
 authTests(authInfo);
 userTests(authInfo);
-
-
-
-// describe("User tests", () => {});
-
-// describe("Food tests", () => {});
-
-// describe("Exercise tests", () => {});
-
-// describe("Daily log tests", () => {});
-
-// describe("Challenge tests", () => {});
+foodTests();
+exerciseTests();
+challengeTests(authInfo);
+dailyLogTests(authInfo);

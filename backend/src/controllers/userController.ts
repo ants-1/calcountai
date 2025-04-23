@@ -122,8 +122,6 @@ const updateUserGoalInfo = async (
       }
     }
 
-    console.log(user.weightHistory);
-
     // Update goal-related fields
     user.gender = gender ?? user.gender;
     user.goal = goal ?? user.goal;
