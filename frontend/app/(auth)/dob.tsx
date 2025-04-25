@@ -7,36 +7,36 @@ import { isValidDate } from "@/utils/isValidDate";
 
 const DoB: React.FC = () => {
   const router = useRouter();
-  const { submitUpdateUserData } = useUserData();
-  const [dob, setDob] = useState({ day: "", month: "", year: "" });
+  const { userData, submitUpdateUserData } = useUserData();
+  const [dateOfBirth, setDateOfBirth] = useState({ day: "", month: "", year: "" });
+  let formattedDoB: string = "";
 
   // Update the user's goal data on submit
   const handleSubmit = async () => {
-    const { day, month, year } = dob;
+  const { day, month, year } = dateOfBirth;
 
-    // Validate the date
-    if (!isValidDate(day, month, year)) {
-      if (Platform.OS === "web") {
-        alert("Invalid Date\nPlease enter a valid date of birth.");
-      } else {
-        Alert.alert("Invalid Date", "Please enter a valid date of birth.");
-      }
-      return;
+  // Validate the date
+  if (!isValidDate(day, month, year)) {
+    if (Platform.OS === "web") {
+      alert("Invalid Date\nPlease enter a valid date of birth.");
+    } else {
+      Alert.alert("Invalid Date", "Please enter a valid date of birth.");
     }
+    return;
+  }
 
-    const updatedDob = { day, month, year };
-    try {
-      await submitUpdateUserData(updatedDob);
-      router.push("/dashboard");
-    } catch (error) {
-      // console.error("Error updating user data:", error);
-      if (Platform.OS === "web") {
-        alert("Error\nError updating user data.");
-      } else {
-        Alert.alert("Error", "Error updating user data.");
-      }
+  const updatedDob = `${year}-${month}-${day}`;
+  try {
+    await submitUpdateUserData(updatedDob);
+    router.push("/dashboard");
+  } catch (error) {
+    if (Platform.OS === "web") {
+      alert("Error\nError updating user data.");
+    } else {
+      Alert.alert("Error", "Error updating user data.");
     }
-  };
+  }
+};
 
   return (
     <KeyboardAvoidingView
@@ -65,6 +65,7 @@ const DoB: React.FC = () => {
               <View className="rounded-full h-8 w-8 bg-black"></View>
               <View className="rounded-full h-8 w-8 bg-black"></View>
               <View className="rounded-full h-8 w-8 bg-black"></View>
+              <View className="rounded-full h-8 w-8 bg-black"></View>
             </View>
 
             {/* DoB Input Section */}
@@ -77,8 +78,8 @@ const DoB: React.FC = () => {
                   placeholder="DD"
                   keyboardType="numeric"
                   maxLength={2}
-                  value={dob.day}
-                  onChangeText={(text) => setDob({ ...dob, day: text })}
+                  value={dateOfBirth.day}
+                  onChangeText={(text) => setDateOfBirth({ ...dateOfBirth, day: text })}
                 />
               </View>
 
@@ -90,8 +91,8 @@ const DoB: React.FC = () => {
                   placeholder="MM"
                   keyboardType="numeric"
                   maxLength={2}
-                  value={dob.month}
-                  onChangeText={(text) => setDob({ ...dob, month: text })}
+                  value={dateOfBirth.month}
+                  onChangeText={(text) => setDateOfBirth({ ...dateOfBirth, month: text })}
                 />
               </View>
 
@@ -103,8 +104,8 @@ const DoB: React.FC = () => {
                   placeholder="YYYY"
                   keyboardType="numeric"
                   maxLength={4}
-                  value={dob.year}
-                  onChangeText={(text) => setDob({ ...dob, year: text })}
+                  value={dateOfBirth.year}
+                  onChangeText={(text) => setDateOfBirth({ ...dateOfBirth, year: text })}
                 />
               </View>
             </View>
@@ -113,8 +114,8 @@ const DoB: React.FC = () => {
           {/* Submit Button */}
           <View>
             <TouchableOpacity
-              className={`p-4 rounded-full w-[300px] ${dob.day && dob.month && dob.year ? "bg-blue-500" : "bg-gray-300"}`}
-              disabled={!dob.day || !dob.month || !dob.year}
+              className={`p-4 rounded-full w-[300px] ${dateOfBirth.day && dateOfBirth.month && dateOfBirth.year ? "bg-blue-500" : "bg-gray-300"}`}
+              disabled={!dateOfBirth.day || !dateOfBirth.month || !dateOfBirth.year}
               onPress={handleSubmit}
             >
               <Text className="text-center text-white font-semibold text-lg">Submit</Text>

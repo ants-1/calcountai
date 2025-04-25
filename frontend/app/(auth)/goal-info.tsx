@@ -47,6 +47,7 @@ const GoalInfo: React.FC = () => {
           <View className='rounded-full h-8 w-8 bg-gray-200'></View>
           <View className='rounded-full h-8 w-8 bg-gray-200'></View>
           <View className='rounded-full h-8 w-8 bg-gray-200'></View>
+          <View className='rounded-full h-8 w-8 bg-gray-200'></View>
         </View>
 
         {/* Goal Options */}

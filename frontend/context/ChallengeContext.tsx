@@ -31,8 +31,18 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
   const fetchChallenges = async () => {
     try {
       const response = await fetch(`${BACKEND_API_URL}/challenges`);
-      if (!response.ok) throw new Error("Unable to fetch challenges");
+
+      if (response.status === 404) {
+        setChallenges([]);
+        return;
+      }
+
+      if (!response.ok) {
+        return;
+      };
+
       const data = await response.json();
+
       setChallenges(data.challenges);
     } catch (error: any) {
       console.error(error.message);
@@ -44,7 +54,6 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
       const response = await fetch(`${BACKEND_API_URL}/users/${userId}/challenges`);
 
       if (response.status === 404) {
-        console.warn("No challenges found for user.");
         setUserChallenges([]);
         return;
       }

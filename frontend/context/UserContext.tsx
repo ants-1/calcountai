@@ -22,6 +22,7 @@ interface UserContextType {
   currentWeight: any;
   targetWeight: any;
   weightHistory: any;
+  calories: any
 }
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -40,6 +41,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [weightHistory, setWeightHistory] = useState<any>(null);
   const [currentWeight, setCurrentWeight] = useState<any>(null);
   const [targetWeight, setTargetWeight] = useState<any>(null);
+  const [calories, setCalories] = useState<any>(null);
   const { user } = useAuth();
   const { challengeCheck } = useChallenge(); 
   const BACKEND_API_URL = Constants.expoConfig?.extra?.BACKEND_API_URL;
@@ -50,10 +52,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   }
 
   // Submit updated user data to the backend
-  const submitUpdateUserData = async (dob: any) => {
-    const updatedUser = { ...userData, dob };
+  const submitUpdateUserData = async (dateOfBirth: any) => {
+    const updatedUser = { ...userData, dateOfBirth };
     
     try {
+      console.log("Pass", updatedUser);
       const response = await fetch(`${BACKEND_API_URL}/users/${user?._id}/goal-info`, {
         method: "PUT",
         headers: {
@@ -101,10 +104,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   }
 
   // Update profile information such as username and email
-  /*
-  BUG: Creates duplicate emails
-       Check if email already exist if so return error
-  */
   const updateProfile = async (updatedUsername: string, updatedEmail: string) => {
     try {
       const API_URL = `${BACKEND_API_URL}/users/${user?._id}`;
@@ -147,6 +146,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       setTargetWeight(data.user.targetWeight);
       setGoal(data.user.goal);
       setWeightHistory(data.user.weightHistory);
+      setCalories(data.user.calories);
     } catch (error) {
       console.error("Error fetching weight goal data");
     }
@@ -190,7 +190,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       userGoalData,
       currentWeight,
       targetWeight,
-      weightHistory
+      weightHistory,
+      calories
     }}>
       {children}
     </UserContext.Provider>

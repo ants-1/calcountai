@@ -37,12 +37,13 @@ const PersonalInfo: React.FC = () => {
 
         {/* Progress Indicator */}
         <View className="flex flex-row justify-center mb-20 gap-5">
-          <View className="rounded-full h-8 w-8 bg-black"></View>
-          <View className="rounded-full h-8 w-8 bg-black"></View>
-          <View className="rounded-full h-8 w-8 bg-gray-200"></View>
-          <View className="rounded-full h-8 w-8 bg-gray-200"></View>
-          <View className="rounded-full h-8 w-8 bg-gray-200"></View>
-          <View className="rounded-full h-8 w-8 bg-gray-200"></View>
+          <View className='rounded-full h-8 w-8 bg-black'></View>
+          <View className='rounded-full h-8 w-8 bg-black'></View>
+          <View className='rounded-full h-8 w-8 bg-gray-200'></View>
+          <View className='rounded-full h-8 w-8 bg-gray-200'></View>
+          <View className='rounded-full h-8 w-8 bg-gray-200'></View>
+          <View className='rounded-full h-8 w-8 bg-gray-200'></View>
+          <View className='rounded-full h-8 w-8 bg-gray-200'></View>
         </View>
 
         {/* Gender Options */}

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import User, { IUser } from "../models/user";
+import { calorieCalculator } from "../utils/calorieCalculator";
 
 // @desc    Retrieve all users from database
 // @route   GET /api/v1/users
@@ -83,14 +84,14 @@ const updateUserGoalInfo = async (
 ): Promise<any> => {
   try {
     const { id } = req.params;
-
     const {
       gender,
       goal,
       currentWeight,
       targetWeight,
       height,
-      dateOfBirth,
+      activityLevel,
+      dateOfBirth, // This should be a string in the format YYYY-MM-DD
     } = req.body;
 
     const user = await User.findById(id);
@@ -116,8 +117,7 @@ const updateUserGoalInfo = async (
         if (currentWeight > currentStartWeight) {
           user.weightHistory.unshift({ weight: currentWeight, date });
         } else {
-
-      user.weightHistory?.push({ weight: currentWeight, date });
+          user.weightHistory.push({ weight: currentWeight, date });
         }
       }
     }
@@ -128,7 +128,16 @@ const updateUserGoalInfo = async (
     user.currentWeight = currentWeight ?? user.currentWeight;
     user.targetWeight = targetWeight ?? user.targetWeight;
     user.height = height ?? user.height;
+    user.activityLevel = activityLevel ?? user.activityLevel;
     user.dateOfBirth = dateOfBirth ?? user.dateOfBirth;
+
+    user.calories = calorieCalculator({
+      weight: currentWeight,
+      height,
+      dateOfBirth,
+      gender: gender.toLowerCase(),
+      activityLevel,
+    });
 
     await user.save();
 
@@ -137,6 +146,7 @@ const updateUserGoalInfo = async (
     return next(err);
   }
 };
+
 
 export default {
   getAllUsers,

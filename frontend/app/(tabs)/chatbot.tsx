@@ -53,7 +53,7 @@ const Chatbot: React.FC = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white px-4 pt-6">
+    <SafeAreaView className="flex-1 bg-white">
       <Text className="text-3xl font-bold text-center mt-6">AI Assistant</Text>
 
       <ScrollView className='px-4 mt-6'>

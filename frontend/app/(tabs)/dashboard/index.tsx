@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import useAuth from "@/hooks/useAuth";
 import { useFocusEffect } from "expo-router";
 import Header from "@/components/Header";
-import { motivationalQuotes } from "@/utils/motivationalQuotes";
 import { useUserData } from "@/hooks/useUser";
 import useLog from "@/hooks/useLog";
 import { FoodType } from "@/types/FoodType";
 import { ActivityType } from "@/types/ActivityType";
 import useChallenge from "@/hooks/useChallenge";
+import { getQuoteOfTheDay } from "@/utils/motivationalQuotes";
+import CalorieProgressCard from "@/components/CalorieProgressCard";
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
@@ -20,17 +21,15 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
 
-  const { weightHistory, streak, currentWeight, targetWeight, goal, fetchWeightGoalData, fetchStreak } = useUserData();
-  const { currentLog, fetchDailyLogs, createNewDailyLog } = useLog();
+  const { weightHistory, calories, streak, currentWeight, targetWeight, goal, fetchWeightGoalData, fetchStreak, userData } = useUserData();
+  const { currentLog, fetchDailyLogs } = useLog();
   const { fetchChallenges, fetchUserChallenges, userChallenges } = useChallenge();
 
-  const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
-  const dailyGoal = 2000;
+  const dailyGoal = calories || 2000;
   const caloriesConsumed = currentLog?.foods?.reduce((sum: number, food: FoodType) => sum + food.calories, 0) || 0;
   const caloriesBurned = currentLog?.exercises?.reduce((sum: number, exercise: ActivityType) => sum + exercise.caloriesBurned, 0) || 0;
   const remainingCalories = dailyGoal - caloriesConsumed + caloriesBurned;
 
-  // new weight progress function - maybe it should have it's own file
   useEffect(() => {
     if (currentWeight && targetWeight && weightHistory?.[0]?.weight) {
       const startWeight = weightHistory[0].weight;
@@ -71,34 +70,17 @@ const Dashboard: React.FC = () => {
     <SafeAreaView className="flex-1 bg-white px-4 pt-6">
       <Header title="Dashboard" icon="user-circle" iconSize={30} titleSize="text-3xl" link="/dashboard/profile" />
 
-      <ScrollView>
+      <ScrollView className={`w-full ${Platform.OS == "web" ? 'pb-10 px-10 md:px-20' : ''}`}>
         {/* Motivational Support Section */}
         {goal?.includes("Reduce Stress") && (
-          <View className="mt-6 bg-blue-100 p-4 rounded-xl">
+          <View className={`mt-6 bg-blue-100 p-4 rounded-xl`}>
             <Text className="text-lg font-semibold text-blue-700">Motivation for You</Text>
-            <Text className="text-base text-gray-600 mt-2">{randomQuote}</Text>
+            <Text className="text-base text-gray-600 mt-2">{getQuoteOfTheDay()}</Text>
           </View>
         )}
 
         {/* Calorie Progress Section */}
-        <View className="mt-6 bg-gray-100 p-4 rounded-xl">
-          <Text className="text-lg font-semibold text-gray-700">Calories Progress</Text>
-          <View className="flex-row justify-between items-center mt-2">
-            <Text className="text-sm text-gray-500">Goal: {dailyGoal} kcal</Text>
-            <Text className="text-sm text-gray-500">{caloriesConsumed} kcal consumed</Text>
-          </View>
-          <View className="w-full bg-gray-300 h-2 mt-2 rounded-xl">
-            <View
-              className="bg-green-500 h-2 rounded-xl"
-              style={{ width: `${(caloriesConsumed / dailyGoal) * 100}%` }}
-            />
-          </View>
-          <Text className="mt-2 text-sm text-gray-500">
-            {remainingCalories > 0
-              ? `You can consume ${remainingCalories} more calories today`
-              : 'You have exceeded your daily calorie goal!'}
-          </Text>
-        </View>
+        <CalorieProgressCard />
 
         {/* Streak Section */}
         {goal?.includes("Get Healthier") && (
@@ -128,7 +110,7 @@ const Dashboard: React.FC = () => {
                   />
                 </View>
 
-                {progress >= 99.5 && (
+                {progress >= 100 && (
                   <Text className="text-center text-yellow-500 mt-2 font-semibold">
                     Well done for completing your goal!
                   </Text>
@@ -139,7 +121,7 @@ const Dashboard: React.FC = () => {
                   className="mt-4 bg-yellow-500 py-2 px-4 rounded-full"
                   onPress={() => router.push("/(tabs)/dashboard/weight-history")}
                 >
-                  <Text className="text-center text-white font-semibold text-lg">View Activities</Text>
+                  <Text className="text-center text-white font-semibold text-lg">View History</Text>
                 </TouchableOpacity>
               </>
             ) : (

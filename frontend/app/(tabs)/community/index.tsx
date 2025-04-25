@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useFocusEffect } from '@react-navigation/native';
@@ -15,7 +15,7 @@ const Community: React.FC = () => {
   const [sortOption, setSortOption] = useState<SortOption>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [showSortDropdown, setShowSortDropdown] = useState<boolean>(false);
-  const { communities, fetchCommunities} = useCommunity();
+  const { communities, fetchCommunities } = useCommunity();
 
   // Re-fetch communities every time the screen is focused
   useFocusEffect(
@@ -52,77 +52,81 @@ const Community: React.FC = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white px-4 pt-6">
-      <Text className="text-3xl font-bold text-center">Communities</Text>
+      <Text className={`text-3xl font-bold text-center ${Platform.OS === "web" ? "mt-6" : ""}`}>Communities</Text>
+      <View className={`${Platform.OS === "web" ? "p-10 h-full" : ""}`}>
+        {/* Search and Create Community Button */}
+        <View className="flex-row items-center mt-4">
+          <TextInput
+            className="flex-1 p-3 bg-gray-100 rounded-full text-sm mr-2"
+            placeholder="Search for a community..."
+            placeholderTextColor="#888"
+            value={searchText}
+            onChangeText={setSearchText}
+          />
 
-      {/* Search and Create Community Button */}
-      <View className="flex-row items-center mt-4">
-        <TextInput
-          className="flex-1 p-3 bg-gray-100 rounded-full text-sm mr-2"
-          placeholder="Search for a community..."
-          placeholderTextColor="#888"
-          value={searchText}
-          onChangeText={setSearchText}
-        />
+          <TouchableOpacity
+            className="bg-black p-3 rounded-full"
+            onPress={() => setShowSortDropdown((prev) => !prev)}
+          >
+            <Text className="text-sm font-semibold text-white">
+              Sort: {`${sortOption === 'name' ? 'Name' : 'Members'} ${sortOrder === 'asc' ? 'Ascending' : 'Descending'}`}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity
-          className="bg-black p-3 rounded-full"
-          onPress={() => setShowSortDropdown((prev) => !prev)}
-        >
-          <Text className="text-sm font-semibold text-white">
-            Sort: {`${sortOption === 'name' ? 'Name' : 'Members'} ${sortOrder === 'asc' ? 'Ascending' : 'Descending'}`}
-          </Text>
-        </TouchableOpacity>
-      </View>
+        <View className="relative mt-4">
+          <TouchableOpacity
+            className="bg-blue-500 p-3 rounded-full"
+            onPress={() => router.push('/community/create-community')}
+          >
+            <Text className="text-white font-semibold">+ Create</Text>
+          </TouchableOpacity>
 
-      <View className="relative mt-4">
-        <TouchableOpacity
-          className="bg-blue-500 p-3 rounded-full"
-          onPress={() => router.push('/community/create-community')}
-        >
-          <Text className="text-white font-semibold">+ Create</Text>
-        </TouchableOpacity>
+          {/* Sort Dropdown */}
+          {showSortDropdown && (
+            <View
+              className="absolute bg-white border border-gray-300 rounded-lg mt-2 w-full"
+            >
+              {sortOptions.map((option) => (
+                <TouchableOpacity
+                  key={option.label}
+                  className="p-2"
+                  onPress={() => {
+                    setSortOption(option.option as SortOption);
+                    setSortOrder(option.order as SortOrder);
+                    setShowSortDropdown(false);
+                  }}
+                >
+                  <Text className="text-sm text-gray-700">{option.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
 
-        {/* Sort Dropdown */}
-        {showSortDropdown && (
-          <View className="absolute bg-white border border-gray-300 rounded-lg mt-2 z-10 w-full">
-            {sortOptions.map((option) => (
+        </View>
+
+        {loading ? (
+          <ActivityIndicator size="large" color="#3B82F6" className="mt-6 z-0" />
+        ) : communities.length === 0 ? (
+          <Text className="text-center text-gray-500 mt-5 z-0">No communities found.</Text>
+        ) : (
+          <FlatList
+            className={`mt-4 z-0 ${Platform.OS === "web" ? "pb-6" : ""}`}
+            data={sortedCommunities}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
               <TouchableOpacity
-                key={option.label}
-                className="p-2"
-                onPress={() => {
-                  setSortOption(option.option as SortOption);
-                  setSortOrder(option.order as SortOrder);
-                  setShowSortDropdown(false);
-                }}
+                className="bg-gray-100 p-4 mb-3 rounded-lg"
+                onPress={() => router.push(`/community/${item._id}`)}
               >
-                <Text className="text-sm text-gray-700">{option.label}</Text>
+                <Text className="text-lg font-semibold text-gray-700">{item.name}</Text>
+                <Text className="text-sm text-gray-500">{item.members.length || 0} members</Text>
+                <Text className="text-sm text-gray-600 mt-2">{item.description}</Text>
               </TouchableOpacity>
-            ))}
-          </View>
+            )}
+          />
         )}
       </View>
-
-      {loading ? (
-        <ActivityIndicator size="large" color="#3B82F6" className="mt-6" />
-      ) : communities.length === 0 ? (
-        <Text className="text-center text-gray-500 mt-5">No communities found.</Text>
-      ) : (
-        <FlatList
-          className="mt-4"
-          data={sortedCommunities}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              className="bg-gray-100 p-4 mb-3 rounded-lg"
-              onPress={() => router.push(`/community/${item._id}`)}
-            >
-              <Text className="text-lg font-semibold text-gray-700">{item.name}</Text>
-              <Text className="text-sm text-gray-500">{item.members.length || 0} members</Text>
-              <Text className="text-sm text-gray-600 mt-2">{item.description}</Text>
-            </TouchableOpacity>
-          )}
-        />
-      )}
     </SafeAreaView>
   );
 };

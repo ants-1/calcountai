@@ -52,14 +52,15 @@ const TargetWeight: React.FC = () => {
             </View>
 
             {/* Progress Indicator */}
-            <View className="flex flex-row justify-center mb-20 gap-5">
-              {[...Array(3)].map((_, i) => (
-                <View key={i} className="rounded-full h-8 w-8 bg-black"></View>
-              ))}
-              {[...Array(3)].map((_, i) => (
-                <View key={i + 3} className="rounded-full h-8 w-8 bg-gray-200"></View>
-              ))}
-            </View>
+        <View className="flex flex-row justify-center mb-20 gap-5">
+          <View className='rounded-full h-8 w-8 bg-black'></View>
+          <View className='rounded-full h-8 w-8 bg-black'></View>
+          <View className='rounded-full h-8 w-8 bg-black'></View>
+          <View className='rounded-full h-8 w-8 bg-black'></View>
+          <View className='rounded-full h-8 w-8 bg-gray-200'></View>
+          <View className='rounded-full h-8 w-8 bg-gray-200'></View>
+          <View className='rounded-full h-8 w-8 bg-gray-200'></View>
+        </View>
 
             {/* Weight Input */}
             <View className="flex flex-row justify-center gap-3">

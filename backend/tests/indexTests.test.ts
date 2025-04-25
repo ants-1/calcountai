@@ -14,9 +14,9 @@ let authInfo = {
 
 beforeAll(async () => {
   try {
+    await mongoose.connection.close();
     if (mongoose.connection.readyState === 0) {
       const testDBUrl = process.env.DB_TEST_URL;
-      console.log('db url:', testDBUrl);
       await mongoose.connect(testDBUrl || "");
     }
     const collections = await mongoose.connection.db?.collections();
@@ -29,7 +29,6 @@ beforeAll(async () => {
     for (const collection of collections) {
       await collection.deleteMany({});
     }
-
   } catch (err) {
     console.error("Error during beforeAll when testing: ", err);
     throw err;

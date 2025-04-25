@@ -11,6 +11,7 @@ export interface IUser {
   targetWeight?: Number;
   activityLevel?: string;
   weightHistory?: { weight: number; date: Date }[];
+  calories?: Number;
   height?: string;
   dateOfBirth?: string;
   streak?: Number;
@@ -35,6 +36,7 @@ const UserSchema = new Schema<IUser, UserModel>({
       date: { type: Date, default: Date.now },
     },
   ],
+  calories: { type: Number},
   height: { type: String },
   dateOfBirth: { type: String },
   streak: { type: Number },

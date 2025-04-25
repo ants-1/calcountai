@@ -51,12 +51,12 @@ const SignIn: React.FC = () => {
       <View className="absolute bottom-[-100px] right-[-100px] w-[250px] h-[250px] bg-blue-500 rounded-full opacity-80" />
 
       <View className="w-full justify-evenly min-h-[83vh] px-4 my-10">
-        <View className="mb-48">
+        <View className="mb-48 w-full items-center">
           <Text className="text-5xl font-bold text-center mb-20">Login</Text>
 
           {/* Email Input */}
           <TextInput
-            className="w-full bg-gray-100 rounded-full p-5 mb-6"
+            className="w-full md:max-w-[600px] bg-gray-100 rounded-full p-5 mb-6"
             placeholder="Email Address"
             placeholderTextColor="#888"
             value={form.email}
@@ -66,7 +66,7 @@ const SignIn: React.FC = () => {
 
           {/* Password Input */}
           <TextInput
-            className="w-full bg-gray-100 rounded-full p-5 mb-6"
+            className="w-full md:max-w-[600px] bg-gray-100 rounded-full p-5 mb-6"
             placeholder="Password"
             placeholderTextColor="#888"
             value={form.password}

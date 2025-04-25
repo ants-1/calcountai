@@ -31,6 +31,12 @@ const AuthLayout = () => {
           }}
         />
         <Stack.Screen
+          name="activity-level"
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
           name="current-weight"
           options={{
             headerShown: false

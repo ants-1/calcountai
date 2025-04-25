@@ -3,16 +3,11 @@ import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
 import useAuth from '@/hooks/useAuth';
-
-interface FormState {
-  username: string;
-  email: string;
-  password: string;
-}
+import FormStateType from '@/types/FormStateType';
 
 const SignUp: React.FC = () => {
   const { signUp } = useAuth();
-  const [form, setForm] = useState<FormState>({
+  const [form, setForm] = useState<FormStateType>({
     username: '',
     email: '',
     password: '',
@@ -62,7 +57,7 @@ const SignUp: React.FC = () => {
     }
 
     // Check for at least one uppercase letter and one symbol
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+    const passwordRegex = /^(?=(.*[A-Z]))(?=(.*[!@#$%^&*(),.?":{}|<>]))[A-Za-z\d!@#$%^&*(),.?":{}|<>]*$/;
 
     if (!passwordRegex.test(form.password)) {
       if (Platform.OS === "web") {
@@ -100,14 +95,14 @@ const SignUp: React.FC = () => {
       <View className="absolute top-[-100px] left-[-100px] w-[250px] h-[250px] bg-blue-500 rounded-full opacity-80" />
       <View className="absolute bottom-[-100px] right-[-100px] w-[250px] h-[250px] bg-blue-500 rounded-full opacity-80" />
 
-      <View className="w-full justify-evenly min-h-[83vh] px-4 my-10">
-        <View className="mb-20">
+      <View className="w-full justify-evenly items-center min-h-[83vh] px-4 my-10">
+        <View className="mb-20 w-full items-center">
           {/* Header */}
           <Text className="text-5xl font-bold text-center mb-20">Sign Up</Text>
 
           {/* Input Fields */}
           <TextInput
-            className="w-full bg-gray-100 rounded-full p-5 mb-6"
+            className="w-full md:max-w-[600px] bg-gray-100 rounded-full p-5 mb-6"
             placeholder="Username"
             placeholderTextColor={'#888'}
             value={form.username}
@@ -116,7 +111,7 @@ const SignUp: React.FC = () => {
           />
 
           <TextInput
-            className="w-full bg-gray-100 rounded-full p-5 mb-6"
+            className="w-full md:max-w-[600px] bg-gray-100 rounded-full p-5 mb-6"
             placeholder="Email Address"
             placeholderTextColor={'#888'}
             value={form.email}
@@ -125,7 +120,7 @@ const SignUp: React.FC = () => {
           />
 
           <TextInput
-            className="w-full bg-gray-100 rounded-full p-5 mb-6"
+            className="w-full md:max-w-[600px] bg-gray-100 rounded-full p-5 mb-6"
             placeholder="Password"
             placeholderTextColor={'#888'}
             value={form.password}

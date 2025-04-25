@@ -4,12 +4,12 @@ import { useRouter } from "expo-router";
 import { useUserData } from "@/hooks/useUser";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { convertKgToStone, convertStoneToKg } from "@/utils/weightFormatter";
-import { isValidWeight } from "@/utils/isValidWeight"; 
+import { isValidWeight } from "@/utils/isValidWeight";
 
 const CurrentWeight: React.FC = () => {
   const router = useRouter();
   const { userData, updateUserGoalData } = useUserData();
-  const [weight, setWeight] = useState("");
+  const [weight, setWeight] = useState(userData.currentWeight || "");
   const [unit, setUnit] = useState<"st" | "kg">("st");
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const CurrentWeight: React.FC = () => {
 
     if (unit === "st") {
       finalWeight = convertStoneToKg(parseFloat(weight))
-    } 
+    }
 
     updateUserGoalData({ ...userData, currentWeight: finalWeight });
     console.log(userData);
@@ -54,12 +54,13 @@ const CurrentWeight: React.FC = () => {
 
             {/* Progress Indicator */}
             <View className="flex flex-row justify-center mb-20 gap-5">
-              {[...Array(3)].map((_, i) => (
-                <View key={i} className="rounded-full h-8 w-8 bg-black"></View>
-              ))}
-              {[...Array(3)].map((_, i) => (
-                <View key={i + 3} className="rounded-full h-8 w-8 bg-gray-200"></View>
-              ))}
+              <View className='rounded-full h-8 w-8 bg-black'></View>
+              <View className='rounded-full h-8 w-8 bg-black'></View>
+              <View className='rounded-full h-8 w-8 bg-black'></View>
+              <View className='rounded-full h-8 w-8 bg-gray-200'></View>
+              <View className='rounded-full h-8 w-8 bg-gray-200'></View>
+              <View className='rounded-full h-8 w-8 bg-gray-200'></View>
+              <View className='rounded-full h-8 w-8 bg-gray-200'></View>
             </View>
 
             {/* Weight Input */}

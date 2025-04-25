@@ -1,4 +1,4 @@
-import { View, Image, ImageSourcePropType, Text } from 'react-native'
+import { View, Image, ImageSourcePropType, Text, Platform } from 'react-native'
 import { Tabs } from "expo-router";
 import React from 'react';
 
@@ -18,7 +18,8 @@ const icons = {
 
 const TabIcon: React.FC<TabIconProps> = ({ icon, color, name, focused }) => {
   return (
-    <View className="flex items-center justify-center gap-2 w-20 mt-6">
+    <View
+      className={`flex items-center justify-center gap-2 w-20 ${Platform.OS === "web" ? "": "mt-6"}`}>
       <Image
         source={icon}
         resizeMode="contain"
