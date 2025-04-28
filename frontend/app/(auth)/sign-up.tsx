@@ -38,7 +38,7 @@ const SignUp: React.FC = () => {
     // Check email is a valid email address
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!form.email || !emailRegex.test(form.email)) {
-      if (Platform.OS = "web") {
+      if (Platform.OS === "web") {
         alert("Validation Error: \nPlease enter a valid email address.");
       } else {
         Alert.alert("Validation Error", "Please enter a valid email address.");

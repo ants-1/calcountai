@@ -16,7 +16,7 @@ const AddMealManual = () => {
   const [meal, setMeal] = useState<MealForm>({
     name: selectedMeal?.name || "",
     calories: selectedMeal?.calories || "",
-    numberOfServings: selectedMeal?.numberOfServings || "1", 
+    numberOfServings: selectedMeal?.numberOfServings || "1",
     servingSize: selectedMeal?.servingSize || "",
     mealType: selectedMeal?.mealType || "",
     protein: selectedMeal?.protein || "",
@@ -24,7 +24,7 @@ const AddMealManual = () => {
     carbohydrates: selectedMeal?.carbohydrates || "",
   });
 
-  const [originalMeal, setOriginalMeal] = useState<MealForm>(meal); 
+  const [originalMeal, setOriginalMeal] = useState<MealForm>(meal);
   const [log, setLog] = useState<LogForm | null>(null);
   const [showLogDropdown, setShowLogDropdown] = useState<boolean>(false);
   const [showMealTypeDropdown, setShowMealTypeDropdown] = useState<boolean>(false);
@@ -49,7 +49,7 @@ const AddMealManual = () => {
         carbohydrates: selectedMeal?.carbohydrates || "",
       };
       setMeal(initialMeal);
-      setOriginalMeal(initialMeal); 
+      setOriginalMeal(initialMeal);
     }
   }, [selectedMeal]);
 
@@ -113,7 +113,7 @@ const AddMealManual = () => {
     <SafeAreaView className="flex-1 bg-white pt-6">
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
         <Header title="Add Meal" icon="chevron-left" iconSize={25} titleSize="text-3xl" />
-        
+
         <ScrollView showsVerticalScrollIndicator={false} className="px-6">
           {/* Name */}
           <Text className="text-lg font-semibold mb-2 mt-10">Meal Name</Text>
@@ -150,25 +150,27 @@ const AddMealManual = () => {
             </TouchableOpacity>
 
             {showServingsDropdown && (
-              <View className="absolute left-0 bg-white border border-gray-200 rounded-lg mt-12 w-full z-10 shadow-lg">
-                {servingSizes.map((size) => (
-                  <TouchableOpacity
-                    key={size}
-                    className="p-2"
-                    onPress={() => {
-                      handleNumberOfServingsChange(size);
-                      setShowServingsDropdown(false);
-                    }}
-                  >
-                    <Text className="text-gray-700">{`${size} Servings`}</Text>
-                  </TouchableOpacity>
-                ))}
+              <View className="absolute left-0 bg-white border border-gray-200 rounded-lg mt-12 w-full z-10 shadow-lg max-h-20" style={{ zIndex: 999 }}>
+                <ScrollView>
+                  {servingSizes.map((size) => (
+                    <TouchableOpacity
+                      key={size}
+                      className="p-2"
+                      onPress={() => {
+                        handleNumberOfServingsChange(size);
+                        setShowServingsDropdown(false);
+                      }}
+                    >
+                      <Text className="text-gray-700">{`${size} Servings`}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
               </View>
             )}
           </View>
 
           {/* Serving Size Input */}
-          <Text className="text-lg font-semibold mb-2 mt-4">Serving Size</Text>
+          <Text className="text-lg font-semibold mb-2 mt-4" style={{ zIndex: -99 }}>Serving Size</Text>
           <TextInput
             className="w-full p-4 pt-2 bg-gray-200 rounded-full mb-4 text-lg"
             placeholder="Enter serving size"
@@ -180,7 +182,7 @@ const AddMealManual = () => {
           />
 
           {/* Meal Type Input */}
-          <Text className="text-lg font-semibold mb-2">Meal Type</Text>
+          <Text className="text-lg font-semibold mb-2" style={{ zIndex: -99 }}>Meal Type</Text>
           <View className="flex-row justify-start relative">
             <TouchableOpacity
               className="bg-gray-200 px-3 py-6 rounded-full w-full"
@@ -192,25 +194,27 @@ const AddMealManual = () => {
             </TouchableOpacity>
 
             {showMealTypeDropdown && (
-              <View className="absolute left-0 bg-white border border-gray-200 rounded-lg mt-12 w-full z-10 shadow-lg">
-                {mealTypes.map((mealType) => (
-                  <TouchableOpacity
-                    key={mealType}
-                    className="p-2"
-                    onPress={() => {
-                      setMeal({ ...meal, mealType });
-                      setShowMealTypeDropdown(false);
-                    }}
-                  >
-                    <Text className="text-gray-700">{mealType}</Text>
-                  </TouchableOpacity>
-                ))}
+              <View className="absolute left-0 bg-white border border-gray-200 rounded-lg mt-12 w-full z-10 shadow-lg max-h-20" style={{ zIndex: 999 }}>
+                <ScrollView>
+                  {mealTypes.map((mealType) => (
+                    <TouchableOpacity
+                      key={mealType}
+                      className="p-2"
+                      onPress={() => {
+                        setMeal({ ...meal, mealType });
+                        setShowMealTypeDropdown(false);
+                      }}
+                    >
+                      <Text className="text-gray-700">{mealType}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
               </View>
             )}
           </View>
 
           {/* Protein Input */}
-          <Text className="text-lg font-semibold mb-2 mt-4">Protein (grams)</Text>
+          <Text className="text-lg font-semibold mb-2 mt-4" style={{ zIndex: -99 }}>Protein (grams)</Text>
           <TextInput
             className="w-full p-4 pt-2 bg-gray-200 rounded-full mb-4 text-lg"
             placeholder="Enter protein amount"
@@ -258,7 +262,7 @@ const AddMealManual = () => {
             </TouchableOpacity>
 
             {showLogDropdown && (
-              <ScrollView className="absolute left-0 bg-white border border-gray-200 rounded-lg mt-12 w-full z-10 shadow-lg">
+              <ScrollView className="absolute left-0 bg-white border border-gray-200 rounded-lg mt-12 w-full z-10 shadow-lg max-h-20" style={{ zIndex: 999 }}>
                 {dailyLogs.map((logItem) => (
                   <TouchableOpacity
                     key={logItem._id}
@@ -276,7 +280,7 @@ const AddMealManual = () => {
           </View>
 
           {/* Add Meal to Log Button */}
-          <View className="flex items-center justify-center mt-10">
+          <View className="flex items-center justify-center mt-10" style={{ zIndex: -99 }}>
             <TouchableOpacity
               className={`p-4 rounded-full w-[300px] ${meal.name && meal.calories && meal.numberOfServings && meal.servingSize && meal.mealType && log
                 ? "bg-blue-500"

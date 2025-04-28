@@ -112,7 +112,7 @@ const Meals: React.FC = () => {
 
       {/* Sort + Scan */}
       <View className="flex-row justify-between relative mt-4 px-6">
-      <TouchableOpacity
+        <TouchableOpacity
           className="bg-black px-4 py-3 rounded-full"
           onPress={() => router.push("/(tabs)/logs/add-meal-manual")}
         >
@@ -156,8 +156,10 @@ const Meals: React.FC = () => {
         renderScene={renderScene}
         onIndexChange={setIndex}
         initialLayout={{ width: Dimensions.get("window").width }}
+        style={{ zIndex: -99 }}
         renderTabBar={(props) => (
-          <TabBar {...props} indicatorStyle={{ backgroundColor: "#3B82F6" }} style={{ backgroundColor: "white" }} activeColor="#3B82F6" inactiveColor="gray" />
+          <TabBar {...props} indicatorStyle={{ backgroundColor: "#3B82F6" }}
+            style={{ backgroundColor: "white", zIndex: -99 }} activeColor="#3B82F6" inactiveColor="gray" />
         )}
       />
     </SafeAreaView>

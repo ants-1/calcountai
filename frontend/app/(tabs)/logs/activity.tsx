@@ -61,7 +61,7 @@ const ActivityTrackerScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <View className="flex-row justify-start relative mt-4 px-6">
+      <View className="flex-row justify-end relative mt-4 px-6">
         <TouchableOpacity
           className="bg-black p-3 rounded-full"
           onPress={() => setShowSortDropdown((prev) => !prev)}
@@ -72,7 +72,7 @@ const ActivityTrackerScreen: React.FC = () => {
         </TouchableOpacity>
 
         {showSortDropdown && (
-          <View className="absolute left-0 bg-white border border-gray-200 rounded-lg mt-12 w-48 z-10 shadow-lg">
+          <View className="absolute right-5 bg-white border border-gray-200 rounded-lg mt-12 w-48 z-10 shadow-lg">
             {[
               { label: "Name Ascending", option: "name", order: "asc" },
               { label: "Name Descending", option: "name", order: "desc" },
@@ -95,7 +95,7 @@ const ActivityTrackerScreen: React.FC = () => {
         )}
       </View>
 
-      <View className="flex-row justify-around mt-6 border-b border-gray-300 pb-2 mx-6">
+      <View style={{ zIndex: -99 }} className="flex-row justify-around mt-6 border-b border-gray-300 pb-2 mx-6">
         <Text className="font-semibold px-6">History</Text>
       </View>
 

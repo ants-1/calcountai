@@ -85,7 +85,7 @@ const Community: React.FC = () => {
           {/* Sort Dropdown */}
           {showSortDropdown && (
             <View
-              className="absolute bg-white border border-gray-300 rounded-lg mt-2 w-full"
+              className="absolute right-0 bg-white border border-gray-200 rounded-lg  w-48 shadow-lg -mt-2" style={{ zIndex: 999 }}
             >
               {sortOptions.map((option) => (
                 <TouchableOpacity
@@ -113,6 +113,7 @@ const Community: React.FC = () => {
           <FlatList
             className={`mt-4 z-0 ${Platform.OS === "web" ? "pb-6" : ""}`}
             data={sortedCommunities}
+            style={{ zIndex: -99 }}
             keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
               <TouchableOpacity

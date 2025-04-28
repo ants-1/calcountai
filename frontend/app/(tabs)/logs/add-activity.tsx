@@ -101,24 +101,26 @@ const AddActivity = () => {
           </TouchableOpacity>
 
           {showLogDropdown && (
-            <View className="absolute left-0 bg-white border border-gray-200 rounded-lg mt-12 w-full z-10 shadow-lg">
-              {dailyLogs.map((logItem) => (
-                <TouchableOpacity
-                  key={logItem._id}
-                  className="p-2"
-                  onPress={() => {
-                    setLog(logItem);
-                    setShowLogDropdown(false);
-                  }}
-                >
-                  <Text className=" text-gray-700">{`Log Date: ${formatDate(logItem.date)}`}</Text>
-                </TouchableOpacity>
-              ))}
+            <View style={{ zIndex: 999}} className="absolute left-0 bg-white border border-gray-200 rounded-lg mt-12 w-full z-10 shadow-lg max-h-20" >
+              <ScrollView>
+                {dailyLogs.map((logItem) => (
+                  <TouchableOpacity
+                    key={logItem._id}
+                    className="p-2"
+                    onPress={() => {
+                      setLog(logItem);
+                      setShowLogDropdown(false);
+                    }}
+                  >
+                    <Text className=" text-gray-700">{`Log Date: ${formatDate(logItem.date)}`}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             </View>
           )}
         </View>
 
-        <View className="flex items-center justify-center mt-10">
+        <View className="flex items-center justify-center mt-10" style={{ zIndex: -99}}>
           <TouchableOpacity
             className={`p-4 rounded-full w-[300px] ${activity.name && activity.duration && activity.caloriesBurned && log
               ? "bg-blue-500"

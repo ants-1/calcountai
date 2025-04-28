@@ -11,7 +11,7 @@ const ActivityCard = ({ item }: { item: ActivityType }) => {
     <View className="flex-row justify-between items-center bg-gray-100 p-3 mt-2 rounded-lg">
       <Text className="text-lg">{item.name}</Text>
       <View className="flex flex-row items-center gap-4">
-        <Text className="text-gray-600">{item.caloriesBurned} cal</Text>
+        <Text className="text-gray-600 mr-2">{item.caloriesBurned} cal</Text>
         <TouchableOpacity onPress={() => addExerciseToLog(item._id)}>
           <Icon name="plus" size={20} color="#4B5563" />
         </TouchableOpacity>

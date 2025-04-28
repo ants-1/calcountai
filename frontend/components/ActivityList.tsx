@@ -10,6 +10,7 @@ const ActivityList: React.FC<ActivityListProps> = ({ activities }) => {
   return (
     <FlatList
       className="mt-4 px-6"
+      style={{ zIndex: -99 }} 
       data={activities}
       keyExtractor={(item) => item._id}
       renderItem={({ item }) => (
