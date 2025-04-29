@@ -12,6 +12,7 @@ dotenv.config();
 
 const app = express();
 const PORT = Number(process.env.PORT) || 4000;
+let server: any;
 // const allowedOrigins = [
 //   String(PORT),
 //   "http://localhost:4000",
@@ -19,7 +20,9 @@ const PORT = Number(process.env.PORT) || 4000;
 //   String(process.env.FRONTEND_PRO_URL),
 // ];
 
-connectToDatabase();
+if (process.env.NODE_ENV !== "test") {
+  connectToDatabase();
+}
 initialisePassport();
 
 app.use(bodyParser.json());
@@ -46,8 +49,10 @@ app.use(passport.session());
 // Routes
 app.use("/", routes);
 
-const server = app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== "test") {
+  server = app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 export { app, server };

@@ -20,7 +20,7 @@ export default function RootLayout() {
     if (!user) {
       router.replace("/");
     }
-  }, [user, router]);
+  }, [user]);
 
   return (
     <AuthContextProvider>

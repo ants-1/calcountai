@@ -19,7 +19,7 @@ const Meals: React.FC = () => {
 
   const [index, setIndex] = useState(0);
   const routes = [
-    { key: "myfoods", title: "My Foods" },
+    { key: "myfoods", title: "Food Database" },
     { key: "search", title: "Search" },
   ];
 

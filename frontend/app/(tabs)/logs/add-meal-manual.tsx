@@ -7,6 +7,7 @@ import useLog from "@/hooks/useLog";
 import { MealForm } from "@/types/MealForm";
 import { LogForm } from "@/types/LogForm";
 import useMeal from "@/hooks/useMeal";
+import { formatDate } from "@/utils/dateFormatter";
 
 const AddMealManual = () => {
   const { user } = useAuth();
@@ -56,28 +57,29 @@ const AddMealManual = () => {
   const mealTypes = ["Breakfast", "Lunch", "Dinner", "Snacks"];
   const servingSizes = ["0.25", "0.50", "0.75", "1", "2", "3", "4", "5"];
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-  };
-
   const handleChange = (key: keyof MealForm, value: string) => {
-    if (value === "") {
-      setMeal({ ...meal, [key]: value });
+    if (key === "name" || key === "mealType" || key === "servingSize") {
+      setMeal((prevMeal) => ({ ...prevMeal, [key]: value }));
       return;
     }
-
+  
+    if (value === "") {
+      setMeal((prevMeal) => ({ ...prevMeal, [key]: value }));
+      return;
+    }
+  
     const numericValue = parseFloat(value);
     if (isNaN(numericValue) || numericValue <= 0) {
       return;
     }
-
+  
     if (["calories", "protein", "fat", "carbohydrates"].includes(key)) {
       value = numericValue.toFixed(2);
     }
-
+  
     setMeal((prevMeal) => ({ ...prevMeal, [key]: value }));
   };
+  
 
   const getNumericValue = (value: string | undefined): number => {
     return value ? parseFloat(value) : 0;
@@ -87,11 +89,10 @@ const AddMealManual = () => {
   const handleNumberOfServingsChange = (newServings: string) => {
     const servings = parseFloat(newServings);
     if (servings > 0.1) {
-      // Recalculate only when servings are greater than 0.1
       const updatedMeal = {
         ...meal,
         numberOfServings: newServings,
-        calories: (getNumericValue(originalMeal.calories) * servings).toFixed(2), // Use original meal values for consistency
+        calories: (getNumericValue(originalMeal.calories) * servings).toFixed(2), 
         protein: (getNumericValue(originalMeal.protein) * servings).toFixed(2),
         fat: (getNumericValue(originalMeal.fat) * servings).toFixed(2),
         carbohydrates: (getNumericValue(originalMeal.carbohydrates) * servings).toFixed(2),
@@ -280,7 +281,7 @@ const AddMealManual = () => {
           </View>
 
           {/* Add Meal to Log Button */}
-          <View className="flex items-center justify-center mt-10" style={{ zIndex: -99 }}>
+          <View className={`flex items-center justify-center mt-10 ${Platform.OS === "web" ? "mb-5" : ""}`}style={{ zIndex: -99 }}>
             <TouchableOpacity
               className={`p-4 rounded-full w-[300px] ${meal.name && meal.calories && meal.numberOfServings && meal.servingSize && meal.mealType && log
                 ? "bg-blue-500"

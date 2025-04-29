@@ -76,7 +76,7 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
         body: JSON.stringify(challengeData),
       });
 
-      const rawResponse = await response.text();
+      await response.json();
 
       if (!response.ok) {
         if (Platform.OS === "web") {
@@ -86,14 +86,13 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
         }
         return;
       }
-
-      const data = JSON.parse(rawResponse);
-      console.log(data);
     } catch (error: any) {
       console.error(error.message);
     }
   };
 
+
+  // Fix fetch challenges
   const joinChallenge = async (userId: string | undefined, challengeId: string) => {
     try {
       const response = await fetch(`${BACKEND_API_URL}/users/${userId}/challenges/${challengeId}/join`, {
@@ -104,11 +103,8 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
 
       Alert.alert('Success', 'You have joined the challenge.');
 
-      if (Platform.OS === 'web') {
-        window.location.reload();
-      } else {
-        router.replace("/(tabs)/dashboard/challenges");
-      }
+      router.push("/(tabs)/dashboard");
+      fetchChallenges();
     } catch (error: any) {
       console.error(error.message);
     }
@@ -124,11 +120,8 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
 
       Alert.alert('Success', 'You have left the challenge.');
 
-      if (Platform.OS === 'web') {
-        window.location.reload();
-      } else {
-        router.replace("/(tabs)/dashboard/challenges");
-      }
+      router.push("/(tabs)/dashboard");
+      fetchChallenges();
     } catch (error: any) {
       console.error(error.message);
     }

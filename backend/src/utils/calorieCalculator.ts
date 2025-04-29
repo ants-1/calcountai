@@ -1,5 +1,4 @@
 const getAge = (dateOfBirth: string): number => {
-  console.log(dateOfBirth);
   const birthDate = new Date(dateOfBirth);
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();

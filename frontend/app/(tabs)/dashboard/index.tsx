@@ -190,9 +190,9 @@ const Dashboard: React.FC = () => {
           )}
           <TouchableOpacity
             className="mt-4 bg-blue-500 py-2 px-4 rounded-full"
-            onPress={() => router.push("/logs")}
+            onPress={() => router.push("/logs/meals")}
           >
-            <Text className="text-center text-white font-semibold text-lg">View Logs</Text>
+            <Text className="text-center text-white font-semibold text-lg">View Meals</Text>
           </TouchableOpacity>
         </View>
 
@@ -213,7 +213,7 @@ const Dashboard: React.FC = () => {
           )}
           <TouchableOpacity
             className="mt-4 bg-blue-500 py-2 px-4 rounded-full"
-            onPress={() => router.push("/(tabs)/logs")}
+            onPress={() => router.push("/(tabs)/logs/activity")}
           >
             <Text className="text-center text-white font-semibold text-lg">View Activities</Text>
           </TouchableOpacity>

@@ -25,7 +25,7 @@ const CalorieProgressCard = () => {
     const caloriesConsumed = currentLog?.foods?.reduce((sum: any, food: FoodType) => sum + food.calories, 0) || 0;
     const caloriesBurned = currentLog?.exercises?.reduce((sum: any, exercise: ExerciseType) => sum + exercise.caloriesBurned, 0) || 0;
     const remainingCalories = dailyGoal - caloriesConsumed + caloriesBurned;
-    const progress = (caloriesConsumed / dailyGoal) * 100;
+    const progress = Math.min((caloriesConsumed / dailyGoal) * 100, 100);
 
     return (
         <View className="mt-6 bg-gray-100 p-4 rounded-xl">

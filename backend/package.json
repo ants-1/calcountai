@@ -7,7 +7,7 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "serve": "node dist/index.js",
-    "test": "jest"
+    "test": "NODE_ENV=test jest --forceExit --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
