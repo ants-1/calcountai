@@ -55,7 +55,7 @@ const Community: React.FC = () => {
       <Text className={`text-3xl font-bold text-center ${Platform.OS === "web" ? "mt-6" : ""}`}>Communities</Text>
       <View className={`${Platform.OS === "web" ? "p-10 h-full" : ""}`}>
         {/* Search and Create Community Button */}
-        <View className="flex-row items-center mt-4">
+        <View className="flex-row flex-wrap items-center mt-4">
           <TextInput
             className="flex-1 p-3 bg-gray-100 rounded-full text-sm mr-2"
             placeholder="Search for a community..."

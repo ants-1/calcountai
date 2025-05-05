@@ -5,9 +5,13 @@ import { View, Text, TouchableOpacity, Platform } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 const ActivityTab = () => {
-  const { currentLog, removeLogActivity } = useLog();
   const { user } = useAuth();
   const userId = user?._id;
+  const { currentLog, removeLogActivity } = useLog();
+
+  if (!currentLog || !userId) {
+    return <Text>No log or user data available</Text>;
+  }
 
   const handleRemoveActivity = async (exerciseId: string) => {
     removeLogActivity(currentLog._id, exerciseId, userId);
@@ -18,11 +22,7 @@ const ActivityTab = () => {
   return (
     <View className="mt-5">
       {/* Activities Section */}
-      <View className="bg-gray-100 p-4 rounded-xl" style={
-        Platform.OS === "web"
-          ? { flex: 1, overflowY: "auto" }
-          : { flex: 1 }
-      }>
+      <View className="bg-gray-100 p-4 rounded-xl">
         <Text className="text-lg font-semibold text-gray-700 mb-2">Activities</Text>
 
         {exercises.length === 0 ? (

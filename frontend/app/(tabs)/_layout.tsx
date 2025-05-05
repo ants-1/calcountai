@@ -19,7 +19,7 @@ const icons = {
 const TabIcon: React.FC<TabIconProps> = ({ icon, color, name, focused }) => {
   return (
     <View
-      className={`flex items-center justify-center gap-2 w-20 ${Platform.OS === "web" ? "mt-4": "mt-6"}`}>
+      className={`flex items-center justify-center gap-2 w-20 ${Platform.OS === "web" ? "mt-12": "mt-6"}`}>
       <Image
         source={icon}
         resizeMode="contain"

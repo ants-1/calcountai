@@ -38,9 +38,13 @@ const Log: React.FC = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white px-4 pt-6">
+    <SafeAreaView className="flex-1 bg-white px-4 pt-6" style={
+            Platform.OS === "web"
+              ? { flex: 1, overflowY: "auto" }
+              : { flex: 1 }
+          } >
       {/* Header */}
-      <View className="flex flex-row justify-between items-center px-4 py-4">
+      <View className={`flex flex-row justify-between items-center px-4 ${Platform.OS == "web" ? 'pt-4' : 'py-4 '}`}>
         {/* Previous Log Button */}
         <TouchableOpacity
           disabled={!currentLog || dailyLogs[0]?._id === currentLog._id}
@@ -67,8 +71,8 @@ const Log: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <View className={`flex-1 w-full ${Platform.OS == "web" ? 'pb-10 px-10 md:px-20' : ''}`}>
-        <View className="mt-4 mb-4">
+      <View className={`flex-1 w-full h-full ${Platform.OS == "web" ? 'px-10 md:px-20 overflow-y-auto' : ''}` }>
+        <View className="mb-4">
           {dailyLogs?.length === 0 ? (
             <Text className="text-center mt-6 text-gray-500">No logs available. Creating one now...</Text>
           ) : currentLog ? (

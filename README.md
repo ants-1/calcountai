@@ -46,7 +46,7 @@ To run this project, you will need to add the following environment variables to
 1. Clone the project
 
 ```bash
-  git clone https://link-to-project
+  git clone https://github.com/ants-1/calcountai.git
 ```
 
 2. Go to the project directory
@@ -56,14 +56,6 @@ To run this project, you will need to add the following environment variables to
 ```
 
 3. Install dependencies
-
-Frontend (Expo App):
-
-```bash
-  cd frontend
-  npm install
-  npx expo start
-```
 
 Backend (Node.js Server)
 
@@ -79,4 +71,12 @@ Chatbot (Flask)
   cd chatbot
   pip install -r requirements.txt
   gunicorn app:app
+```
+
+Frontend (Expo App):
+
+```bash
+  cd frontend
+  npm install
+  npx expo start
 ```

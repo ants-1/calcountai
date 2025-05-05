@@ -62,7 +62,6 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
   const createNewDailyLog = async () => {
     try {
       const today = new Date().toISOString().split("T")[0];
-      console.log("new log created: ", today);
       const newLog = {
         date: today,
         foods: [],

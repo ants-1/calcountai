@@ -17,7 +17,7 @@ const MealCard = ({ item }: { item: FoodType }) => {
   const totalCarbs = (item.carbohydrates ?? 0) * servings;
 
   return (
-    <View className="flex-col gap-2 bg-gray-100 p-3 mt-2 rounded-lg">
+    <View className="flex-col gap-2 bg-gray-100 p-3 mb-2 rounded-lg">
       <View className='flex-row justify-between items-center'>
         <Text className="text-lg">
           {item.name.length > 29 ? item.name.slice(0, 29) + "..." : item.name}
