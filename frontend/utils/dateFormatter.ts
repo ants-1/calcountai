@@ -1,3 +1,4 @@
+// Helpder functions to format dates
 export const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
@@ -6,7 +7,6 @@ export const formatDate = (dateString: string) => {
 export const formatTimeAndDate = (dataString: string) => {
   const date = new Date(dataString);
 
-  // Get the date in the same format as `formatDate`
   const formattedDate = `${date.getDate()}/${
     date.getMonth() + 1
   }/${date.getFullYear()}`;

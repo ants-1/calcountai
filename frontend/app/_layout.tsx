@@ -1,5 +1,5 @@
 import { Stack, useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useAuth from "@/hooks/useAuth";
 
 import "../global.css";
@@ -12,15 +12,29 @@ import { UserProvider } from "@/context/UserContext";
 import { MealProvider } from "@/context/MealContext";
 import { ActivityProvider } from "@/context/ActivityContext";
 
+import { startChatbotPing } from "@/utils/chatbot";
+
 export default function RootLayout() {
   const { user } = useAuth();
   const router = useRouter();
+  const [iseMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      router.replace("/");
+    setIsMounted(true);
+    startChatbotPing();
+  }, []);
+
+  useEffect(() => {
+    if (iseMounted) {
+      if (!user) {
+        router.replace("/");
+      }
     }
-  }, [user]);
+  }, [iseMounted, user, router]);
+
+  if (!iseMounted) {
+    return null;
+  }
 
   return (
     <AuthContextProvider>
@@ -30,7 +44,7 @@ export default function RootLayout() {
             <MealProvider>
               <ActivityProvider>
                 <CommunityProvider>
-                  <Stack>
+                  <Stack >
                     <Stack.Screen name="index" options={{ headerShown: false }} />
                     <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                     <Stack.Screen name="(auth)" options={{ headerShown: false }} />

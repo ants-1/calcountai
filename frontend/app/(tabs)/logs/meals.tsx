@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Dimensions } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Dimensions, ScrollView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import Header from "@/components/Header";
@@ -33,11 +33,15 @@ const Meals: React.FC = () => {
 
   const MyFoodsScreen = () => {
     return (
-      <View>
+      <View style={
+        Platform.OS === "web"
+          ? { flex: 1, overflowY: "auto" }
+          : { flex: 1 }
+      } className="pb-2">
         {loading ? (
           <ActivityIndicator size="large" color="#4B5563" className="mt-6" />
         ) : (
-          MealsList(sortedMeals)
+          <MealsList meals={sortedMeals} />
         )}
       </View>
     );
@@ -45,7 +49,11 @@ const Meals: React.FC = () => {
 
   const SearchScreen = () => {
     return (
-      <View>
+      <View style={
+          Platform.OS === "web"
+            ? { flex: 1, overflowY: "auto" }
+            : { flex: 1 }
+        }>
         {searchLoading ? (
           <ActivityIndicator size="large" color="#4B5563" className="mt-6" />
         ) : searchText.trim().length <= 1 ? (
@@ -53,7 +61,8 @@ const Meals: React.FC = () => {
         ) : apiMeals.length === 0 ? (
           <Text className="text-gray-500 mt-6 text-center">No foods found for "{searchText}".</Text>
         ) : (
-          MealsList(apiMeals)
+          <MealsList meals={apiMeals} />
+
         )}
       </View>
     );
@@ -92,7 +101,8 @@ const Meals: React.FC = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
-      <Header title="Meals" icon="chevron-left" iconSize={25} titleSize="text-3xl" />
+      <Header title="Meals" icon="chevron-left" iconSize={25} titleSize="text-3xl" link="(tabs)/logs" />
+
 
       <View className="flex-row items-center space-x-2 mt-5 px-6">
         <TextInput

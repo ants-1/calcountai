@@ -146,7 +146,7 @@ const getStreaks = async (
   }
 };
 
-// @desc    Create new daily log
+/// @desc    Create new daily log
 // @route   POST /api/v1/users/:userId/dailyLogs
 const createDailyLog = async (
   req: Request,
@@ -167,6 +167,18 @@ const createDailyLog = async (
       return res.status(404).json({ error: "User not found" });
     }
 
+    const today = new Date().toISOString().split("T")[0];
+
+    const existingLog = await DailyLog.findOne({
+      _id: { $in: user.dailyLogs },
+      date: { $gte: new Date(today), $lt: new Date(new Date(today).getTime() + 86400000) }, // 24 hrs window
+    });
+    
+    if (existingLog) {
+      return res.status(400).json({ error: "Log for today already exists" });
+    }
+
+    // Create a new daily log
     const dailyLog = await DailyLog.create({
       foods,
       protein: 0,
@@ -185,6 +197,8 @@ const createDailyLog = async (
     next(err);
   }
 };
+
+
 
 // @desc    Edit daily log information and update total nutrients
 // @route   PUT /users/:userId/dailyLogs/:dailyLogId

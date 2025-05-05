@@ -1,7 +1,7 @@
 import useAuth from "@/hooks/useAuth";
 import useLog from "@/hooks/useLog";
 import { ExerciseType } from "@/types/ExerciseType";
-import { ScrollView, View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Platform } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 const ActivityTab = () => {
@@ -16,9 +16,13 @@ const ActivityTab = () => {
   const exercises = currentLog?.exercises || [];
 
   return (
-    <ScrollView className="mt-5">
+    <View className="mt-5">
       {/* Activities Section */}
-      <View className="bg-gray-100 p-4 rounded-xl">
+      <View className="bg-gray-100 p-4 rounded-xl" style={
+        Platform.OS === "web"
+          ? { flex: 1, overflowY: "auto" }
+          : { flex: 1 }
+      }>
         <Text className="text-lg font-semibold text-gray-700 mb-2">Activities</Text>
 
         {exercises.length === 0 ? (
@@ -40,7 +44,7 @@ const ActivityTab = () => {
           })
         )}
       </View>
-    </ScrollView>
+    </View>
   );
 };
 

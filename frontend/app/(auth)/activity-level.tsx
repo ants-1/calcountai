@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 const ActivityLevel: React.FC = () => {
   const router = useRouter();
   const { userData, updateUserGoalData } = useUserData();
-  const [selectedLevel, setSelectedLevel] = useState<string>(userData?.activityLevel || "");
+  const [selectedLevel, setSelectedLevel] = useState<string>(userData.activityLevel || "");
 
   const levels = [
     "Sedentary: little or no exercise",
@@ -29,7 +29,6 @@ const ActivityLevel: React.FC = () => {
         activityLevel: selectedLevel, 
       };
       updateUserGoalData(updatedUser);
-      console.log(updatedUser);
       router.push('/dob');
     }
   };
@@ -42,7 +41,7 @@ const ActivityLevel: React.FC = () => {
           <Icon name="chevron-left" size={25} color="#4B5563" />
         </TouchableOpacity>
         <Text className="text-3xl font-bold text-center">Activity Level</Text>
-        <View style={{ width: 25 }} /> {/* Empty spacer */}
+        <View></View>
       </View>
 
       {/* Progress Indicator */}

@@ -7,13 +7,12 @@ export const isValidHeight = (height: string, unit: "ft" | "cm"): boolean => {
       return false;
     }
   
-    // Validation for unit-specific ranges if required
     if (unit === "ft" && (heightValue < 1 || heightValue > 8)) {
-      return false; // Valid height range for feet (1-8 ft)
+      return false; 
     }
   
     if (unit === "cm" && (heightValue < 30 || heightValue > 250)) {
-      return false; // Valid height range for cm (30-250 cm)
+      return false;
     }
   
     return true;

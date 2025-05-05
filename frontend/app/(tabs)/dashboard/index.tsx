@@ -21,8 +21,8 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
 
-  const { weightHistory, calories, streak, currentWeight, targetWeight, goal, fetchWeightGoalData, fetchStreak, userData } = useUserData();
-  const { currentLog, fetchDailyLogs } = useLog();
+  const { weightHistory, calories, streak, currentWeight, targetWeight, goal, fetchWeightGoalData, fetchStreak } = useUserData();
+  const { currentLog, fetchDailyLogs, createNewDailyLog } = useLog();
   const { fetchChallenges, fetchUserChallenges, userChallenges } = useChallenge();
 
   const dailyGoal = calories || 2000;
@@ -42,19 +42,23 @@ const Dashboard: React.FC = () => {
     }
   }, [currentWeight, targetWeight, weightHistory]);
 
-
   useFocusEffect(
     React.useCallback(() => {
       if (userId) {
         setLoading(true);
-        fetchDailyLogs().finally(() => setLoading(false));
-        fetchWeightGoalData(userId).finally(() => setLoading(false));
-        fetchUserChallenges(userId);
-        fetchStreak(userId);
-        fetchChallenges();
+        Promise.all([
+          createNewDailyLog(),
+          fetchDailyLogs(),
+          fetchWeightGoalData(userId),
+          fetchUserChallenges(userId),
+          fetchStreak(userId),
+          fetchChallenges(),
+        ]).finally(() => setLoading(false));
       }
     }, [userId])
   );
+  
+  
 
   const getProgressMessage = () => {
     if (remainingCalories > 0) {
@@ -181,7 +185,7 @@ const Dashboard: React.FC = () => {
           ) : currentLog?.foods?.length > 0 ? (
             currentLog.foods.slice(0, 3).map((meal: any, index: number) => (
               <View key={index} className="flex-row justify-between items-center mt-4">
-                <Text className="text-sm text-gray-600">{meal.name}</Text>
+                <Text className="text-sm text-gray-600">{meal.name.length > 35 ? meal.name.slice(0, 35) + "..." : meal.name}</Text>
                 <Text className="text-sm text-gray-500">{meal.calories} kcal</Text>
               </View>
             ))
@@ -202,9 +206,9 @@ const Dashboard: React.FC = () => {
           {loading ? (
             <ActivityIndicator size="small" color="#4B5563" />
           ) : currentLog?.exercises?.length > 0 ? (
-            currentLog.exercises.slice(0, 3).map((exercise: any, index: number) => (
+            currentLog?.exercises?.slice(0, 3).map((exercise: any, index: number) => (
               <View key={index} className="flex-row justify-between items-center mt-4">
-                <Text className="text-sm text-gray-600">{exercise.name}</Text>
+                <Text className="text-sm text-gray-600">{exercise.name.length > 35 ? exercise.name.slice(0, 35) + "..." : exercise.name}</Text>
                 <Text className="text-sm text-gray-500">{exercise.caloriesBurned} kcal</Text>
               </View>
             ))

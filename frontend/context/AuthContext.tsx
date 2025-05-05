@@ -100,7 +100,6 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
       } catch (error) {
         setUser(null);
         setIsAuth(false);
-        console.log(error);
       }
     };
 
@@ -176,7 +175,6 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children }) =
         router.push("/(auth)/goal-info");
       }
     } catch (error: any) {
-      console.error("Sign-up error:", error);
       if (Platform.OS === "web") {
         alert("Error \n" + error.message || "Failed to sign up. Please try again.");
       } else {

@@ -1,3 +1,4 @@
+// Helper function to convert weights
 export const convertStoneToKg = (stones: number) => {
     return (stones * 6.35).toFixed(2);
   };

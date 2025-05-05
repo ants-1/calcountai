@@ -18,7 +18,6 @@ const PersonalInfo: React.FC = () => {
     };
 
     updateUserGoalData(updatedUser);
-    console.log(userData);
   };
 
   return (

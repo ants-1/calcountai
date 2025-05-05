@@ -34,7 +34,6 @@ const CurrentWeight: React.FC = () => {
     }
 
     updateUserGoalData({ ...userData, currentWeight: finalWeight });
-    console.log(userData);
     router.push("/(auth)/target-weight");
   };
 

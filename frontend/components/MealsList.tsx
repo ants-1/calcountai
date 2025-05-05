@@ -1,12 +1,16 @@
-import { View, Text, FlatList } from 'react-native'
-import React from 'react'
-import MealCard from './MealCard'
+import { View, Text, FlatList } from 'react-native';
+import React from 'react';
+import MealCard from './MealCard';
 
-const MealsList: React.FC = (sortedMeals: any) => {
+interface MealsListProps {
+  meals: any[];
+}
+
+const MealsList: React.FC<MealsListProps> = ({ meals }) => {
   return (
     <FlatList
       className="mt-4 px-6"
-      data={sortedMeals}
+      data={meals}
       keyExtractor={(item) => item._id}
       renderItem={({ item }) => (
         <MealCard item={item} />
@@ -17,7 +21,7 @@ const MealsList: React.FC = (sortedMeals: any) => {
         </View>
       }
     />
-  )
-}
+  );
+};
 
-export default MealsList
+export default MealsList;

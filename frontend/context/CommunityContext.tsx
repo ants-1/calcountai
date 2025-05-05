@@ -64,10 +64,7 @@ export const CommunityProvider: React.FC<CommunityProviderProps> = ({ children }
       if (!data.community) throw new Error("API did not return valid community data");
 
       setCommunity(data.community);
-      console.log(data);
     } catch (error: any) {
-      console.error("Error fetching community:", error);
-
       if (Platform.OS === "web") {
         alert("Error: \nCommunity not found or there was an issue loading the data.");
       } else {
@@ -116,8 +113,6 @@ export const CommunityProvider: React.FC<CommunityProviderProps> = ({ children }
 
       router.replace(`/community/${id}`);
     } catch (error: any) {
-      console.error("Error joining community:", error);
-
       if (Platform.OS === "web") {
         alert("Error: \nThere was an issue joining the community.")
       } else {
@@ -152,8 +147,6 @@ export const CommunityProvider: React.FC<CommunityProviderProps> = ({ children }
 
       router.back();
     } catch (error: any) {
-      console.error("Error creating community:", error);
-
       if (Platform.OS == "web") {
         alert("Error: There was an issue creating the community.");
       } else {
@@ -203,8 +196,6 @@ export const CommunityProvider: React.FC<CommunityProviderProps> = ({ children }
 
       router.replace(`/community/${id}`);
     } catch (error: any) {
-      console.error("Error leaving community:", error);
-
       if (Platform.OS === "web") {
         alert("There was an issue leaving the community.");
       } else {
@@ -250,8 +241,6 @@ export const CommunityProvider: React.FC<CommunityProviderProps> = ({ children }
 
       router.push("/(tabs)/community");
     } catch (error: any) {
-      console.error("Error deleting community:", error);
-
       if (Platform.OS === "web") {
         alert("There was an issue deleting the community.");
       } else {

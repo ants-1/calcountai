@@ -2,11 +2,13 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import Challenge from "../models/challenge";
 
-dotenv.config();
+dotenv.config({ path: __dirname + "/../../.env" });
 
+// Create dummy data
 async function createSeed() {
   try {
     await mongoose.connect(process.env.DB_URL || "");
+  
     console.log("Connected to DB");
 
     await seedChallenges();
@@ -24,39 +26,39 @@ async function seedChallenges() {
     await Challenge.deleteMany({});
 
     await Challenge.create([
-      {
-        name: "Streak 1",
-        level: 1,
-        description: "Complete by getting a 1-day login streak",
-        challengeType: "Streak",
-      },
-      {
-        name: "Streak 5",
-        level: 5,
-        description: "Complete by getting a 5-day login streak",
-        challengeType: "Streak",
-      },
-      {
-        name: "Streak 10",
-        level: 10,
-        description: "Complete by getting a 10-day login streak",
-        challengeType: "Streak",
-      },
-      {
-        name: "Streak 20",
-        level: 20,
-        description: "Complete by getting a 20-day login streak",
-        challengeType: "Streak",
-      },
-      {
-        name: "Streak 50",
-        level: 50,
-        description: "Complete by getting a 50-day login streak",
-        challengeType: "Streak",
-      },
+      // {
+      //   name: "Streak 1",
+      //   level: 1,
+      //   description: "Complete by getting a 1-day login streak",
+      //   challengeType: "Streak",
+      // },
+      // {
+      //   name: "Streak 5",
+      //   level: 5,
+      //   description: "Complete by getting a 5-day login streak",
+      //   challengeType: "Streak",
+      // },
+      // {
+      //   name: "Streak 10",
+      //   level: 10,
+      //   description: "Complete by getting a 10-day login streak",
+      //   challengeType: "Streak",
+      // },
+      // {
+      //   name: "Streak 20",
+      //   level: 20,
+      //   description: "Complete by getting a 20-day login streak",
+      //   challengeType: "Streak",
+      // },
+      // {
+      //   name: "Streak 50",
+      //   level: 50,
+      //   description: "Complete by getting a 50-day login streak",
+      //   challengeType: "Streak",
+      // },
       {
         name: "Log 1 Meal",
-        level: 5,
+        level: 1,
         description: "Complete by logging 1 meal",
         challengeType: "Meal",
       },
@@ -86,7 +88,7 @@ async function seedChallenges() {
       },
       {
         name: "Log 1 Activity",
-        level: 5,
+        level: 1,
         description: "Complete by logging 1 activity",
         challengeType: "Activity",
       },
@@ -121,5 +123,9 @@ async function seedChallenges() {
     console.error("Error seeding challenges", err);
   }
 }
+
+async function foodSeed() {}
+
+async function communitySeed() {}
 
 createSeed();

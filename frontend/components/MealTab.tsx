@@ -34,7 +34,7 @@ const MealTab = () => {
             ) : (
               filteredFoods.map((food: FoodType) => (
                 <View key={food._id} className="flex-row justify-between items-center my-2">
-                  <Text className="text-sm text-gray-600">{food.name}</Text>
+                  <Text className="text-sm text-gray-600">{food.name.length > 35 ? food.name.slice(0, 35) + "..." : food.name}</Text>
                   <View className="flex flex-row">
                     <Text className="text-sm text-gray-500 mr-2">{food.calories} kcal</Text>
                     <TouchableOpacity onPress={() => handleRemoveMeal(food._id)}>

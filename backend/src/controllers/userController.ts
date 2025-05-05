@@ -91,7 +91,7 @@ const updateUserGoalInfo = async (
       targetWeight,
       height,
       activityLevel,
-      dateOfBirth, // This should be a string in the format YYYY-MM-DD
+      dateOfBirth,
     } = req.body;
 
     const user = await User.findById(id);

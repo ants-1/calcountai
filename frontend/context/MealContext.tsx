@@ -127,8 +127,6 @@ export const MealProvider: React.FC<MealProviderProps> = ({ children }) => {
         challengeCheck(user?._id, "Meal", null);
         router.push("/logs");
       } else {
-        const errorLogData = await logResponse.json();
-        console.error("Failed to add meal to log:", errorLogData);
         if (Platform.OS === "web") {
           alert("Error: \nFailed to add meal to log.");
         } else {

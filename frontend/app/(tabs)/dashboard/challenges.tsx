@@ -1,4 +1,4 @@
-import { View, Dimensions, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Dimensions, ActivityIndicator, ScrollView, Platform } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '@/components/Header';
@@ -8,15 +8,23 @@ import useChallenge from '@/hooks/useChallenge';
 import useAuth from '@/hooks/useAuth';
 
 const AllChallengesTab = ({ challenges = [], loading }: { challenges: any[]; loading: boolean }) => (
-  <ScrollView>
+  <View style={
+    Platform.OS === "web"
+      ? { flex: 1, overflowY: "auto" }
+      : { flex: 1 }
+  }>
     {loading ? <ActivityIndicator size="large" className='mt-20' color="#3B82F6" /> : <ChallengeList challenges={challenges || []} />}
-  </ScrollView>
+  </View>
 );
 
 const OwnChallengesTab = ({ challenges = [], loading }: { challenges: any[]; loading: boolean }) => (
-  <ScrollView>
+  <View style={
+    Platform.OS === "web"
+      ? { flex: 1, overflowY: "auto" }
+      : { flex: 1 }
+  }>
     {loading ? <ActivityIndicator size="large" className='mt-20' color="#3B82F6" /> : <ChallengeList challenges={challenges || []} />}
-  </ScrollView>
+  </View>
 );
 
 const Challenges: React.FC = () => {

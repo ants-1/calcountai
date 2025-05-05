@@ -1,8 +1,12 @@
-import { ScrollView, View, Text } from "react-native";
+import { View, Text, Platform } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 const PeopleTab = ({ members, creatorId }: { members: any[]; creatorId: string }) => (
-  <ScrollView className="p-4">
+  <View className="p-4" style={
+    Platform.OS === "web"
+      ? { flex: 1, overflowY: "auto" }
+      : { flex: 1 }
+  }>
     {members.length > 0 ? (
       members.map((member) => (
         <View key={member._id} className="flex flex-row justify-between items-center w-full mb-4 bg-gray-100 p-4 rounded-lg">
@@ -18,7 +22,7 @@ const PeopleTab = ({ members, creatorId }: { members: any[]; creatorId: string }
     ) : (
       <Text className="text-lg text-gray-700">No members available yet.</Text>
     )}
-  </ScrollView>
+  </View>
 );
 
 export default PeopleTab;

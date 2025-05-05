@@ -13,7 +13,7 @@ interface ChallengeContextType {
   leaveChallenge: (userId: string | undefined, challengeId: string) => Promise<void>;
   updateChallenge: (userId: string | undefined, challengeId: string, progress: number) => Promise<void>;
   challengeCheck: (userId: string | undefined, selectedChallengeType: string, challengeData: string | null) => void;
-  shareChallenge: (userId: string, communityId: string, challengeId: string) => Promise<void>;
+  shareChallenge: (userId: string | undefined, communityId: string, challengeId: string) => Promise<void>;
 }
 
 interface ChallengeProviderProps {
@@ -91,8 +91,6 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
     }
   };
 
-
-  // Fix fetch challenges
   const joinChallenge = async (userId: string | undefined, challengeId: string) => {
     try {
       const response = await fetch(`${BACKEND_API_URL}/users/${userId}/challenges/${challengeId}/join`, {
@@ -104,7 +102,6 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
       Alert.alert('Success', 'You have joined the challenge.');
 
       router.push("/(tabs)/dashboard");
-      fetchChallenges();
     } catch (error: any) {
       console.error(error.message);
     }
@@ -121,7 +118,6 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
       Alert.alert('Success', 'You have left the challenge.');
 
       router.push("/(tabs)/dashboard");
-      fetchChallenges();
     } catch (error: any) {
       console.error(error.message);
     }
@@ -143,12 +139,7 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
     }
   };
 
-  /*
-    BUG: Updating challengeType Streak
-      Only updates one streak and doesn't update new streak challenges added
-      - Due to fetchStreaks in UserContext only being used in index
-      - Completed need to be added to particepents 
-  */
+
   const challengeCheck = async (
     userId: string | undefined,
     selectedChallengeType: string,
@@ -157,12 +148,10 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
     // Ensure userChallenges is available and an array
     if (!userChallenges || !Array.isArray(userChallenges)) return;
 
-    // Update promises for concurrent updates
     const updatePromises: Promise<void>[] = [];
 
     // Loop through each challenge to check for matching type
     userChallenges.forEach((challenge: any) => {
-      // Skip if the challenge type doesn't match the selected challenge type
       if (challenge.challengeType !== selectedChallengeType) return;
 
       // Find the participant for the challenge
@@ -170,7 +159,6 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
         (p: any) => p.user === userId
       );
 
-      // If the participant doesn't exist, skip this challenge
       if (!participant) return;
 
       let newProgress: number;
@@ -178,33 +166,29 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
       // Calculate the new progress based on the challenge type
       switch (challenge.challengeType) {
         case "Streak":
-          // For Streaks, use the passed challengeData (e.g., streak number)
           newProgress = Number(challengeData);
           break;
         case "Meal":
         case "Activity":
-          // For meals and activities, increment the participant's progress
           newProgress = (participant?.progress || 0) + 1;
           break;
         default:
           return;
       }
 
-      // Cap the progress at the challenge level (do not exceed the max level)
+      // Caps the progress at the challeng level 
       if (newProgress > challenge.level) newProgress = challenge.level;
 
-      // If the participant has already completed the challenge, no need to update
       if (participant.progress >= challenge.level) return;
 
       // Add the update to the promises array
       updatePromises.push(updateChallenge(userId, challenge._id, newProgress));
     });
 
-    // Wait for all update promises to resolve
     await Promise.all(updatePromises);
   };
 
-  const shareChallenge = async (userId: string, communityId: string, challengeId: string) => {
+  const shareChallenge = async (userId: string | undefined, communityId: string, challengeId: string) => {
     try {
       const response = await fetch(`${BACKEND_API_URL}/communities/${communityId}/feeds`, {
         method: "POST",

@@ -108,7 +108,7 @@ const Community: React.FC = () => {
         {loading ? (
           <ActivityIndicator size="large" color="#3B82F6" className="mt-6 z-0" />
         ) : communities.length === 0 ? (
-          <Text className="text-center text-gray-500 mt-5 z-0">No communities found.</Text>
+          <Text className="text-center text-gray-500 mt-5 z-0" style={{ zIndex: -99 }}>No communities found.</Text>
         ) : (
           <FlatList
             className={`mt-4 z-0 ${Platform.OS === "web" ? "pb-6" : ""}`}

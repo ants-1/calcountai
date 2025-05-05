@@ -118,8 +118,6 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
       const exerciseId = exerciseData.newExercise?._id;
 
       if (!exerciseId) {
-        console.error("Invalid exercise ID:", exerciseData);
-
         if (Platform.OS === "web") {
           alert("Error: \nFailed to create valid exercise.");
         } else {
@@ -174,7 +172,6 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
         }
       }
     } catch (error) {
-      console.error("Error adding exercise:", error);
       if (Platform.OS === "web") {
         alert("Error: \nAn error occurred while adding the exercise.");
       } else {

@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Platform, Alert } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "@/components/Header";
@@ -8,6 +8,19 @@ const CreateCommunity = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const { createCommunity } = useCommunity();
+
+  const handleCreate = () => {
+    if (!name || !description) {
+      if (Platform.OS === "web") {
+        alert("Validation Error: \nPlease enter both name and description.");
+      } else {
+        Alert.alert("Validation Error", "Please enter both name and description.");
+      }
+      return;
+    }
+
+    createCommunity(name, description);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
@@ -34,7 +47,7 @@ const CreateCommunity = () => {
         />
         <TouchableOpacity
           className="bg-blue-500 p-4 rounded-full w-full mt-6"
-          onPress={() => createCommunity(name, description)}
+          onPress={() => handleCreate()}
         >
           <Text className="text-white text-center">Create</Text>
         </TouchableOpacity>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, ScrollView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import Header from "@/components/Header";
@@ -43,8 +43,9 @@ const ActivityTrackerScreen: React.FC = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
-      <Header title="Activities" icon="chevron-left" iconSize={25} titleSize="text-3xl" />
+      <Header title="Activities" icon="chevron-left" iconSize={25} titleSize="text-3xl" link="(tabs)/logs" />
 
+      {/* Search bar */}
       <View className="flex-row items-center space-x-2 px-6 mt-5">
         <TextInput
           className="flex-1 bg-gray-100 p-3 mr-3 rounded-full"
@@ -98,12 +99,17 @@ const ActivityTrackerScreen: React.FC = () => {
       <View style={{ zIndex: -99 }} className="flex-row justify-around mt-6 border-b border-gray-300 pb-2 mx-6">
         <Text className="font-semibold px-6">History</Text>
       </View>
-
-      {loading ? (
-        <ActivityIndicator size="large" color="#4B5563" className="mt-6" />
-      ) : (
-        <ActivityList activities={getSortedActivities()} />
-      )}
+      <View style={
+        Platform.OS === "web"
+          ? { flex: 1, overflowY: "auto" }
+          : { flex: 1 }
+      }>
+        {loading ? (
+          <ActivityIndicator size="large" color="#4B5563" className="mt-6" />
+        ) : (
+          <ActivityList activities={getSortedActivities()} />
+        )}
+      </View>
     </SafeAreaView>
   );
 };

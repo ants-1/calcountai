@@ -56,14 +56,14 @@ const SignUp: React.FC = () => {
       return false;
     }
 
-    // Check for at least one uppercase letter and one symbol
+    // Check for at least one uppercase letter or one symbol
     const passwordRegex = /^(?=(.*[A-Z]))(?=(.*[!@#$%^&*(),.?":{}|<>]))[A-Za-z\d!@#$%^&*(),.?":{}|<>]*$/;
 
     if (!passwordRegex.test(form.password)) {
       if (Platform.OS === "web") {
-        alert("Validation Error: \nPassword must include at least one uppercase letter and one symbol.");
+        alert("Validation Error: \nPassword must include at least one uppercase letter or one symbol.");
       } else {
-        Alert.alert("Validation Error", "Password must include at least one uppercase letter and one symbol.");
+        Alert.alert("Validation Error", "Password must include at least one uppercase letter or one symbol.");
       }
       return false;
     }

@@ -15,6 +15,8 @@ CalCountAI is an AI calorie tracking application designed to help users log meal
 
 - Secure Authentication – JWT-based authentication for secure access.
 
+- Challenges - Join, share, leave challenges to create healthier habits.
+
 - Cross-Platform Compatibility – Built with React Native (Expo) for a seamless experience on iOS, Android, and mobile web.
 ## Tech Stack
 

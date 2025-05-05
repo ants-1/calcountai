@@ -29,7 +29,6 @@ const Height: React.FC = () => {
     const finalHeight = unit === "cm" ? parseFloat(height) : convertFeetToCm(parseFloat(height));
 
     updateUserGoalData({ ...userData, height: finalHeight });
-    console.log(userData);
     router.push("/activity-level");
   };
 

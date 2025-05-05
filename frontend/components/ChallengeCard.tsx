@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Platform, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import useChallenge from '@/hooks/useChallenge';
 import useAuth from '@/hooks/useAuth';
-import CommunityModal from './CommunityModal'; 
+import CommunityModal from './CommunityModal';
 import { ChallengeType } from '@/types/ChallengeType';
 import useCommunity from '@/hooks/useCommunity';
 
@@ -21,10 +21,10 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge }) => {
   const isParticipant = participants.some((p) => p.user === userId);
   const userProgress = participants.find((p) => p.user === userId)?.progress ?? 0;
   const level = Number(challenge.level);
-  const progressPercentage = level > 0 ? Math.min((userProgress / level) * 100, 100) : 0;
+  const progressPercentage = Math.min((userProgress / level) * 100, 100);
 
   const [menuVisible, setMenuVisible] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
+  const [modalVisible, setModalVisible] = useState(false);
 
   const menuRef = useRef<View | null>(null);
 
@@ -52,18 +52,17 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge }) => {
     }
   }, [menuVisible]);
 
-  // BUG: pop does not gray out screen 
   const handleOptionPress = (action: 'join' | 'leave' | 'share') => {
     setMenuVisible(false);
     if (action === 'join') joinChallenge(userId, challenge._id);
     if (action === 'leave') leaveChallenge(userId, challenge._id);
-    if (action === 'share') setModalVisible(true); // Ensure this is called for share action
+    if (action === 'share') setModalVisible(true);
   };
 
   // Handle community selection
   const handleCommunitySelect = async (communityId: string) => {
-      await shareChallenge(userId, communityId, challenge._id);
-      setModalVisible(false);
+    await shareChallenge(userId, communityId, challenge._id);
+    setModalVisible(false);
   };
 
   return (
@@ -80,7 +79,7 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge }) => {
       <View className="w-full bg-gray-300 h-2 mt-2 mb-2 rounded-xl">
         <View
           className="bg-green-500 h-2 rounded-xl"
-          style={{ width: `${progressPercentage}%` }}
+          style={{ width: `${progressPercentage}%`, backgroundColor: '#34D399' }}
         />
       </View>
 

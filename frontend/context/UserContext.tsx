@@ -56,7 +56,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const updatedUser = { ...userData, dateOfBirth };
     
     try {
-      console.log("Pass", updatedUser);
       const response = await fetch(`${BACKEND_API_URL}/users/${user?._id}/goal-info`, {
         method: "PUT",
         headers: {
@@ -124,7 +123,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       setUsername(data.updatedUser.username);
       setEmail(data.updatedUser.email);
     } catch (error) {
-      console.error("Error updating profile:", error);
       if (Platform.OS === "web") {
         alert("Failed to update profile. Please try again.");
       } else {

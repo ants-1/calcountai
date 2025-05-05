@@ -4,7 +4,7 @@ export const isValidDate = (day: string, month: string, year: string) => {
   const monthNum = parseInt(month);
   const yearNum = parseInt(year);
 
-  // Check for valid day, month, and year
+  // Check for valid day, month and year
   if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum)) {
     return false;
   }
@@ -20,7 +20,7 @@ export const isValidDate = (day: string, month: string, year: string) => {
     return false;
   }
 
-  // Check for realistic age (e.g., not too old or future date)
+  // Check for realistic age
   const currentYear = new Date().getFullYear();
   if (yearNum > currentYear || yearNum < currentYear - 120) {
     return false;

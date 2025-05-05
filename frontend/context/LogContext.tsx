@@ -37,8 +37,9 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
 
       const response = await fetch(`${BACKEND_API_URL}/users/${user._id}/dailyLogs`);
 
-      // Replace with alerts
-      // if (!response.ok) throw new Error("Failed to fetch logs");
+      if (!response.ok) {
+        return;
+      }
 
       const data = await response.json();
       const logs = data.dailyLogs || [];
@@ -53,7 +54,7 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
 
       setCurrentLog(todayLog);
     } catch (error) {
-      console.error("Error fetching logs:", error);
+      Alert.alert("Error", "Unable to fetch log.");
     }
   };
 
@@ -61,7 +62,7 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
   const createNewDailyLog = async () => {
     try {
       const today = new Date().toISOString().split("T")[0];
-
+      console.log("new log created: ", today);
       const newLog = {
         date: today,
         foods: [],
@@ -77,6 +78,10 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newLog),
       });
+
+      if(response.status === 400) {
+        return;
+      }
 
       if (!response.ok) {
         const errMsg = await response.text();

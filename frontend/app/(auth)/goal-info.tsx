@@ -29,7 +29,6 @@ const GoalInfo: React.FC = () => {
         goal: selectedGoals,
       };
       updateUserGoalData(updatedUser);
-      console.log(userData);
       router.push('/personal-info');
     }
   };
