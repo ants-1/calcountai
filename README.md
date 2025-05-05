@@ -29,7 +29,7 @@ CalCountAI is an AI calorie tracking application designed to help users log meal
 
 To run this project, you will need to add the following environment variables to your .env file
 
-`DB_URL`
+MongoDB URL (Required): `DB_URL`
 
 `TOKEN_SECRET_KEY`
 
@@ -39,7 +39,7 @@ To run this project, you will need to add the following environment variables to
 
 `PORT`
 
-`GEMINI_API_KEY`
+Google Gemini API (Required): `GEMINI_API_KEY`
 
 ## Run Locally
 
